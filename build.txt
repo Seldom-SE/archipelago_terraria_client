@@ -1,0 +1,3 @@
+displayName = Archipelago Randomizer (Seldom's version)
+author = Seldom
+version = 0.1
