@@ -14,10 +14,10 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
 
 ## Future Work
 
-[ ] Client-side randomization
-[ ] Server-side implementation
-[ ] Client responses to server
-[ ] Archipelago features
+- [ ] Client-side randomization
+- [ ] Server-side implementation
+- [ ] Client responses to server
+- [ ] Archipelago features
 
 ## Usage
 
