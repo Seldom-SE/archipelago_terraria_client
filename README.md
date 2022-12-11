@@ -14,7 +14,8 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
 
 ## Future Work
 
-- [ ] Client-side randomization
+- [ ] Remove effects from original bosses
+- [ ] Re-add effects conditionally
 - [ ] Server-side implementation
 - [ ] Client responses to server
 - [ ] Archipelago features

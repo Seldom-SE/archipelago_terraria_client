@@ -1,4 +1,4 @@
-displayName = Archipelago Randomizer (Seldom's version)
+displayName = Archipelago Randomizer (Seldom's implementation)
 author = Seldom
 version = 0.1
 homepage = https://archipelago.gg/
