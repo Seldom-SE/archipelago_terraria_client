@@ -14,71 +14,59 @@ namespace SeldomArchipelago
 
         public override void Load()
         {
-            // Take control of town NPC spawning
+            // Town NPC spawning
             IL.Terraria.Main.UpdateTime_SpawnTownNPCs += il =>
             {
                 var cursor = new ILCursor(il);
 
                 // Witch Doctor spawning
-                if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee)))))
-                {
-                    Logger.Error("Failed to find Witch Doctor spawning logic");
-                    return;
-                }
-
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
 
                 // Witch Doctor prioritization
-                if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee)))))
-                {
-                    Logger.Error("Failed to find Witch Doctor prioritization logic");
-                    return;
-                }
-
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
             };
 
-            // Take control of NPC spawning
+            // NPC spawning
             IL.Terraria.NPC.SpawnNPC += il =>
             {
                 var cursor = new ILCursor(il);
 
                 // Dungeon enemy spawning IL_0E34
-                if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3)))))
-                {
-                    Logger.Error("Failed to find Dungeon enemy spawning logic");
-                    return;
-                }
-
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3))));
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DungeonSafe)));
 
                 // Unconscious Man spawning Terraria/NPC.cs:71052, Terraria.GameContent.Events/DD2Event.cs:58, IL_30DD
-                if (!cursor.TryGotoNext(instruction => instruction.MatchCall(typeof(DD2Event).GetProperty(nameof(DD2Event.ReadyToFindBartender)).GetGetMethod())))
-                {
-                    Logger.Error("Failed to find Unconscious Man spawning logic");
-                    return;
-                }
-
+                cursor.GotoNext(instruction => instruction.MatchCall(typeof(DD2Event).GetProperty(nameof(DD2Event.ReadyToFindBartender)).GetGetMethod()));
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(UnconsciousManMaySpawn)));
 
                 // Dungeon Guardian spawning IL_60F3
-                if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3)))))
-                {
-                    Logger.Error("Failed to find Dungeon Guardian spawning logic");
-                    return;
-                }
-
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3))));
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DungeonSafe)));
+            };
+
+            // NPC defeat events
+            IL.Terraria.NPC.DoDeathEvents += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                // Hardmode start Terraria/NPC.cs:69103, IL_093B
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.GotoPrev(instruction => instruction.MatchBeq(out ILLabel _));
+                var label = (ILLabel)cursor.Next.Operand;
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Emit(OpCodes.Br, label);
             };
         }
     }
