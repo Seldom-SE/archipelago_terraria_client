@@ -2,6 +2,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Terraria;
 using Terraria.GameContent.Events;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace SeldomArchipelago
@@ -12,6 +13,8 @@ namespace SeldomArchipelago
         public static bool UnconsciousManMaySpawn;
         public static bool WitchDoctorMaySpawn;
         public static bool DungeonSafe;
+        public static bool WizardMaySpawn;
+        public static bool TruffleMaySpawn;
 
         public override void Load()
         {
@@ -38,6 +41,12 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(BoundGoblinMaySpawn)));
 
+                // Bound Wizard spawning IL_4674
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WizardMaySpawn)));
+
                 // Dungeon Guardian spawning IL_60F3
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3))));
                 cursor.Index++;
@@ -50,13 +59,26 @@ namespace SeldomArchipelago
             {
                 var cursor = new ILCursor(il);
 
-                // Witch Doctor spawning
+                // Witch Doctor spawning IL_0944
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
 
-                // Witch Doctor prioritization
+                // Truffle spawning IL_0979
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(TruffleMaySpawn)));
+
+                // Truffle prioritization IL_0BF8
+                cursor.GotoNext(instruction => instruction.MatchLdcI4(NPCID.Truffle));
+                cursor.GotoPrev(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(TruffleMaySpawn)));
+
+                // Witch Doctor prioritization IL_0C3C
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);

@@ -22,8 +22,8 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Hardmode
     - [X] Underground Evil
     - [X] Hallow
-    - [ ] Wizard
-    - [ ] Truffle
+    - [X] Wizard
+    - [X] Truffle
     - [ ] Hardmode Fishing
     - [X] Chlorophyte Ore
     - [ ] Truffle Worm
@@ -50,8 +50,8 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [ ] Hardmode
     - [ ] Underground Evil
     - [ ] Hallow
-    - [ ] Wizard
-    - [ ] Truffle
+    - [X] Wizard
+    - [X] Truffle
     - [ ] Hardmode Fishing
     - [ ] Chlorophyte Ore
     - [ ] Truffle Worm
