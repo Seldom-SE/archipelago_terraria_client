@@ -1,14 +1,15 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Terraria;
+using Terraria.GameContent.Events;
 using Terraria.ModLoader;
 
 namespace SeldomArchipelago
 {
     public class SeldomArchipelago : Mod
     {
-        public static bool DryadMaySpawn = true;
-        public static int OldOnesArmyTier = 0;
+        public static bool DryadMaySpawn = false;
+        public static bool UnconsciousManMaySpawn = false;
 
         public override void Load()
         {
@@ -19,7 +20,7 @@ namespace SeldomArchipelago
                 var cursor = new ILCursor(il);
                 if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss1)))))
                 {
-                    Logger.Error("Failed to locate Dryad spawning logic");
+                    Logger.Error("Failed to find Dryad spawning logic");
                     return;
                 }
 
@@ -29,20 +30,36 @@ namespace SeldomArchipelago
                 cursor.RemoveRange(4);
                 // Replace whether boss 1 was killed with a controlled value
                 cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(SeldomArchipelago.DryadMaySpawn)));
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DryadMaySpawn)));
                 // After this, it decides whether to spawn Dryad based on the value in stack
 
                 // Repeat for Dryad prioritization logic
                 if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss1)))))
                 {
-                    Logger.Error("Failed to locate Dryad prioritization logic");
+                    Logger.Error("Failed to find Dryad prioritization logic");
                     return;
                 }
 
                 cursor.Index++;
                 cursor.RemoveRange(4);
                 cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(SeldomArchipelago.DryadMaySpawn)));
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DryadMaySpawn)));
+            };
+
+            // Take control of Unconscious Man spawning
+            // Unconscious Man spawn logic Terraria/NPC.cs:71052 and Terraria.GameContent.Events/DD2Event.cs:58
+            IL.Terraria.NPC.SpawnNPC += il =>
+            {
+                var cursor = new ILCursor(il);
+                if (!cursor.TryGotoNext(instruction => instruction.MatchCall(typeof(DD2Event).GetProperty(nameof(DD2Event.ReadyToFindBartender)).GetGetMethod())))
+                {
+                    Logger.Error("Failed to find Unconscious Man spawning logic");
+                    return;
+                }
+
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(UnconsciousManMaySpawn)));
             };
         }
     }
