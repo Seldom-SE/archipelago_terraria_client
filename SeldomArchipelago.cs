@@ -8,30 +8,13 @@ namespace SeldomArchipelago
 {
     public class SeldomArchipelago : Mod
     {
+        public static bool BoundGoblinMaySpawn;
         public static bool UnconsciousManMaySpawn;
         public static bool WitchDoctorMaySpawn;
         public static bool DungeonSafe;
 
         public override void Load()
         {
-            // Town NPC spawning
-            IL.Terraria.Main.UpdateTime_SpawnTownNPCs += il =>
-            {
-                var cursor = new ILCursor(il);
-
-                // Witch Doctor spawning
-                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
-                cursor.Index++;
-                cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
-
-                // Witch Doctor prioritization
-                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
-                cursor.Index++;
-                cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
-            };
-
             // NPC spawning
             IL.Terraria.NPC.SpawnNPC += il =>
             {
@@ -49,11 +32,35 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(UnconsciousManMaySpawn)));
 
+                // Bound Goblin spawning IL_45F7
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedGoblins))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(BoundGoblinMaySpawn)));
+
                 // Dungeon Guardian spawning IL_60F3
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3))));
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DungeonSafe)));
+            };
+
+            // Town NPC spawning
+            IL.Terraria.Main.UpdateTime_SpawnTownNPCs += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                // Witch Doctor spawning
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
+
+                // Witch Doctor prioritization
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
             };
 
             // NPC defeat events

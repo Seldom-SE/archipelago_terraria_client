@@ -15,7 +15,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
 ## Future Work
 
 - [ ] Remove effects from original bosses
-    - [ ] Goblin Tinkerer
+    - [X] Bound Goblin
     - [X] Unconscious Man
     - [X] Witch Doctor
     - [X] The Dungeon
@@ -43,7 +43,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [ ] Martian Probe
     - [ ] Cultist
 - [ ] Re-add effects conditionally
-    - [ ] Goblin Tinkerer
+    - [X] Bound Goblin
     - [X] Unconscious Man
     - [X] Witch Doctor
     - [X] The Dungeon
