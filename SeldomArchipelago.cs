@@ -8,7 +8,6 @@ namespace SeldomArchipelago
 {
     public class SeldomArchipelago : Mod
     {
-        public static bool DryadMaySpawn;
         public static bool UnconsciousManMaySpawn;
         public static bool WitchDoctorMaySpawn;
         public static bool DungeonSafe;
@@ -20,22 +19,6 @@ namespace SeldomArchipelago
             {
                 var cursor = new ILCursor(il);
 
-                // Dryad spawning Terraria/Main.cs:60053
-                if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss1)))))
-                {
-                    Logger.Error("Failed to find Dryad spawning logic");
-                    return;
-                }
-
-                // Skip the first boss killed check so its label isn't broken
-                cursor.Index++;
-                // Remove code to check whether bosses were killed
-                cursor.RemoveRange(4);
-                // Replace whether boss 1 was killed with a controlled value
-                cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DryadMaySpawn)));
-                // After this, it decides whether to spawn Dryad based on the value in stack
-
                 // Witch Doctor spawning
                 if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee)))))
                 {
@@ -46,18 +29,6 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
-
-                // Dryad prioritization
-                if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss1)))))
-                {
-                    Logger.Error("Failed to find Dryad prioritization logic");
-                    return;
-                }
-
-                cursor.Index++;
-                cursor.RemoveRange(4);
-                cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DryadMaySpawn)));
 
                 // Witch Doctor prioritization
                 if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee)))))
