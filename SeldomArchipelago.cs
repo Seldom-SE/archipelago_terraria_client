@@ -10,14 +10,17 @@ namespace SeldomArchipelago
     {
         public static bool DryadMaySpawn = false;
         public static bool UnconsciousManMaySpawn = false;
+        public static bool WitchDoctorMaySpawn = false;
 
         public override void Load()
         {
-            // Take control of Dryad spawning
+            // Take control of town NPC spawning
             // Dryad spawn logic Terraria/Main.cs:60053
             IL.Terraria.Main.UpdateTime_SpawnTownNPCs += il =>
             {
                 var cursor = new ILCursor(il);
+
+                // Dryad spawning
                 if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss1)))))
                 {
                     Logger.Error("Failed to find Dryad spawning logic");
@@ -33,7 +36,18 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DryadMaySpawn)));
                 // After this, it decides whether to spawn Dryad based on the value in stack
 
-                // Repeat for Dryad prioritization logic
+                // Witch Doctor spawning
+                if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee)))))
+                {
+                    Logger.Error("Failed to find Witch Doctor spawning logic");
+                    return;
+                }
+
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
+
+                // Dryad prioritization
                 if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss1)))))
                 {
                     Logger.Error("Failed to find Dryad prioritization logic");
@@ -44,6 +58,16 @@ namespace SeldomArchipelago
                 cursor.RemoveRange(4);
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DryadMaySpawn)));
+
+                // Witch Doctor prioritization
+                if (!cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee)))))
+                {
+                    Logger.Error("Failed to find Witch Doctor prioritization logic");
+                }
+
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
             };
 
             // Take control of Unconscious Man spawning
