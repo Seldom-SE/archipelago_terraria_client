@@ -1,5 +1,5 @@
 displayName = Archipelago Randomizer (Seldom's implementation)
 author = Seldom
-version = 0.1
+version = 0.0.1
 homepage = https://archipelago.gg/
 includeSource = true

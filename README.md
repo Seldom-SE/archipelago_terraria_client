@@ -14,7 +14,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
 
 ## Future Work
 
-- [ ] Remove effects from original bosses
+- [ ] 🚧 Remove effects from original bosses
 - [ ] Re-add effects conditionally
 - [ ] Server-side implementation
 - [ ] Client responses to server
