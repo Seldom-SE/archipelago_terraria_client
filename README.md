@@ -34,11 +34,11 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Plantera's Bulb
     - [X] Cyborg
     - [X] Autohammer
-    - [ ] Post-Plantera Dungeon
+    - [X] Post-Plantera Dungeon
     - [ ] Biome Chest
     - [ ] Mothron
-    - [ ] Golem
-    - [ ] Prismatic Lacewing
+    - [X] Golem
+    - [X] Prismatic Lacewing
     - [X] Old One's Army Tier 3
     - [ ] Martian Probe
     - [ ] Cultist
@@ -62,11 +62,11 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Plantera's Bulb
     - [X] Cyborg
     - [X] Autohammer
-    - [ ] Post-Plantera Dungeon
+    - [X] Post-Plantera Dungeon
     - [ ] Biome Chest
     - [ ] Mothron
-    - [ ] Golem
-    - [ ] Prismatic Lacewing
+    - [X] Golem
+    - [X] Prismatic Lacewing
     - [X] Old One's Army Tier 3
     - [ ] Martian Probe
     - [ ] Cultist

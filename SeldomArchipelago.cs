@@ -25,6 +25,9 @@ namespace SeldomArchipelago
         public static bool PlanterasBulbMayGrow; //
         public static bool CyborgMaySpawn; //
         public static bool MaySellAutohammer; //
+        public static bool PlanteraDungeonEnemiesMaySpawn; //
+        public static bool GolemMaySpawn; //
+        public static bool PrismaticLacewingMaySpawn; //
 
         public override void Load()
         {
@@ -32,6 +35,14 @@ namespace SeldomArchipelago
             IL.Terraria.NPC.SpawnNPC += il =>
             {
                 var cursor = new ILCursor(il);
+
+                // Plantera Dungeon enemy Terraria/NPC.cs:69945, spawning IL_018C
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedPlantBoss))));
+                cursor.GotoNext(instruction => instruction.MatchStloc(out int _));
+                var variable = (VariableDefinition)cursor.Next.Operand;
+                cursor.Index++;
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(PlanteraDungeonEnemiesMaySpawn)));
+                cursor.Emit(OpCodes.Stloc_S, variable);
 
                 // Dungeon enemy spawning IL_0E34
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3))));
@@ -73,6 +84,24 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(TruffleWormMaySpawn)));
+
+                // Prismatic Lacewing spawning Terraria/NPC.cs:72733, IL_C303
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedPlantBoss))));
+                cursor.GotoPrev(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
+                var label = (ILLabel)cursor.Next.Operand;
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedPlantBoss))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(PrismaticLacewingMaySpawn)));
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.cloudAlpha))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(Main).GetField(nameof(Main.hardMode)));
+                cursor.Emit(OpCodes.Brfalse_S, label);
+                cursor.Emit(OpCodes.Ldsfld, typeof(Main).GetField(nameof(Main.cloudAlpha)));
             };
 
             // Town NPC spawning
@@ -229,6 +258,35 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(MaySellAutohammer)));
+            };
+
+            // Dungeon Spirit spawning Terraria/NPC.cs:68692
+            IL.Terraria.NPC.DoDeathEvents_SummonDungeonSpirit += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(PlanteraDungeonEnemiesMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
+            };
+
+            // Player tile usages
+            IL.Terraria.Player.TileInteractionsUse += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                // Golem spawning Terraria/Player.cs:25954
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(GolemMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
             };
         }
     }
