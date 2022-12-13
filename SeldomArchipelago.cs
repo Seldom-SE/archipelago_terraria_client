@@ -17,6 +17,7 @@ namespace SeldomArchipelago
         public static bool TruffleMaySpawn;
         public static bool HardmodeFishing;
         public static bool TruffleWormMaySpawn;
+        public static bool SteampunkerMaySpawn;
 
         public override void Load()
         {
@@ -72,6 +73,12 @@ namespace SeldomArchipelago
             {
                 var cursor = new ILCursor(il);
 
+                // Steampunker spawning IL_0912
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedMechBossAny))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(SteampunkerMaySpawn)));
+
                 // Witch Doctor spawning IL_0944
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
                 cursor.Index++;
@@ -96,6 +103,12 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(WitchDoctorMaySpawn)));
+
+                // Steampunker prioritization IL_0C53
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedMechBossAny))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(SteampunkerMaySpawn)));
             };
 
             // NPC defeat events

@@ -27,7 +27,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Hardmode Fishing
     - [X] Chlorophyte Ore
     - [X] Truffle Worm
-    - [ ] Steampunker
+    - [X] Steampunker
     - [ ] Life Fruit
     - [ ] Old One's Army Tier 2
     - [ ] Solar Eclipse
@@ -55,7 +55,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Hardmode Fishing
     - [ ] Chlorophyte Ore
     - [X] Truffle Worm
-    - [ ] Steampunker
+    - [X] Steampunker
     - [ ] Life Fruit
     - [ ] Old One's Army Tier 2
     - [ ] Solar Eclipse
