@@ -22,6 +22,7 @@ namespace SeldomArchipelago
         public static bool LifeFruitMayGrow; //
         public static int OldOnesArmyTier = 1; //
         public static bool PlanterasBulbMayGrow; //
+        public static bool SolarEclipseMayOccur; //
 
         public override void Load()
         {
@@ -180,6 +181,21 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(OldOnesArmyTier)));
                 cursor.Emit(OpCodes.Stsfld, typeof(DD2Event).GetField(nameof(DD2Event.OngoingDifficulty)));
                 cursor.Emit(OpCodes.Ret);
+            };
+
+            // Day start events
+            IL.Terraria.Main.UpdateTime_StartDay += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                // Eclipse starting Terraria/Main.cs:59650
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(SolarEclipseMayOccur)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
             };
         }
     }

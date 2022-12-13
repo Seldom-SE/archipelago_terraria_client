@@ -30,7 +30,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Steampunker
     - [X] Life Fruit
     - [X] Old One's Army Tier 2
-    - [ ] Solar Eclipse
+    - [X] Solar Eclipse
     - [X] Plantera's Bulb
     - [ ] Cyborg
     - [ ] Autohammer
@@ -58,7 +58,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Steampunker
     - [X] Life Fruit
     - [X] Old One's Army Tier 2
-    - [ ] Solar Eclipse
+    - [X] Solar Eclipse
     - [X] Plantera's Bulb
     - [ ] Cyborg
     - [ ] Autohammer
