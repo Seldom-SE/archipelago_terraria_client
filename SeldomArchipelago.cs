@@ -21,8 +21,9 @@ namespace SeldomArchipelago
         public static bool SteampunkerMaySpawn; //
         public static bool LifeFruitMayGrow; //
         public static int OldOnesArmyTier = 1; //
-        public static bool PlanterasBulbMayGrow; //
         public static bool SolarEclipseMayOccur; //
+        public static bool PlanterasBulbMayGrow; //
+        public static bool CyborgMaySpawn; //
 
         public override void Load()
         {
@@ -96,6 +97,15 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(TruffleMaySpawn)));
 
+                // Cyborg spawning IL_098C
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(CyborgMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
+
                 // Truffle prioritization IL_0BF8
                 cursor.GotoNext(instruction => instruction.MatchLdcI4(NPCID.Truffle));
                 cursor.GotoPrev(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
@@ -114,6 +124,15 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(SteampunkerMaySpawn)));
+
+                // Cyborg prioritization IL_0C95
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(CyborgMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
             };
 
             // NPC defeat events

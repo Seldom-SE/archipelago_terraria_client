@@ -32,7 +32,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Old One's Army Tier 2
     - [X] Solar Eclipse
     - [X] Plantera's Bulb
-    - [ ] Cyborg
+    - [X] Cyborg
     - [ ] Autohammer
     - [ ] Post-Plantera Dungeon
     - [ ] Biome Chest
@@ -60,7 +60,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Old One's Army Tier 2
     - [X] Solar Eclipse
     - [X] Plantera's Bulb
-    - [ ] Cyborg
+    - [X] Cyborg
     - [ ] Autohammer
     - [ ] Post-Plantera Dungeon
     - [ ] Biome Chest
