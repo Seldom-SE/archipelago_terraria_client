@@ -33,7 +33,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Solar Eclipse
     - [X] Plantera's Bulb
     - [X] Cyborg
-    - [ ] Autohammer
+    - [X] Autohammer
     - [ ] Post-Plantera Dungeon
     - [ ] Biome Chest
     - [ ] Mothron
@@ -61,7 +61,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Solar Eclipse
     - [X] Plantera's Bulb
     - [X] Cyborg
-    - [ ] Autohammer
+    - [X] Autohammer
     - [ ] Post-Plantera Dungeon
     - [ ] Biome Chest
     - [ ] Mothron

@@ -24,6 +24,7 @@ namespace SeldomArchipelago
         public static bool SolarEclipseMayOccur; //
         public static bool PlanterasBulbMayGrow; //
         public static bool CyborgMaySpawn; //
+        public static bool MaySellAutohammer; //
 
         public override void Load()
         {
@@ -192,7 +193,7 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(LifeFruitMayGrow)));
             };
 
-            // Old One's Army Tier
+            // Old One's Army tier
             IL.Terraria.GameContent.Events.DD2Event.FindProperDifficulty += il =>
             {
                 var cursor = new ILCursor(il);
@@ -215,6 +216,19 @@ namespace SeldomArchipelago
                 cursor.Index += 2;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldc_I4_1);
+            };
+
+            // Town NPC shops
+            IL.Terraria.Chest.SetupShop += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                // Autohammer IL_1340
+                cursor.GotoNext(instruction => instruction.MatchLdcI4(10));
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedPlantBoss)))); // IL_137E
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(MaySellAutohammer)));
             };
         }
     }
