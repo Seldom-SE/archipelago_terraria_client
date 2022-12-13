@@ -31,6 +31,8 @@ namespace SeldomArchipelago
         public static bool PlanteraEclipseEnemiesMaySpawn; //
         public static bool GolemMaySpawn; //
         public static bool PrismaticLacewingMaySpawn; //
+        public static bool MartianProbeMaySpawn; //
+        public static bool CultistsMaySpawn; //
 
         public override void Load()
         {
@@ -52,6 +54,23 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DungeonSafe)));
+
+                // Martian probe spawning IL_23DE
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedMartians))));
+                cursor.GotoPrev(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(MartianProbeMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(MartianProbeMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
 
                 // Unconscious Man spawning Terraria/NPC.cs:71052, Terraria.GameContent.Events/DD2Event.cs:58, IL_30DD
                 cursor.GotoNext(instruction => instruction.MatchCall(typeof(DD2Event).GetProperty(nameof(DD2Event.ReadyToFindBartender)).GetGetMethod()));
@@ -114,6 +133,16 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Ldsfld, typeof(Main).GetField(nameof(Main.hardMode)));
                 cursor.Emit(OpCodes.Brfalse_S, label);
                 cursor.Emit(OpCodes.Ldsfld, typeof(Main).GetField(nameof(Main.cloudAlpha)));
+
+                // Martian Probe spawning again IL_CD7B
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedMartians))));
+                cursor.GotoPrev(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(MartianProbeMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
             };
 
             // Town NPC spawning
@@ -310,6 +339,20 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(GolemMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
+            };
+
+            // Cultist ritual spawning
+            IL.Terraria.GameContent.Events.CultistRitual.CheckRitual += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(CultistsMaySpawn)));
                 cursor.Index += 2;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldc_I4_1);
