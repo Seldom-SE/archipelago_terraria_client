@@ -20,6 +20,7 @@ namespace SeldomArchipelago
         public static bool TruffleWormMaySpawn; //
         public static bool SteampunkerMaySpawn; //
         public static bool LifeFruitMayGrow; //
+        public static int OldOnesArmyTier = 1; //
         public static bool PlanterasBulbMayGrow; //
 
         public override void Load()
@@ -169,6 +170,16 @@ namespace SeldomArchipelago
                 cursor.Index += 2;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(LifeFruitMayGrow)));
+            };
+
+            // Old One's Army Tier
+            IL.Terraria.GameContent.Events.DD2Event.FindProperDifficulty += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(OldOnesArmyTier)));
+                cursor.Emit(OpCodes.Stsfld, typeof(DD2Event).GetField(nameof(DD2Event.OngoingDifficulty)));
+                cursor.Emit(OpCodes.Ret);
             };
         }
     }

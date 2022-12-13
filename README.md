@@ -29,7 +29,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Truffle Worm
     - [X] Steampunker
     - [X] Life Fruit
-    - [ ] Old One's Army Tier 2
+    - [X] Old One's Army Tier 2
     - [ ] Solar Eclipse
     - [X] Plantera's Bulb
     - [ ] Cyborg
@@ -39,7 +39,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [ ] Mothron
     - [ ] Golem
     - [ ] Prismatic Lacewing
-    - [ ] Old One's Army Tier 3
+    - [X] Old One's Army Tier 3
     - [ ] Martian Probe
     - [ ] Cultist
 - [ ] Re-add effects conditionally
@@ -57,7 +57,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Truffle Worm
     - [X] Steampunker
     - [X] Life Fruit
-    - [ ] Old One's Army Tier 2
+    - [X] Old One's Army Tier 2
     - [ ] Solar Eclipse
     - [X] Plantera's Bulb
     - [ ] Cyborg
@@ -67,7 +67,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [ ] Mothron
     - [ ] Golem
     - [ ] Prismatic Lacewing
-    - [ ] Old One's Army Tier 3
+    - [X] Old One's Army Tier 3
     - [ ] Martian Probe
     - [ ] Cultist
 - [ ] Server-side implementation
