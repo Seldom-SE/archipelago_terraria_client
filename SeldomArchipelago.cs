@@ -9,15 +9,18 @@ namespace SeldomArchipelago
 {
     public class SeldomArchipelago : Mod
     {
+        // Flags with empty comments need further testing
         public static bool BoundGoblinMaySpawn;
-        public static bool UnconsciousManMaySpawn;
+        public static bool UnconsciousManMaySpawn; //
         public static bool WitchDoctorMaySpawn;
         public static bool DungeonSafe;
         public static bool WizardMaySpawn;
         public static bool TruffleMaySpawn;
-        public static bool HardmodeFishing;
-        public static bool TruffleWormMaySpawn;
-        public static bool SteampunkerMaySpawn;
+        public static bool HardmodeFishing; //
+        public static bool TruffleWormMaySpawn; //
+        public static bool SteampunkerMaySpawn; //
+        public static bool LifeFruitMayGrow; //
+        public static bool PlanterasBulbMayGrow; //
 
         public override void Load()
         {
@@ -129,12 +132,43 @@ namespace SeldomArchipelago
             {
                 var cursor = new ILCursor(il);
 
+                // Hardmode fishing drops
                 while (cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode)))))
                 {
                     cursor.Index++;
                     cursor.Emit(OpCodes.Pop);
                     cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(HardmodeFishing)));
                 }
+            };
+
+            // Plant growth
+            IL.Terraria.WorldGen.UpdateWorld_GrassGrowth += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                // Plantera's Bulb growth IL_01EF
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(PlanterasBulbMayGrow)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(PlanterasBulbMayGrow)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(PlanterasBulbMayGrow)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(PlanterasBulbMayGrow)));
+
+                // Life Fruit growth IL_031F
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(LifeFruitMayGrow)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(LifeFruitMayGrow)));
             };
         }
     }

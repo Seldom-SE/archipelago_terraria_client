@@ -28,10 +28,10 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Chlorophyte Ore
     - [X] Truffle Worm
     - [X] Steampunker
-    - [ ] Life Fruit
+    - [X] Life Fruit
     - [ ] Old One's Army Tier 2
     - [ ] Solar Eclipse
-    - [ ] Plantera's Bulb
+    - [X] Plantera's Bulb
     - [ ] Cyborg
     - [ ] Autohammer
     - [ ] Post-Plantera Dungeon
@@ -56,10 +56,10 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [ ] Chlorophyte Ore
     - [X] Truffle Worm
     - [X] Steampunker
-    - [ ] Life Fruit
+    - [X] Life Fruit
     - [ ] Old One's Army Tier 2
     - [ ] Solar Eclipse
-    - [ ] Plantera's Bulb
+    - [X] Plantera's Bulb
     - [ ] Cyborg
     - [ ] Autohammer
     - [ ] Post-Plantera Dungeon
