@@ -6,9 +6,9 @@ Not to be confused with prior implementations:
 * [TerrariaAchipelago](https://github.com/Whoneedspacee/TerrariaArchipelago)
 
 This implementations uses boss kills and event clears as checks. The items are the permanent
-changes to the world that bosses reward in vanilla. Things like "Dryad can now spawn", "The dungeon
-is in Post-Plantera mode", and various things caused by Hardmode. Bosses still drop their original
-loot, though.
+changes to the world that bosses reward in vanilla. Things like "Witch Doctor can now spawn",
+"The Dungeon is in Post-Plantera mode", and various things caused by Hardmode. Bosses still drop
+their original loot, though.
 
 See [Archipelago](https://archipelago.gg/) if you don't know what it is.
 
@@ -35,8 +35,8 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Cyborg
     - [X] Autohammer
     - [X] Post-Plantera Dungeon
-    - [ ] Biome Chest
-    - [ ] Mothron
+    - [X] Biome Chest
+    - [X] Post-Plantera Solar Eclipse
     - [X] Golem
     - [X] Prismatic Lacewing
     - [X] Old One's Army Tier 3
@@ -63,8 +63,8 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Cyborg
     - [X] Autohammer
     - [X] Post-Plantera Dungeon
-    - [ ] Biome Chest
-    - [ ] Mothron
+    - [X] Biome Chest
+    - [X] Post-Plantera Solar Eclipse
     - [X] Golem
     - [X] Prismatic Lacewing
     - [X] Old One's Army Tier 3

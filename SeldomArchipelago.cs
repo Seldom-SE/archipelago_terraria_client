@@ -1,5 +1,6 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using System.Linq;
 using Terraria;
 using Terraria.GameContent.Events;
 using Terraria.ID;
@@ -26,6 +27,8 @@ namespace SeldomArchipelago
         public static bool CyborgMaySpawn; //
         public static bool MaySellAutohammer; //
         public static bool PlanteraDungeonEnemiesMaySpawn; //
+        public static bool BiomeChestUnlockable; //
+        public static bool PlanteraEclipseEnemiesMaySpawn; //
         public static bool GolemMaySpawn; //
         public static bool PrismaticLacewingMaySpawn; //
 
@@ -73,6 +76,15 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DungeonSafe)));
+
+                // Plantera Eclipse enemy spawning IL_965B
+                foreach (var _ in Enumerable.Range(0, 6))
+                {
+                    cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedPlantBoss))));
+                    cursor.Index++;
+                    cursor.Emit(OpCodes.Pop);
+                    cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(PlanteraEclipseEnemiesMaySpawn)));
+                }
 
                 // Truffle Worm and other mushroom enemy spawning Terraria/NPC.cs:72269, IL_A10A
                 cursor.GotoNext(instruction => instruction.MatchLdcI4(NPCID.TruffleWorm));
@@ -272,6 +284,20 @@ namespace SeldomArchipelago
                 cursor.Index += 2;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldc_I4_1);
+            };
+
+            // Chest unlocking
+            IL.Terraria.Chest.Unlock += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                // Biome chest unlocking
+                while (cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedPlantBoss)))))
+                {
+                    cursor.Index++;
+                    cursor.Emit(OpCodes.Pop);
+                    cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(BiomeChestUnlockable)));
+                }
             };
 
             // Player tile usages
