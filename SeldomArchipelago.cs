@@ -15,6 +15,8 @@ namespace SeldomArchipelago
         public static bool DungeonSafe;
         public static bool WizardMaySpawn;
         public static bool TruffleMaySpawn;
+        public static bool HardmodeFishing;
+        public static bool TruffleWormMaySpawn;
 
         public override void Load()
         {
@@ -52,6 +54,17 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DungeonSafe)));
+
+                // Truffle Worm and other mushroom enemy spawning Terraria/NPC.cs:72269, IL_A10A
+                cursor.GotoNext(instruction => instruction.MatchLdcI4(NPCID.TruffleWorm));
+                cursor.GotoPrev(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(TruffleWormMaySpawn)));
+                cursor.GotoPrev(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(TruffleWormMaySpawn)));
             };
 
             // Town NPC spawning
@@ -96,6 +109,19 @@ namespace SeldomArchipelago
                 var label = (ILLabel)cursor.Next.Operand;
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode))));
                 cursor.Emit(OpCodes.Br, label);
+            };
+
+            // Fishing drops
+            IL.Terraria.Projectile.FishingCheck_RollItemDrop += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                while (cursor.TryGotoNext(instruction => instruction.MatchLdsfld(typeof(Main).GetField(nameof(Main.hardMode)))))
+                {
+                    cursor.Index++;
+                    cursor.Emit(OpCodes.Pop);
+                    cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(HardmodeFishing)));
+                }
             };
         }
     }

@@ -24,9 +24,9 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [X] Hallow
     - [X] Wizard
     - [X] Truffle
-    - [ ] Hardmode Fishing
+    - [X] Hardmode Fishing
     - [X] Chlorophyte Ore
-    - [ ] Truffle Worm
+    - [X] Truffle Worm
     - [ ] Steampunker
     - [ ] Life Fruit
     - [ ] Old One's Army Tier 2
@@ -52,9 +52,9 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
     - [ ] Hallow
     - [X] Wizard
     - [X] Truffle
-    - [ ] Hardmode Fishing
+    - [X] Hardmode Fishing
     - [ ] Chlorophyte Ore
-    - [ ] Truffle Worm
+    - [X] Truffle Worm
     - [ ] Steampunker
     - [ ] Life Fruit
     - [ ] Old One's Army Tier 2
