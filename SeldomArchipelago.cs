@@ -1,10 +1,16 @@
+using Microsoft.Xna.Framework;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.GameContent.Events;
+using Terraria.GameContent.Generation;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.Utilities;
+using Terraria.WorldBuilding;
 
 namespace SeldomArchipelago
 {
@@ -12,6 +18,7 @@ namespace SeldomArchipelago
     {
         // Flags with empty comments need further testing
         public static bool BoundGoblinMaySpawn;
+        public static bool DryadMaySpawn; //
         public static bool UnconsciousManMaySpawn; //
         public static bool WitchDoctorMaySpawn;
         public static bool DungeonSafe;
@@ -34,8 +41,52 @@ namespace SeldomArchipelago
         public static bool MartianProbeMaySpawn; //
         public static bool CultistsMaySpawn; //
 
+        static int hallowI;
+        static int evilI;
+        static float baseSpeedX;
+
         public override void Load()
         {
+            // Hardmode biome gen params
+            if (Main.rand == null) Main.rand = new UnifiedRandom((int)DateTime.Now.Ticks);
+            var iRatio1 = (float)WorldGen.genRand.Next(300, 400) * 0.001f;
+            var iRatio2 = (float)WorldGen.genRand.Next(200, 300) * 0.001f;
+
+            hallowI = (int)((float)Main.maxTilesX * iRatio1);
+            evilI = (int)((float)Main.maxTilesX * (1f - iRatio1));
+            baseSpeedX = 1;
+
+            if (WorldGen.genRand.Next(2) == 0)
+            {
+                (hallowI, evilI) = (evilI, hallowI);
+                baseSpeedX = -1;
+            }
+
+            if (WorldGen.dungeonX < Main.maxTilesX / 2)
+            {
+                var newI = (int)((float)Main.maxTilesX * iRatio2);
+                if (hallowI > evilI)
+                {
+                    evilI = newI;
+                }
+                else
+                {
+                    hallowI = newI;
+                }
+            }
+            else
+            {
+                var newI = (int)((float)Main.maxTilesX * (1f - iRatio2));
+                if (evilI > hallowI)
+                {
+                    evilI = newI;
+                }
+                else
+                {
+                    hallowI = newI;
+                }
+            }
+
             // NPC spawning
             IL.Terraria.NPC.SpawnNPC += il =>
             {
@@ -150,6 +201,18 @@ namespace SeldomArchipelago
             {
                 var cursor = new ILCursor(il);
 
+                // Dryad spawning IL_0817
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss1))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DryadMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
+
                 // Steampunker spawning IL_0912
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedMechBossAny))));
                 cursor.Index++;
@@ -183,6 +246,18 @@ namespace SeldomArchipelago
                 cursor.Index++;
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(TruffleMaySpawn)));
+
+                // Dryad prioritization IL_0C03
+                cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss1))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DryadMaySpawn)));
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
+                cursor.Index += 2;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_1);
 
                 // Witch Doctor prioritization IL_0C3C
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedQueenBee))));
@@ -357,6 +432,93 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Pop);
                 cursor.Emit(OpCodes.Ldc_I4_1);
             };
+        }
+
+        public static void StartHardmode()
+        {
+            if (Main.netMode == 1) return;
+
+            Main.hardMode = true;
+            List<GenPass> list = new List<GenPass>();
+
+            SystemLoader.ModifyHardmodeTasks(list);
+            foreach (GenPass item in list)
+            {
+                item.Apply(null, null);
+            }
+
+            if (Main.netMode == 2)
+            {
+                Netplay.ResetSections();
+            }
+        }
+
+        // Based on Terraria.WorldGen.smCallBack
+        static void GenerateWalls()
+        {
+            var iterations = (int)((float)Main.maxTilesX / 168f);
+            var iterations2 = 0;
+            ShapeData shapeData = new ShapeData();
+
+            while (iterations > 0)
+            {
+                if (++iterations2 % 15000 == 0)
+                {
+                    iterations--;
+                }
+
+                var point = WorldGen.RandomWorldPoint((int)Main.worldSurface - 100, 1, 190, 1);
+                var tile = Main.tile[point.X, point.Y];
+                var tile2 = Main.tile[point.X, point.Y - 1];
+                ushort wall = 0;
+
+                if (TileID.Sets.Crimson[tile.TileType])
+                {
+                    wall = (ushort)(192 + WorldGen.genRand.Next(4));
+                }
+                else if (TileID.Sets.Corrupt[tile.TileType])
+                {
+                    wall = (ushort)(188 + WorldGen.genRand.Next(4));
+                }
+                else if (TileID.Sets.Hallow[tile.TileType])
+                {
+                    wall = (ushort)(200 + WorldGen.genRand.Next(4));
+                }
+
+                if (tile.HasTile && wall != 0 && !tile2.HasTile)
+                {
+                    bool success = WorldUtils.Gen(new Point(point.X, point.Y - 1), new ShapeFloodFill(1000), Actions.Chain(new Modifiers.IsNotSolid(), new Modifiers.OnlyWalls(0, 54, 55, 56, 57, 58, 59, 61, 185, 212, 213, 214, 215, 2, 196, 197, 198, 199, 15, 40, 71, 64, 204, 205, 206, 207, 208, 209, 210, 211, 71), new Actions.Blank().Output(shapeData)));
+
+                    if (shapeData.Count > 50 && success)
+                    {
+                        WorldUtils.Gen(new Point(point.X, point.Y), new ModShapes.OuterOutline(shapeData, useDiagonals: true, useInterior: true), new Actions.PlaceWall(wall));
+                        iterations--;
+                    }
+
+                    shapeData.Clear();
+                }
+            }
+
+            if (Main.netMode == 2)
+            {
+                Netplay.ResetSections();
+            }
+        }
+
+        public static void GenerateUndergroundEvil()
+        {
+            if (Main.netMode == 1) return;
+
+            WorldGen.GERunner(evilI, 0, 3 * -baseSpeedX, 5, false);
+            GenerateWalls();
+        }
+
+        public static void GenerateHallow()
+        {
+            if (Main.netMode == 1) return;
+
+            WorldGen.GERunner(hallowI, 0, 3 * baseSpeedX, 5);
+            GenerateWalls();
         }
     }
 }

@@ -15,34 +15,7 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
 ## Future Work
 
 - [X] Remove effects from original bosses
-- [ ] Re-add effects conditionally
-    - [X] Bound Goblin
-    - [X] Unconscious Man
-    - [X] Witch Doctor
-    - [X] The Dungeon
-    - [ ] Hardmode
-    - [ ] Underground Evil
-    - [ ] Hallow
-    - [X] Wizard
-    - [X] Truffle
-    - [X] Hardmode Fishing
-    - [ ] Chlorophyte Ore
-    - [X] Truffle Worm
-    - [X] Steampunker
-    - [X] Life Fruit
-    - [X] Old One's Army Tier 2
-    - [X] Solar Eclipse
-    - [X] Plantera's Bulb
-    - [X] Cyborg
-    - [X] Autohammer
-    - [X] Post-Plantera Dungeon
-    - [X] Biome Chest
-    - [X] Post-Plantera Solar Eclipse
-    - [X] Golem
-    - [X] Prismatic Lacewing
-    - [X] Old One's Army Tier 3
-    - [X] Martian Probe
-    - [X] Cultist
+- [X] Re-add effects conditionally
 - [ ] Server-side implementation
 - [ ] Announce boss / event clears to server
 - [ ] Client responses to server
