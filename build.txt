@@ -3,3 +3,4 @@ author = Seldom
 version = 0.0.1
 homepage = https://archipelago.gg/
 includeSource = true
+dllReferences = Archipelago.MultiClient.Net, Newtonsoft.Json

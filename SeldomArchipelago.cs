@@ -41,6 +41,9 @@ namespace SeldomArchipelago
         public static bool MartianProbeMaySpawn; //
         public static bool CultistsMaySpawn; //
 
+        public static bool UndergroundEvilGenerated;
+        public static bool HallowGenerated;
+
         static int hallowI;
         static int evilI;
         static float baseSpeedX;
@@ -511,6 +514,8 @@ namespace SeldomArchipelago
 
             WorldGen.GERunner(evilI, 0, 3 * -baseSpeedX, 5, false);
             GenerateWalls();
+
+            UndergroundEvilGenerated = true;
         }
 
         public static void GenerateHallow()
@@ -519,6 +524,8 @@ namespace SeldomArchipelago
 
             WorldGen.GERunner(hallowI, 0, 3 * baseSpeedX, 5);
             GenerateWalls();
+
+            HallowGenerated = true;
         }
     }
 }

@@ -17,8 +17,8 @@ See [Archipelago](https://archipelago.gg/) if you don't know what it is.
 - [X] Remove effects from original bosses
 - [X] Re-add effects conditionally
 - [ ] Server-side implementation
-- [ ] Announce boss / event clears to server
-- [ ] Client responses to server
+- [X] Announce boss / event clears to server
+- [X] Client responses to server
 - [ ] Archipelago features
 
 ## Usage
