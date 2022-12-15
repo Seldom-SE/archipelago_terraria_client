@@ -18,7 +18,7 @@ namespace SeldomArchipelago
     {
         // Flags with empty comments need further testing
         public static bool BoundGoblinMaySpawn;
-        public static bool DryadMaySpawn; //
+        public static bool DryadMaySpawn; // Known to be spawnable before any checks
         public static bool UnconsciousManMaySpawn; //
         public static bool WitchDoctorMaySpawn;
         public static bool DungeonSafe;
@@ -33,7 +33,7 @@ namespace SeldomArchipelago
         public static bool PlanterasBulbMayGrow; //
         public static bool CyborgMaySpawn; //
         public static bool MaySellAutohammer; //
-        public static bool PlanteraDungeonEnemiesMaySpawn; //
+        public static bool PlanteraDungeonEnemiesMaySpawn;
         public static bool BiomeChestUnlockable; //
         public static bool PlanteraEclipseEnemiesMaySpawn; //
         public static bool GolemMaySpawn; //

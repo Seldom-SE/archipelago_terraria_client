@@ -11,6 +11,8 @@ namespace SeldomArchipelago.System
 {
     public class Archipelago : ModSystem
     {
+        static bool verbose = false;
+
         class BossChecker
         {
             string location;
@@ -26,6 +28,7 @@ namespace SeldomArchipelago.System
             {
                 if (!session.Locations.AllLocationsChecked.Contains(session.Locations.GetLocationIdFromName("Terraria", location)) && checker())
                 {
+                    DebugLog($"Check completed at {location}");
                     CompleteLocation(location);
                 }
             }
@@ -47,7 +50,7 @@ namespace SeldomArchipelago.System
                 new BossChecker("Queen Bee", () => NPC.downedQueenBee),
                 new BossChecker("Skeletron", () => NPC.downedBoss3),
                 new BossChecker("Deerclops", () => NPC.downedDeerclops),
-                // Wall of Flesh is in WallOfFlesh.cs, because we take control of the Main.hardMode
+                // Wall of Flesh is in WallOfFlesh.cs, because we take control of Main.hardMode
                 new BossChecker("Queen Slime", () => NPC.downedQueenSlime),
                 new BossChecker("The Twins", () => NPC.downedMechBoss2),
                 new BossChecker("The Destroyer", () => NPC.downedMechBoss1),
@@ -112,22 +115,28 @@ namespace SeldomArchipelago.System
             session = ArchipelagoSessionFactory.CreateSession(config.address, config.port);
             LoginResult result;
 
+            bool error = false;
+
             try
             {
-                result = session.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.IncludeStartingInventory);
+                result = session.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.AllItems);
 
                 if (result is LoginFailure failure)
                 {
+                    error = true;
                     messages = new List<string>(failure.Errors);
                     session = null;
+                    DebugLog("LoginFailure received", true);
                 }
             }
             catch (Exception e)
             {
+                error = true;
                 messages = new List<string> { e.ToString() };
+                DebugLog("An exception was raised when trying to connect", true);
             }
 
-            if (messages != null)
+            if (error)
             {
                 messages.Add($"Failed to connect to Archipelago server as {config.name}");
                 messages.Add("Perhaps check your config in Workshop > Manage Mods > Config?");
@@ -155,9 +164,9 @@ namespace SeldomArchipelago.System
         {
             if (messages != null)
             {
-                foreach (string error in messages)
+                foreach (string message in messages)
                 {
-                    Main.NewText(error);
+                    Main.NewText(message);
                 }
 
                 messages = null;
@@ -175,9 +184,9 @@ namespace SeldomArchipelago.System
             var items = session.Items.AllItemsReceived;
             while (itemCount < items.Count)
             {
-                var item = items[itemCount++];
-                var itemName = session.Items.GetItemName(item.Item);
-                switch (itemName)
+                var item = session.Items.GetItemName(items[itemCount++].Item);
+                DebugLog($"Processing item: {item}");
+                switch (item)
                 {
                     case "Bound Goblin": SeldomArchipelago.BoundGoblinMaySpawn = true; break;
                     case "Dryad": SeldomArchipelago.DryadMaySpawn = true; break;
@@ -214,27 +223,49 @@ namespace SeldomArchipelago.System
                     case "Post-Plantera Dungeon": SeldomArchipelago.PlanteraDungeonEnemiesMaySpawn = true; break;
                     case "Biome Chests": SeldomArchipelago.BiomeChestUnlockable = true; break;
                     case "Post-Plantera Eclipse": SeldomArchipelago.PlanteraEclipseEnemiesMaySpawn = true; break;
-                    case "Golem": SeldomArchipelago.GolemMaySpawn = true; break;
+                    case "Lihzahrd Altar": SeldomArchipelago.GolemMaySpawn = true; break;
                     case "Prismatic Lacewing": SeldomArchipelago.PrismaticLacewingMaySpawn = true; break;
                     case "Martian Probe": SeldomArchipelago.MartianProbeMaySpawn = true; break;
                     case "Cultists": SeldomArchipelago.CultistsMaySpawn = true; break;
                 }
 
-                Main.NewText($"Obtained {itemName}!");
-
-                foreach (var checker in checkers)
-                {
-                    checker.Check();
-                }
+                Main.NewText($"Obtained {item}!");
             }
+
+            foreach (var checker in checkers)
+            {
+                checker.Check();
+            }
+        }
+
+        public override void OnWorldUnload()
+        {
+            if (session == null || !session.Socket.Connected) return;
+            session.Socket.Disconnect();
         }
 
         public static void CompleteLocation(string location)
         {
+            if (verbose) Main.NewText($"Sending location: {location}");
             if (session == null) return;
 
             var locationId = session.Locations.GetLocationIdFromName("Terraria", location);
             if (locationId >= 0) session.Locations.CompleteLocationChecks(locationId);
+        }
+
+        static void DebugLog(string message, bool preLoad = false)
+        {
+            if (verbose)
+            {
+                Main.NewText(message);
+                ModContent.GetInstance<SeldomArchipelago>().Logger.Debug(message);
+
+                if (preLoad)
+                {
+                    if (messages == null) messages = new List<string>();
+                    messages.Add(message);
+                }
+            }
         }
     }
 }
