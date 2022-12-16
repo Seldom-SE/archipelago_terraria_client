@@ -19,26 +19,26 @@ namespace SeldomArchipelago
         // Flags with empty comments need further testing
         public static bool BoundGoblinMaySpawn;
         public static bool DryadMaySpawn; // Known to be spawnable before any checks
-        public static bool UnconsciousManMaySpawn; //
+        public static bool UnconsciousManMaySpawn;
         public static bool WitchDoctorMaySpawn;
         public static bool DungeonSafe;
         public static bool WizardMaySpawn;
         public static bool TruffleMaySpawn;
-        public static bool HardmodeFishing; //
-        public static bool TruffleWormMaySpawn; //
+        public static bool HardmodeFishing;
+        public static bool TruffleWormMaySpawn;
         public static bool SteampunkerMaySpawn; //
         public static bool LifeFruitMayGrow; //
         public static int OldOnesArmyTier = 1; //
         public static bool SolarEclipseMayOccur; //
         public static bool PlanterasBulbMayGrow; //
-        public static bool CyborgMaySpawn; //
+        public static bool CyborgMaySpawn; // Missing item sales
         public static bool MaySellAutohammer; //
         public static bool PlanteraDungeonEnemiesMaySpawn;
         public static bool BiomeChestUnlockable; //
         public static bool PlanteraEclipseEnemiesMaySpawn; //
         public static bool GolemMaySpawn; //
         public static bool PrismaticLacewingMaySpawn; //
-        public static bool MartianProbeMaySpawn; //
+        public static bool MartianProbeMaySpawn;
         public static bool CultistsMaySpawn; //
 
         public static bool UndergroundEvilGenerated;

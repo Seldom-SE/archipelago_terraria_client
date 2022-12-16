@@ -5,22 +5,37 @@ Not to be confused with prior implementations:
 * [TerrariaFlagRandomizer](https://github.com/Cronus-waters/TerrariaFlagRandomizer)
 * [TerrariaAchipelago](https://github.com/Whoneedspacee/TerrariaArchipelago)
 
-This implementations uses boss kills and event clears as checks. The items are the permanent
-changes to the world that bosses reward in vanilla. Things like "Witch Doctor can now spawn",
-"The Dungeon is in Post-Plantera mode", and various things caused by Hardmode. Bosses still drop
-their original loot, though.
+Archipelago is a multiworld randomizer, which is a sort of multi-game mod that shuffles things
+between games. So, for example, when you kill Skeletron in your Terraria game, your friend
+might get Mothwing Cloak in their Hollow Knight game. But you can't enter the Dungeon
+until your friend picks up the item at Vengeful Spirit's location in their game. Archipelago
+has support for a lot of games. Learn more on its [website](https://archipelago.gg/)
 
-See [Archipelago](https://archipelago.gg/) if you don't know what it is.
+This implementations uses boss kills and event clears as checks. The items are the permanent
+changes to the world that bosses and events reward in vanilla. Things like "Witch Doctor
+can now spawn", "The Dungeon is in Post-Plantera mode", and various things caused by Hardmode.
+Bosses still drop their original loot, though.
 
 ## Future Work
 
 - [X] Remove effects from original bosses
 - [X] Re-add effects conditionally
-- [X] Server-side implementation
 - [X] Announce boss / event clears to server
 - [X] Client responses to server
-- [ ] Archipelago features (deathlink, in-game commands, etc.)
-- [ ] Integrate with other implementations
+- [X] Server-side implementation
+- [ ] Terraria multiplayer
+- [ ] Fix Dryad and Cyborg (and other shops if they're broken)
+- [ ] Wall, Plantera, and Zenith goals (maybe more)
+- [ ] Refactor!
+- [ ] More thorough chat integration
+- [ ] Work on the README
+- [ ] Publish to Steam Workshop. Makes setup so much easier
+- [ ] Rebalance items
+- [ ] Explore more item/location options, like achievements and item rewards
+- [ ] Docs
+- [ ] Get my fork merged if people want it
+- [ ] Other Archipelago features like deathlink? Do people want deathlink?
+- [ ] Calamity maybe probably maybe
 
 ## Usage
 
