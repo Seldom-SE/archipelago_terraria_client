@@ -9,7 +9,7 @@ Archipelago is a multiworld randomizer, which is a sort of multi-game mod that s
 between games. So, for example, when you kill Skeletron in your Terraria game, your friend
 might get Mothwing Cloak in their Hollow Knight game. But you can't enter the Dungeon
 until your friend picks up the item at Vengeful Spirit's location in their game. Archipelago
-has support for a lot of games. Learn more on its [website](https://archipelago.gg/)
+has support for a lot of games. Learn more on its [website](https://archipelago.gg/).
 
 This implementations uses boss kills and event clears as checks. The items are the permanent
 changes to the world that bosses and events reward in vanilla. Things like "Witch Doctor
@@ -23,15 +23,16 @@ Bosses still drop their original loot, though.
 - [X] Announce boss / event clears to server
 - [X] Client responses to server
 - [X] Server-side implementation
-- [ ] Terraria multiplayer
+- [X] Terraria multiplayer
 - [ ] Fix Dryad and Cyborg (and other shops if they're broken)
+- [ ] Prevent accidental checks from loading older worlds
 - [ ] Wall, Plantera, and Zenith goals (maybe more)
 - [ ] Refactor!
 - [ ] More thorough chat integration
 - [ ] Work on the README
 - [ ] Publish to Steam Workshop. Makes setup so much easier
 - [ ] Rebalance items
-- [ ] Explore more item/location options, like achievements and item rewards
+- [ ] Explore more item/location options, like achievements, NPCs, and item rewards
 - [ ] Docs
 - [ ] Get my fork merged if people want it
 - [ ] Other Archipelago features like deathlink? Do people want deathlink?

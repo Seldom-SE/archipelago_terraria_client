@@ -1,9 +1,13 @@
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.Chat;
 using Terraria.GameContent.Events;
+using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -41,7 +45,8 @@ namespace SeldomArchipelago.System
 
         public override void OnWorldLoad()
         {
-            if (Main.netMode == 1) return;
+            // TODO Maybe make the mod only server-side?
+            if (Main.netMode == NetmodeID.MultiplayerClient) return;
 
             checkers = new List<BossChecker> {
                 new BossChecker("King Slime", () => NPC.downedSlimeKing),
@@ -166,7 +171,7 @@ namespace SeldomArchipelago.System
             {
                 foreach (string message in messages)
                 {
-                    Main.NewText(message);
+                    Chat(message);
                 }
 
                 messages = null;
@@ -176,7 +181,7 @@ namespace SeldomArchipelago.System
 
             if (!session.Socket.Connected)
             {
-                Main.NewText("Disconnected from Archipelago. Reload the world to reconnect.");
+                Chat("Disconnected from Archipelago. Reload the world to reconnect.");
                 session = null;
                 return;
             }
@@ -229,7 +234,7 @@ namespace SeldomArchipelago.System
                     case "Cultists": SeldomArchipelago.CultistsMaySpawn = true; break;
                 }
 
-                Main.NewText($"Obtained {item}!");
+                Chat($"Obtained {item}!");
             }
 
             foreach (var checker in checkers)
@@ -246,7 +251,7 @@ namespace SeldomArchipelago.System
 
         public static void CompleteLocation(string location)
         {
-            if (verbose) Main.NewText($"Sending location: {location}");
+            if (verbose) DebugLog($"Sending location: {location}");
             if (session == null) return;
 
             var locationId = session.Locations.GetLocationIdFromName("Terraria", location);
@@ -257,7 +262,7 @@ namespace SeldomArchipelago.System
         {
             if (verbose)
             {
-                Main.NewText(message);
+                Chat(message);
                 ModContent.GetInstance<SeldomArchipelago>().Logger.Debug(message);
 
                 if (preLoad)
@@ -266,6 +271,17 @@ namespace SeldomArchipelago.System
                     messages.Add(message);
                 }
             }
+        }
+
+        static void Chat(string message)
+        {
+            if (Main.netMode == NetmodeID.Server)
+            {
+                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(message), Color.White);
+                Console.WriteLine(message);
+            }
+            else
+                Main.NewText(message);
         }
     }
 }

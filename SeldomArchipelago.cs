@@ -95,7 +95,7 @@ namespace SeldomArchipelago
             {
                 var cursor = new ILCursor(il);
 
-                // Plantera Dungeon enemy Terraria/NPC.cs:69945, spawning IL_018C
+                // Plantera Dungeon enemy spawning Terraria/NPC.cs:69945, IL_018C
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedPlantBoss))));
                 cursor.GotoNext(instruction => instruction.MatchStloc(out int _));
                 var variable = (VariableDefinition)cursor.Next.Operand;
@@ -211,10 +211,10 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Ldsfld, typeof(SeldomArchipelago).GetField(nameof(DryadMaySpawn)));
                 cursor.Index += 2;
                 cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldc_I4_1);
+                cursor.Emit(OpCodes.Ldc_I4_0);
                 cursor.Index += 2;
                 cursor.Emit(OpCodes.Pop);
-                cursor.Emit(OpCodes.Ldc_I4_1);
+                cursor.Emit(OpCodes.Ldc_I4_0);
 
                 // Steampunker spawning IL_0912
                 cursor.GotoNext(instruction => instruction.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedMechBossAny))));
@@ -439,7 +439,7 @@ namespace SeldomArchipelago
 
         public static void StartHardmode()
         {
-            if (Main.netMode == 1) return;
+            if (Main.netMode == NetmodeID.MultiplayerClient) return;
 
             Main.hardMode = true;
             List<GenPass> list = new List<GenPass>();
@@ -450,7 +450,7 @@ namespace SeldomArchipelago
                 item.Apply(null, null);
             }
 
-            if (Main.netMode == 2)
+            if (Main.netMode == NetmodeID.Server)
             {
                 Netplay.ResetSections();
             }
@@ -502,7 +502,7 @@ namespace SeldomArchipelago
                 }
             }
 
-            if (Main.netMode == 2)
+            if (Main.netMode == NetmodeID.Server)
             {
                 Netplay.ResetSections();
             }
@@ -510,7 +510,7 @@ namespace SeldomArchipelago
 
         public static void GenerateUndergroundEvil()
         {
-            if (Main.netMode == 1) return;
+            if (Main.netMode == NetmodeID.MultiplayerClient) return;
 
             WorldGen.GERunner(evilI, 0, 3 * -baseSpeedX, 5, false);
             GenerateWalls();
@@ -520,7 +520,7 @@ namespace SeldomArchipelago
 
         public static void GenerateHallow()
         {
-            if (Main.netMode == 1) return;
+            if (Main.netMode == NetmodeID.MultiplayerClient) return;
 
             WorldGen.GERunner(hallowI, 0, 3 * baseSpeedX, 5);
             GenerateWalls();
