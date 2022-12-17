@@ -45,7 +45,6 @@ namespace SeldomArchipelago.System
 
         public override void OnWorldLoad()
         {
-            // TODO Maybe make the mod only server-side?
             if (Main.netMode == NetmodeID.MultiplayerClient) return;
 
             checkers = new List<BossChecker> {
@@ -245,6 +244,9 @@ namespace SeldomArchipelago.System
 
         public override void OnWorldUnload()
         {
+            SeldomArchipelago.UndergroundEvilGenerated = false;
+            SeldomArchipelago.HallowGenerated = false;
+
             if (session == null || !session.Socket.Connected) return;
             session.Socket.Disconnect();
         }
@@ -258,7 +260,7 @@ namespace SeldomArchipelago.System
             if (locationId >= 0) session.Locations.CompleteLocationChecks(locationId);
         }
 
-        static void DebugLog(string message, bool preLoad = false)
+        public static void DebugLog(string message, bool preLoad = false)
         {
             if (verbose)
             {

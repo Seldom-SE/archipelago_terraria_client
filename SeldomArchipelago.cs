@@ -18,7 +18,7 @@ namespace SeldomArchipelago
     {
         // Flags with empty comments need further testing
         public static bool BoundGoblinMaySpawn;
-        public static bool DryadMaySpawn; // Known to be spawnable before any checks
+        public static bool DryadMaySpawn;
         public static bool UnconsciousManMaySpawn;
         public static bool WitchDoctorMaySpawn;
         public static bool DungeonSafe;
@@ -31,7 +31,7 @@ namespace SeldomArchipelago
         public static int OldOnesArmyTier = 1; //
         public static bool SolarEclipseMayOccur; //
         public static bool PlanterasBulbMayGrow; //
-        public static bool CyborgMaySpawn; // Missing item sales
+        public static bool CyborgMaySpawn;
         public static bool MaySellAutohammer; //
         public static bool PlanteraDungeonEnemiesMaySpawn;
         public static bool BiomeChestUnlockable; //
@@ -510,7 +510,11 @@ namespace SeldomArchipelago
 
         public static void GenerateUndergroundEvil()
         {
+            System.Archipelago.DebugLog("Checking net mode before generating evil...");
+
             if (Main.netMode == NetmodeID.MultiplayerClient) return;
+
+            System.Archipelago.DebugLog($"Generating evil at {evilI}");
 
             WorldGen.GERunner(evilI, 0, 3 * -baseSpeedX, 5, false);
             GenerateWalls();
@@ -520,7 +524,11 @@ namespace SeldomArchipelago
 
         public static void GenerateHallow()
         {
+            System.Archipelago.DebugLog("Checking net mode before generating hallow...");
+
             if (Main.netMode == NetmodeID.MultiplayerClient) return;
+
+            System.Archipelago.DebugLog($"Generating Hallow at {hallowI}");
 
             WorldGen.GERunner(hallowI, 0, 3 * baseSpeedX, 5);
             GenerateWalls();
