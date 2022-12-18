@@ -201,7 +201,12 @@ namespace SeldomArchipelago.System
                             SeldomArchipelago.UnconsciousManMaySpawn = true;
                         break;
                     case "Witch Doctor": SeldomArchipelago.WitchDoctorMaySpawn = true; break;
-                    case "Dungeon": SeldomArchipelago.DungeonSafe = true; break;
+                    case "Progressive Dungeon":
+                        if (SeldomArchipelago.DungeonSafe)
+                            SeldomArchipelago.PlanteraDungeonEnemiesMaySpawn = true;
+                        else
+                            SeldomArchipelago.DungeonSafe = true;
+                        break;
                     case "Hardmode":
                         if (!Main.hardMode)
                             SeldomArchipelago.StartHardmode();

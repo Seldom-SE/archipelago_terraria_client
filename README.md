@@ -24,7 +24,6 @@ Bosses still drop their original loot, though.
 - [X] Client responses to server
 - [X] Server-side implementation
 - [X] Terraria multiplayer
-- [X] Fix Dryad
 - [ ] Prevent accidental checks from loading older worlds
 - [ ] Wall, Plantera, and Zenith goals (maybe more)
 - [ ] Refactor!

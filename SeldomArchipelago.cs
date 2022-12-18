@@ -16,6 +16,10 @@ namespace SeldomArchipelago
 {
     public class SeldomArchipelago : Mod
     {
+        // TODO
+        // Make sure Hallow did generate
+        // GolemMaySpawn
+
         // Flags with empty comments need further testing
         public static bool BoundGoblinMaySpawn;
         public static bool DryadMaySpawn;
@@ -36,7 +40,7 @@ namespace SeldomArchipelago
         public static bool PlanteraDungeonEnemiesMaySpawn;
         public static bool BiomeChestUnlockable; //
         public static bool PlanteraEclipseEnemiesMaySpawn; //
-        public static bool GolemMaySpawn; //
+        public static bool GolemMaySpawn;
         public static bool PrismaticLacewingMaySpawn; //
         public static bool MartianProbeMaySpawn;
         public static bool CultistsMaySpawn; //
