@@ -17,8 +17,10 @@ namespace SeldomArchipelago.Command
                 return;
             }
 
-            // System.Archipelago.enabled = true;
-            caller.Reply("Enabled Archipelago");
+            if (System.Archipelago.Enable())
+                caller.Reply("Enabled Archipelago");
+            else
+                caller.Reply("Could not enable Archipelago since you are not connected");
         }
     }
 }

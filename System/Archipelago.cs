@@ -39,6 +39,10 @@ namespace SeldomArchipelago.System
         }
 
         static ArchipelagoSession session;
+        static bool inGame;
+        static bool enabled;
+        static List<string> ids = new List<string>();
+        static string sessionId;
         static int itemCount;
         static List<string> messages;
         static List<BossChecker> checkers;
@@ -85,6 +89,8 @@ namespace SeldomArchipelago.System
             };
 
             session = null;
+            sessionId = null;
+            inGame = true;
             itemCount = 0;
             messages = null;
 
@@ -132,6 +138,35 @@ namespace SeldomArchipelago.System
                     session = null;
                     DebugLog("LoginFailure received", true);
                 }
+                else
+                {
+                    string id = session.DataStorage[Scope.Game, "SessionId"];
+                    if (id == null)
+                    {
+                        sessionId = Guid.NewGuid().ToString();
+                        session.DataStorage[Scope.Game, "SessionId"] = sessionId;
+                    }
+                    else
+                    {
+                        sessionId = id;
+                    }
+
+                    if (ids.Contains(sessionId))
+                    {
+                        enabled = true;
+                    }
+                    else if (enabled)
+                    {
+                        ids.Add(sessionId);
+                    }
+                    else
+                    {
+                        messages = new List<string> {
+                            "This world is not part of your Archipelago instance, so checks will not be sent or received",
+                            @"To add this world to your instance, run ""/apstart"""
+                        };
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -146,7 +181,7 @@ namespace SeldomArchipelago.System
                 messages.Add("Perhaps check your config in Workshop > Manage Mods > Config?");
                 messages.Add("Reload the world to try again");
             }
-            else
+            else if (messages == null)
             {
                 messages = new List<string> { $"Connected to Archipelago server as {config.name}!" };
             }
@@ -154,14 +189,18 @@ namespace SeldomArchipelago.System
 
         public override void LoadWorldData(TagCompound tag)
         {
-            SeldomArchipelago.UndergroundEvilGenerated = tag.GetBool("UndergroundEvilGenerated");
-            SeldomArchipelago.HallowGenerated = tag.GetBool("HallowGenerated");
+            SeldomArchipelago.UndergroundEvilGenerated = tag.ContainsKey("UndergroundEvilGenerated") ? tag.GetBool("UndergroundEvilGenerated") : false;
+            SeldomArchipelago.HallowGenerated = tag.ContainsKey("HallowGenerated") ? tag.GetBool("HallowGenerated") : false;
+            enabled = tag.ContainsKey("SeekingArchipelago") ? tag.GetBool("SeekingArchipelago") : false;
+            ids = tag.ContainsKey("ArchipelagoIds") ? tag.Get<List<string>>("ArchipelagoIds") : new List<string>();
         }
 
         public override void SaveWorldData(TagCompound tag)
         {
             tag["UndergroundEvilGenerated"] = SeldomArchipelago.UndergroundEvilGenerated;
             tag["HallowGenerated"] = SeldomArchipelago.HallowGenerated;
+            tag["SeekingArchipelago"] = !inGame;
+            tag["ArchipelagoIds"] = ids;
         }
 
         public override void PostUpdateWorld()
@@ -184,6 +223,8 @@ namespace SeldomArchipelago.System
                 session = null;
                 return;
             }
+
+            if (!enabled) return;
 
             var items = session.Items.AllItemsReceived;
             while (itemCount < items.Count)
@@ -229,7 +270,6 @@ namespace SeldomArchipelago.System
                     case "Plantera's Bulb": SeldomArchipelago.PlanterasBulbMayGrow = true; break;
                     case "Cyborg": SeldomArchipelago.CyborgMaySpawn = true; break;
                     case "Autohammer": SeldomArchipelago.MaySellAutohammer = true; break;
-                    case "Post-Plantera Dungeon": SeldomArchipelago.PlanteraDungeonEnemiesMaySpawn = true; break;
                     case "Biome Chests": SeldomArchipelago.BiomeChestUnlockable = true; break;
                     case "Post-Plantera Eclipse": SeldomArchipelago.PlanteraEclipseEnemiesMaySpawn = true; break;
                     case "Lihzahrd Altar": SeldomArchipelago.GolemMaySpawn = true; break;
@@ -251,6 +291,8 @@ namespace SeldomArchipelago.System
         {
             SeldomArchipelago.UndergroundEvilGenerated = false;
             SeldomArchipelago.HallowGenerated = false;
+            ids = new List<string>();
+            inGame = false;
 
             if (session == null || !session.Socket.Connected) return;
             session.Socket.Disconnect();
@@ -259,10 +301,23 @@ namespace SeldomArchipelago.System
         public static void CompleteLocation(string location)
         {
             if (verbose) DebugLog($"Sending location: {location}");
-            if (session == null) return;
+            if (session == null || !enabled) return;
 
             var locationId = session.Locations.GetLocationIdFromName("Terraria", location);
             if (locationId >= 0) session.Locations.CompleteLocationChecks(locationId);
+        }
+
+        public static bool Enable()
+        {
+            if (session == null || !session.Socket.Connected || sessionId == null) return false;
+
+            if (!ids.Contains(sessionId))
+            {
+                ids.Add(sessionId);
+            }
+
+            enabled = true;
+            return true;
         }
 
         public static void DebugLog(string message, bool preLoad = false)

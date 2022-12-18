@@ -24,7 +24,7 @@ Bosses still drop their original loot, though.
 - [X] Client responses to server
 - [X] Server-side implementation
 - [X] Terraria multiplayer
-- [ ] Prevent accidental checks from loading older worlds
+- [X] Prevent accidental checks when loading older worlds
 - [ ] Wall, Plantera, and Zenith goals (maybe more)
 - [ ] Refactor!
 - [ ] More thorough chat integration
