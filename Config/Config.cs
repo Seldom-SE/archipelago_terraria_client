@@ -13,15 +13,15 @@ namespace SeldomArchipelago.Config
         [DefaultValue("")]
         public string name;
 
+        [Label("Port")]
+        [Range(0, 65535)]
+        [DefaultValue(46376)]
+        public int port;
+
         [Header("Advanced")]
 
         [Label("Server Address")]
         [DefaultValue("archipelago.gg")]
         public string address;
-
-        [Label("Port")]
-        [Range(0, 65535)]
-        [DefaultValue(46376)]
-        public int port;
     }
 }

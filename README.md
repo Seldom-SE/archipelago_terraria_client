@@ -3,7 +3,7 @@
 Not to be confused with prior implementations:
 
 * [TerrariaFlagRandomizer](https://github.com/Cronus-waters/TerrariaFlagRandomizer)
-* [TerrariaAchipelago](https://github.com/Whoneedspacee/TerrariaArchipelago)
+* [TerrariaArchipelago](https://github.com/Whoneedspacee/TerrariaArchipelago)
 
 Archipelago is a multiworld randomizer, which is a sort of multi-game mod that shuffles things
 between games. So, for example, when you kill Skeletron in your Terraria game, your friend
@@ -50,10 +50,9 @@ Since this game isn't on Archipelago's main server, you'll need to set all of th
 including the advanced ones. If you're hosting, the address will probably be "localhost"
 and the server should tell you the port. If not, whoever's hosting should know.
 
-You may use as many worlds as you like, but joining pre-existing worlds or using pre-existing
-characters may mess with it. If you want to cheat, disable the mod first, do your business,
-and then re-enable it. It's also supposed to work in multiplayer, but I haven't tested that
-as much.
+You may use as many worlds as you like. Pre-existing worlds will require a command (it will prompt
+you) to enable sending and recieving checks. There are many known issues when playing
+on multiplayer.
 
 ### For the host, if you have any Terraria players
 

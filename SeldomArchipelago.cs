@@ -19,6 +19,10 @@ namespace SeldomArchipelago
         // TODO
         // Make sure Hallow did generate
         // GolemMaySpawn
+        // Multiplayer connected users unable to Hardmode fish
+        // Might not save ap when loading new world requiring /apstart
+        // Queue up messages for on-login
+        // Plantera's Bulb?
 
         // Flags with empty comments need further testing
         public static bool BoundGoblinMaySpawn;
@@ -93,6 +97,8 @@ namespace SeldomArchipelago
                     hallowI = newI;
                 }
             }
+
+            // Begin cursed IL editing
 
             // NPC spawning
             IL.Terraria.NPC.SpawnNPC += il =>

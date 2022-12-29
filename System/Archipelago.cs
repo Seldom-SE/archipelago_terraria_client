@@ -125,7 +125,7 @@ namespace SeldomArchipelago.System
             session = ArchipelagoSessionFactory.CreateSession(config.address, config.port);
             LoginResult result;
 
-            bool error = false;
+            bool connectionError = false;
 
             try
             {
@@ -133,7 +133,7 @@ namespace SeldomArchipelago.System
 
                 if (result is LoginFailure failure)
                 {
-                    error = true;
+                    connectionError = true;
                     messages = new List<string>(failure.Errors);
                     session = null;
                     DebugLog("LoginFailure received", true);
@@ -170,12 +170,12 @@ namespace SeldomArchipelago.System
             }
             catch (Exception e)
             {
-                error = true;
+                connectionError = true;
                 messages = new List<string> { e.ToString() };
                 DebugLog("An exception was raised when trying to connect", true);
             }
 
-            if (error)
+            if (connectionError)
             {
                 messages.Add($"Failed to connect to Archipelago server as {config.name}");
                 messages.Add("Perhaps check your config in Workshop > Manage Mods > Config?");
