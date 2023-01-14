@@ -1,4 +1,4 @@
-using SeldomArchipelago.System;
+using SeldomArchipelago.Systems;
 using Terraria.ModLoader;
 
 namespace SeldomArchipelago.Command
@@ -17,10 +17,10 @@ namespace SeldomArchipelago.Command
                 return;
             }
 
-            if (System.Archipelago.Enable())
-                caller.Reply("Enabled Archipelago");
+            if (ArchipelagoSystem.Enable())
+                ArchipelagoSystem.Chat("Enabled Archipelago");
             else
-                caller.Reply("Could not enable Archipelago since you are not connected");
+                ArchipelagoSystem.Chat("Could not enable Archipelago since you are not connected");
         }
     }
 }

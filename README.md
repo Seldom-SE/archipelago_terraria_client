@@ -12,9 +12,8 @@ until your friend picks up the item at Vengeful Spirit's location in their game.
 has support for a lot of games. Learn more on its [website](https://archipelago.gg/).
 
 This implementations uses boss kills and event clears as checks. The items are the permanent
-changes to the world that bosses and events reward in vanilla. Things like "Witch Doctor
-can now spawn", "The Dungeon is in Post-Plantera mode", and various things caused by Hardmode.
-Bosses still drop their original loot, though.
+changes to the world that bosses and events reward in vanilla. Things like "Post-Plantera" and
+"Hardmode". Bosses still drop their original loot, though.
 
 ## Future Work
 
@@ -26,12 +25,12 @@ Bosses still drop their original loot, though.
 - [X] Terraria multiplayer
 - [X] Prevent accidental checks when loading older worlds
 - [ ] Wall, Plantera, and Zenith goals (maybe more)
-- [ ] Refactor!
+- [X] Refactor!
 - [ ] More thorough chat integration
 - [ ] Work on the README
 - [ ] Publish to Steam Workshop. Makes setup so much easier
-- [ ] Rebalance items
-- [ ] Explore more item/location options, like achievements, NPCs, and item rewards
+- [X] Rebalance items
+- [ ] Explore more item/location options, like achievements, NPCs, bestiary completion, Journey research, and item rewards
 - [ ] Docs
 - [ ] Get my fork merged if people want it
 - [ ] Other Archipelago features like deathlink? Do people want deathlink?
