@@ -28,6 +28,21 @@ namespace SeldomArchipelago
                 cursor.Emit(OpCodes.Ret);
             };
 
+            // Allow Torch God even if you have `unlockedBiomeTorches`
+            IL.Terraria.Player.UpdateTorchLuck_ConsumeCountersAndCalculate += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                cursor.GotoNext(i => i.MatchLdfld(typeof(Player).GetField(nameof(Player.unlockedBiomeTorches))));
+                cursor.Index++;
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_0);
+
+                cursor.GotoNext(i => i.MatchLdcI4(ItemID.TorchGodsFavor));
+                cursor.Emit(OpCodes.Pop);
+                cursor.Emit(OpCodes.Ldc_I4_0);
+            };
+
             // General event clear locations
             IL.Terraria.NPC.SetEventFlagCleared += il =>
             {

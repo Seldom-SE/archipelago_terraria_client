@@ -24,7 +24,7 @@ changes to the world that bosses and events reward in vanilla. Things like "Post
 - [X] Server-side implementation
 - [X] Terraria multiplayer
 - [X] Prevent accidental checks when loading older worlds
-- [ ] Wall, Plantera, and Zenith goals (maybe more)
+- [X] Wall, Plantera, and Zenith goals (maybe more)
 - [X] Refactor!
 - [ ] More thorough chat integration
 - [ ] Work on the README
