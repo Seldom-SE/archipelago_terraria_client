@@ -216,23 +216,23 @@ namespace SeldomArchipelago.Systems
             }
         }
 
+        public override void SaveWorldData(TagCompound tag)
+        {
+            tag["ApCollectedItems"] = collectedItems;
+        }
+
         public override void OnWorldUnload()
         {
             locationBacklog.Clear();
             locationQueue = null;
             session = null;
             enabled = false;
+            collectedItems = new List<string>();
 
             Main.Achievements.ClearAll();
 
             if (session == null) return;
             session.Socket.Disconnect();
-        }
-
-        public override void SaveWorldData(TagCompound tag)
-        {
-            tag["ApCollectedItems"] = collectedItems;
-            collectedItems = new List<string>();
         }
 
         public static string[] Status() => Tuple.Create(session != null, enabled) switch
