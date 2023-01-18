@@ -223,6 +223,8 @@ namespace SeldomArchipelago.Systems
             session = null;
             enabled = false;
 
+            Main.Achievements.ClearAll();
+
             if (session == null) return;
             session.Socket.Disconnect();
         }
@@ -230,7 +232,7 @@ namespace SeldomArchipelago.Systems
         public override void SaveWorldData(TagCompound tag)
         {
             tag["ApCollectedItems"] = collectedItems;
-            collectedItems.Clear();
+            collectedItems = new List<string>();
         }
 
         public static string[] Status() => Tuple.Create(session != null, enabled) switch
