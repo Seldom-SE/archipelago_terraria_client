@@ -13,7 +13,13 @@ has support for a lot of games. Learn more on its [website](https://archipelago.
 
 This implementations uses boss kills and event clears as checks. The items are the permanent
 changes to the world that bosses and events reward in vanilla. Things like "Post-Plantera" and
-"Hardmode". Bosses still drop their original loot, though.
+"Hardmode". Bosses still drop their original loot, though. Optionally, you may also include
+achievement checks and item rewards.
+
+## Important Known Issue
+
+For achievements to work, you must click Workshop > Manage Mods > Force Reload every time you start
+the game.
 
 ## Future Work
 
@@ -44,10 +50,12 @@ Clone/download this repo into Documents/My Games/Terraria/tModLoader/ModSources 
 SeldomArchipelago.sln is at
 Documents/My Games/Terraria/tModLoader/ModSources/SeldomArchipelago/SeldomArchipelago.sln.
 In tModLoader, go to Workshop > Develop Mods, and click "Build + Reload" under SeldomArchipelago.
-In Workshop > Manage Mods, edit Archipelago Randomizer (Seldom's Implementation)'s settings.
-Since this game isn't on Archipelago's main server, you'll need to set all of the settings,
-including the advanced ones. If you're hosting, the address will probably be "localhost"
-and the server should tell you the port. If not, whoever's hosting should know.
+For good measure, also click Workshop > Manage Mods > Force Reload. You'll have to do this
+every time you start the game. In Workshop > Manage Mods, edit Archipelago Randomizer
+(Seldom's Implementation)'s settings. Since this game isn't on Archipelago's main server,
+you'll need to set all of the settings, including the advanced ones. If you're hosting, the address
+will probably be "localhost" and the server should tell you the port. If not, whoever's hosting
+should know.
 
 You may use as many worlds as you like. Pre-existing worlds will require a command (it will prompt
 you) to enable sending and recieving checks. There are many known issues when playing
