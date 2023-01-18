@@ -36,7 +36,7 @@ the game.
 - [ ] Work on the README
 - [ ] Publish to Steam Workshop. Makes setup so much easier
 - [X] Rebalance items
-- [ ] Explore more item/location options, like achievements, NPCs, bestiary completion, Journey research, and item rewards
+- [X] Explore more item/location options, like achievements, NPCs, bestiary completion, Journey research, and item rewards
 - [ ] Docs
 - [ ] Get my fork merged if people want it
 - [ ] Other Archipelago features like deathlink? Do people want deathlink?
