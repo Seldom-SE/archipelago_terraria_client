@@ -1,1 +1,3 @@
-Archipelago multiworld randomizer integration for Terraria. Randomizes permanent world effects caused by defeating bosses.
+Archipelago multiworld randomizer integration for Terraria. Randomizes permanent world effects caused by defeating bosses. Optionally randomizes achievement checks and item rewards.
+
+For achievements to work, you must Force Reload after the mod is loaded. For more info, see the mod's homepage.

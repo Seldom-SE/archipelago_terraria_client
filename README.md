@@ -16,31 +16,22 @@ changes to the world that bosses and events reward in vanilla. Things like "Post
 "Hardmode". Bosses still drop their original loot, though. Optionally, you may also include
 achievement checks and item rewards.
 
+Because this mod adds an extra layer of multiplayer, there are many ways to use it:
+* Randomize one singleplayer Terraria world
+* Randomize one multiplayer Terraria world
+* Randomize multiple singleplayer or multiplayer Terraria worlds between each other
+* Randomize Terraria with entirely separate games
+
 ## Important Known Issue
 
-For achievements to work, you must click Workshop > Manage Mods > Force Reload every time you start
-the game.
+For achievements to work, the mod needs to be loaded twice. Whether you enabled the mod, causing
+a reload, or the game loaded the mod upon startup, you must click Workshop > Manage Mods > Force
+Reload.
 
-## Future Work
-
-- [X] Remove effects from original bosses
-- [X] Re-add effects conditionally
-- [X] Announce boss / event clears to server
-- [X] Client responses to server
-- [X] Server-side implementation
-- [X] Terraria multiplayer
-- [X] Prevent accidental checks when loading older worlds
-- [X] Wall, Plantera, and Zenith goals (maybe more)
-- [X] Refactor!
-- [ ] More thorough chat integration
-- [ ] Work on the README
-- [ ] Publish to Steam Workshop. Makes setup so much easier
-- [X] Rebalance items
-- [X] Explore more item/location options, like achievements, NPCs, bestiary completion, Journey research, and item rewards
-- [ ] Docs
-- [ ] Get my fork merged if people want it
-- [ ] Other Archipelago features like deathlink? Do people want deathlink?
-- [ ] Calamity maybe probably maybe
+If you're experienced with Terraria modding, advice about this bug would be appreciated. Search for
+`On.Terraria.Achievements.AchievementCondition.Complete +=`, and you'll find the code enabling
+the bug. If you copy that statement into an empty mod, it exhibits the same problem. You can ping
+me on the [Archipelago Discord](https://discord.gg/8Z65BR2) `@Seldom`.
 
 ## Usage
 
@@ -57,20 +48,41 @@ you'll need to set all of the settings, including the advanced ones. If you're h
 will probably be "localhost" and the server should tell you the port. If not, whoever's hosting
 should know.
 
-You may use as many worlds as you like. Pre-existing worlds will require a command (it will prompt
-you) to enable sending and recieving checks. There are many known issues when playing
-on multiplayer.
+You may use as many worlds as you like. When you're ready, run `/apstart` to enable sending
+and recieving checks. You may open your world in multiplayer for others to join.
 
 ### For the host, if you have any Terraria players
 
 You should have some technical knowledge to get through this part. Run
 [my Archipelago fork](https://github.com/Seldom-SE/Archipelago/tree/terraria) from source (see this
 [guide](https://github.com/Seldom-SE/Archipelago/blob/terraria/docs/running%20from%20source.md)).
-The command for that will look something like `python WebHost.py`. This will run a website,
-so watch the console for an address including `localhost`, and go there on your browser.
-You can find information for how to setup the game on the website. Terraria players have to setup
-their `yaml` files from this website, but other games should work fine from
-[the official site](https://archipelago.gg/), unless I haven't kept my fork up to date.
+You will need to run `Generate.py` and `MultiServer.py`. To create the `yaml` files, you can run
+`WebHost.py`. This will run a website, so watch the console for an address including `localhost`,
+and go there on your browser. Terraria players have to setup their `yaml` files from this website,
+but other games should work fine from [the official site](https://archipelago.gg/), unless I
+haven't kept my fork up to date. You may also host the game from `WebHost.py`, if you prefer.
+
+## Future Work
+
+- [X] Remove effects from original bosses
+- [X] Re-add effects conditionally
+- [X] Announce boss / event clears to server
+- [X] Client responses to server
+- [X] Server-side implementation
+- [X] Terraria multiplayer
+- [X] Prevent accidental checks when loading older worlds
+- [X] Wall, Plantera, and Zenith goals (maybe more)
+- [X] Refactor!
+- [ ] More thorough chat integration
+- [X] Work on the README
+- [ ] Publish to Steam Workshop. Makes setup so much easier
+- [X] Rebalance items
+- [X] Explore more item/location options, like achievements, NPCs, bestiary completion, Journey
+research, and item rewards
+- [ ] Docs
+- [ ] Get my fork merged if people want it
+- [ ] Other Archipelago features like deathlink? Do people want deathlink?
+- [ ] Calamity maybe probably maybe
 
 ## License
 
