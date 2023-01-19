@@ -263,9 +263,9 @@ namespace SeldomArchipelago.Systems
             return true;
         }
 
-        public static void Chat(string message, Player player = null)
+        public static void Chat(string message, int player = -1)
         {
-            if (player == null)
+            if (player == -1)
             {
                 if (Main.netMode == NetmodeID.Server)
                 {
@@ -274,10 +274,10 @@ namespace SeldomArchipelago.Systems
                 }
                 else Main.NewText(message);
             }
-            else ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(message), Color.White, player.whoAmI);
+            else ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(message), Color.White, player);
         }
 
-        public static void Chat(string[] messages, Player player = null)
+        public static void Chat(string[] messages, int player = -1)
         {
             foreach (var message in messages)
             {

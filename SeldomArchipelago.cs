@@ -15,7 +15,6 @@ namespace SeldomArchipelago
     public class SeldomArchipelago : Mod
     {
         // TODO
-        // Multiplayer doesn't look like it connected
         // Stop sending locations that have already been sent
         // Mod has to be loaded twice
 
@@ -233,9 +232,17 @@ namespace SeldomArchipelago
             };
         }
 
-        public override void HandlePacket(BinaryReader reader, int _)
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
-            ArchipelagoSystem.QueueLocation(reader.ReadString());
+            var message = reader.ReadString();
+            if (message == "")
+            {
+                ArchipelagoSystem.Chat(ArchipelagoSystem.Status(), whoAmI);
+            }
+            else
+            {
+                ArchipelagoSystem.QueueLocation(message);
+            }
         }
     }
 }
