@@ -15,7 +15,6 @@ namespace SeldomArchipelago
     public class SeldomArchipelago : Mod
     {
         // TODO
-        // Stop sending locations that have already been sent
         // Mod has to be loaded twice
 
         // Terraria is single-threaded so this *should* be fine

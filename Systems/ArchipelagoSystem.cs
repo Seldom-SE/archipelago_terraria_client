@@ -22,6 +22,7 @@ namespace SeldomArchipelago.Systems
         static ArchipelagoSession session;
         static bool enabled;
         static List<string> collectedItems = new List<string>();
+        static List<string> collectedLocations = new List<string>();
 
         public override void LoadWorldData(TagCompound tag)
         {
@@ -42,11 +43,19 @@ namespace SeldomArchipelago.Systems
                 if (session.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.AllItems) is LoginFailure)
                 {
                     session = null;
+                    return;
                 }
             }
             catch
             {
                 session = null;
+                return;
+            }
+
+            var locations = session.DataStorage[Scope.Slot, "CollectedLocations"].To<String[]>();
+            if (locations != null)
+            {
+                collectedLocations = new List<string>(locations);
             }
         }
 
@@ -219,6 +228,7 @@ namespace SeldomArchipelago.Systems
         public override void SaveWorldData(TagCompound tag)
         {
             tag["ApCollectedItems"] = collectedItems;
+            if (enabled) session.DataStorage[Scope.Slot, "CollectedLocations"] = collectedLocations.ToArray();
         }
 
         public override void OnWorldUnload()
@@ -228,6 +238,7 @@ namespace SeldomArchipelago.Systems
             session = null;
             enabled = false;
             collectedItems = new List<string>();
+            collectedLocations = new List<string>();
 
             Main.Achievements?.ClearAll();
 
@@ -294,8 +305,17 @@ namespace SeldomArchipelago.Systems
             }
 
             var location = session.Locations.GetLocationIdFromName("Terraria", locationName);
+            if (!collectedLocations.Contains(locationName))
+            {
+                try
+                {
+                    locationQueue.Add(session.Locations.ScoutLocationsAsync(new long[] { location }));
+                    collectedLocations.Add(locationName);
+                }
+                catch { }
+            }
+
             session.Locations.CompleteLocationChecks(new long[] { location });
-            locationQueue.Add(session.Locations.ScoutLocationsAsync(new long[] { location }));
         }
 
         public static void QueueLocationClient(string locationName)
