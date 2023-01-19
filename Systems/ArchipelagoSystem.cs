@@ -229,7 +229,7 @@ namespace SeldomArchipelago.Systems
             enabled = false;
             collectedItems = new List<string>();
 
-            Main.Achievements.ClearAll();
+            Main.Achievements?.ClearAll();
 
             if (session == null) return;
             session.Socket.Disconnect();
@@ -296,6 +296,23 @@ namespace SeldomArchipelago.Systems
             var location = session.Locations.GetLocationIdFromName("Terraria", locationName);
             session.Locations.CompleteLocationChecks(new long[] { location });
             locationQueue.Add(session.Locations.ScoutLocationsAsync(new long[] { location }));
+        }
+
+        public static void QueueLocationClient(string locationName)
+        {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
+                QueueLocation(locationName);
+                return;
+            }
+
+            var mod = ModContent.GetInstance<SeldomArchipelago>();
+
+            if (mod == null) return;
+
+            var packet = mod.GetPacket();
+            packet.Write(locationName);
+            packet.Send();
         }
 
         public static void GiveItem(string itemName, int item)

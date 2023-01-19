@@ -8,6 +8,7 @@ using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Social;
+using System.IO;
 
 namespace SeldomArchipelago
 {
@@ -15,6 +16,8 @@ namespace SeldomArchipelago
     {
         // TODO
         // Multiplayer doesn't look like it connected
+        // Stop sending locations that have already been sent
+        // Mod has to be loaded twice
 
         // Terraria is single-threaded so this *should* be fine
         bool temp;
@@ -141,6 +144,8 @@ namespace SeldomArchipelago
                 mode.SetValue(null, SocialMode.Steam);
             };
 
+            if (Main.netMode == NetmodeID.Server) return;
+
             Main.Achievements.OnAchievementCompleted += achievement =>
             {
                 var name = achievement.Name switch
@@ -224,8 +229,13 @@ namespace SeldomArchipelago
                     _ => null,
                 };
 
-                if (name != null) ArchipelagoSystem.QueueLocation(name);
+                if (name != null) ArchipelagoSystem.QueueLocationClient(name);
             };
+        }
+
+        public override void HandlePacket(BinaryReader reader, int _)
+        {
+            ArchipelagoSystem.QueueLocation(reader.ReadString());
         }
     }
 }
