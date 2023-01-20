@@ -22,7 +22,8 @@ namespace SeldomArchipelago.Players
                 return;
             }
 
-            ArchipelagoSystem.Chat(ArchipelagoSystem.Status(), player.whoAmI);
+            var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
+            archipelagoSystem.Chat(archipelagoSystem.Status(), player.whoAmI);
         }
     }
 }

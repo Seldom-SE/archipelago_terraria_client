@@ -11,7 +11,7 @@ namespace SeldomArchipelago.Items
 
         public override void OnCreate(Item item, ItemCreationContext context)
         {
-            ArchipelagoSystem.QueueLocation("Zenith");
+            ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Zenith");
         }
     }
 }

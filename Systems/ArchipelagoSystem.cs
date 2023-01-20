@@ -4,6 +4,7 @@ using Archipelago.MultiClient.Net.Packets;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.Chat;
@@ -12,17 +13,18 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.Social;
 
 namespace SeldomArchipelago.Systems
 {
     public class ArchipelagoSystem : ModSystem
     {
-        static List<string> locationBacklog = new List<string>();
-        static List<Task<LocationInfoPacket>> locationQueue;
-        static ArchipelagoSession session;
-        static bool enabled;
-        static List<string> collectedItems = new List<string>();
-        static List<string> collectedLocations = new List<string>();
+        List<string> locationBacklog = new List<string>();
+        List<Task<LocationInfoPacket>> locationQueue;
+        ArchipelagoSession session;
+        bool enabled;
+        List<string> collectedItems = new List<string>();
+        List<string> collectedLocations = new List<string>();
 
         public override void LoadWorldData(TagCompound tag)
         {
@@ -31,6 +33,8 @@ namespace SeldomArchipelago.Systems
 
         public override void OnWorldLoad()
         {
+            typeof(SocialAPI).GetField("_mode", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, SocialMode.None);
+
             locationQueue = new List<Task<LocationInfoPacket>>();
 
             if (Main.netMode == NetmodeID.MultiplayerClient) return;
@@ -233,6 +237,8 @@ namespace SeldomArchipelago.Systems
 
         public override void OnWorldUnload()
         {
+            typeof(SocialAPI).GetField("_mode", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, SocialMode.Steam);
+
             locationBacklog.Clear();
             locationQueue = null;
             session = null;
@@ -246,7 +252,7 @@ namespace SeldomArchipelago.Systems
             session.Socket.Disconnect();
         }
 
-        public static string[] Status() => Tuple.Create(session != null, enabled) switch
+        public string[] Status() => Tuple.Create(session != null, enabled) switch
         {
             (false, _) => new string[] {
                 "The world is not connected to Archipelago and will need to reload.",
@@ -256,7 +262,7 @@ namespace SeldomArchipelago.Systems
             (true, true) => new string[] { "Archipelago is active!" },
         };
 
-        public static bool Enable()
+        public bool Enable()
         {
             if (session == null)
             {
@@ -274,7 +280,7 @@ namespace SeldomArchipelago.Systems
             return true;
         }
 
-        public static void Chat(string message, int player = -1)
+        public void Chat(string message, int player = -1)
         {
             if (player == -1)
             {
@@ -288,7 +294,7 @@ namespace SeldomArchipelago.Systems
             else ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(message), Color.White, player);
         }
 
-        public static void Chat(string[] messages, int player = -1)
+        public void Chat(string[] messages, int player = -1)
         {
             foreach (var message in messages)
             {
@@ -296,7 +302,7 @@ namespace SeldomArchipelago.Systems
             }
         }
 
-        public static void QueueLocation(string locationName)
+        public void QueueLocation(string locationName)
         {
             if (!enabled)
             {
@@ -305,20 +311,18 @@ namespace SeldomArchipelago.Systems
             }
 
             var location = session.Locations.GetLocationIdFromName("Terraria", locationName);
+            if (location == -1) return;
+
             if (!collectedLocations.Contains(locationName))
             {
-                try
-                {
-                    locationQueue.Add(session.Locations.ScoutLocationsAsync(new long[] { location }));
-                    collectedLocations.Add(locationName);
-                }
-                catch { }
+                locationQueue.Add(session.Locations.ScoutLocationsAsync(new long[] { location }));
+                collectedLocations.Add(locationName);
             }
 
             session.Locations.CompleteLocationChecks(new long[] { location });
         }
 
-        public static void QueueLocationClient(string locationName)
+        public void QueueLocationClient(string locationName)
         {
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
@@ -326,16 +330,12 @@ namespace SeldomArchipelago.Systems
                 return;
             }
 
-            var mod = ModContent.GetInstance<SeldomArchipelago>();
-
-            if (mod == null) return;
-
-            var packet = mod.GetPacket();
+            var packet = ModContent.GetInstance<SeldomArchipelago>().GetPacket();
             packet.Write(locationName);
             packet.Send();
         }
 
-        public static void GiveItem(string itemName, int item)
+        public void GiveItem(string itemName, int item)
         {
             foreach (var player in Main.player)
             {

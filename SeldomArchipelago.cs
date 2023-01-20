@@ -2,12 +2,11 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System;
 using SeldomArchipelago.Systems;
-using System.Reflection;
 using Terraria;
+using Terraria.Achievements;
 using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.Social;
 using System.IO;
 
 namespace SeldomArchipelago
@@ -15,13 +14,15 @@ namespace SeldomArchipelago
     public class SeldomArchipelago : Mod
     {
         // TODO
-        // Mod has to be loaded twice
+        // Archipelago-end KeyError causing disconnect
 
         // Terraria is single-threaded so this *should* be fine
         bool temp;
 
         public override void Load()
         {
+            var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
+
             // Begin cursed IL editing
 
             // Torch God reward Terraria.Player:13794
@@ -30,7 +31,7 @@ namespace SeldomArchipelago
                 var cursor = new ILCursor(il);
 
                 cursor.GotoNext(i => i.MatchLdsfld(typeof(Main).GetField(nameof(Main.netMode))));
-                cursor.EmitDelegate<Action>(() => ArchipelagoSystem.QueueLocation("Torch God"));
+                cursor.EmitDelegate<Action>(() => archipelagoSystem.QueueLocation("Torch God"));
                 cursor.Emit(OpCodes.Ret);
             };
 
@@ -55,7 +56,7 @@ namespace SeldomArchipelago
                 var cursor = new ILCursor(il);
 
                 cursor.Emit(OpCodes.Ldarg_1);
-                cursor.EmitDelegate<Action<int>>((int id) => ArchipelagoSystem.QueueLocation(id switch
+                cursor.EmitDelegate<Action<int>>((int id) => archipelagoSystem.QueueLocation(id switch
                 {
                     GameEventClearedID.DefeatedGoblinArmy => "Goblin Army",
                     GameEventClearedID.DefeatedSlimeKing => "King Slime",
@@ -106,7 +107,7 @@ namespace SeldomArchipelago
                     cursor.EmitDelegate<Action>(() =>
                     {
                         flag.SetValue(null, temp);
-                        ArchipelagoSystem.QueueLocation($"Old One's Army Tier {tier}");
+                        archipelagoSystem.QueueLocation($"Old One's Army Tier {tier}");
                     });
                 }
             };
@@ -134,114 +135,112 @@ namespace SeldomArchipelago
                 cursor.EmitDelegate<Action>(() => Main.hardMode = temp);
             };
 
-            On.Terraria.Achievements.AchievementCondition.Complete += (orig, condition) =>
-            {
-                var mode = typeof(SocialAPI).GetField("_mode", BindingFlags.Static | BindingFlags.NonPublic);
-                mode.SetValue(null, SocialMode.None);
-                orig(condition);
-                mode.SetValue(null, SocialMode.Steam);
-            };
-
-            if (Main.netMode == NetmodeID.Server) return;
-
-            Main.Achievements.OnAchievementCompleted += achievement =>
-            {
-                var name = achievement.Name switch
-                {
-                    "TIMBER" => "Timber!!",
-                    "NO_HOBO" => "No Hobo",
-                    "OBTAIN_HAMMER" => "Stop! Hammer Time!",
-                    "OOO_SHINY" => "Ooo! Shiny!",
-                    "HEART_BREAKER" => "Heart Breaker",
-                    "HEAVY_METAL" => "Heavy Metal",
-                    "I_AM_LOOT" => "I Am Loot!",
-                    "STAR_POWER" => "Star Power",
-                    "HOLD_ON_TIGHT" => "Hold on Tight!",
-                    "SMASHING_POPPET" => "Smashing, Poppet!",
-                    "WHERES_MY_HONEY" => "Where's My Honey?",
-                    "DUNGEON_HEIST" => "Dungeon Heist",
-                    "ITS_GETTING_HOT_IN_HERE" => "It's Getting Hot in Here",
-                    "MINER_FOR_FIRE" => "Miner for Fire",
-                    "LIKE_A_BOSS" => "Like a Boss",
-                    "BLOODBATH" => "Bloodbath",
-                    "NOT_THE_BEES" => "Not the Bees!",
-                    "JEEPERS_CREEPERS" => "Jeepers Creepers",
-                    "FUNKYTOWN" => "Funkytown",
-                    "INTO_ORBIT" => "Into Orbit",
-                    "ROCK_BOTTOM" => "Rock Bottom",
-                    "FASHION_STATEMENT" => "Fashion Statement",
-                    "VEHICULAR_MANSLAUGHTER" => "Vehicular Manslaughter",
-                    "LUCKY_BREAK" => "Lucky Break",
-                    "THROWING_LINES" => "Throwing Lines",
-                    "DYE_HARD" => "Dye Hard",
-                    "THE_CAVALRY" => "The Cavalry",
-                    "COMPLETELY_AWESOME" => "Completely Awesome",
-                    "TIL_DEATH" => "Til Death...",
-                    "WATCH_YOUR_STEP" => "Watch Your Step!",
-                    "YOU_CAN_DO_IT" => "You Can Do It!",
-                    "MATCHING_ATTIRE" => "Matching Attire",
-                    "BENCHED" => "Benched",
-                    "FOUND_GRAVEYARD" => "Quiet Neighborhood",
-                    "GO_LAVA_FISHING" => "Hot Reels!",
-                    "TALK_TO_NPC_AT_MAX_HAPPINESS" => "Leading Landlord",
-                    "PET_THE_PET" => "Feeling Petty",
-                    "DIE_TO_DEAD_MANS_CHEST" => "Dead Men Tell No Tales",
-                    "STICKY_SITUATION" => "Sticky Situation",
-                    "THERE_ARE_SOME_WHO_CALL_HIM" => "There are Some Who Call Him...",
-                    "DECEIVER_OF_FOOLS" => "Deceiver of Fools",
-                    "ARCHAEOLOGIST" => "Archaeologist",
-                    "PRETTY_IN_PINK" => "Pretty in Pink",
-                    "GET_TERRASPARK_BOOTS" => "Boots of the Hero",
-                    "FLY_A_KITE_ON_A_WINDY_DAY" => "A Rather Blustery Day",
-                    "TURN_GNOME_TO_STATUE" => "Heliophobia",
-                    "THROW_A_PARTY" => "Jolly Jamboree",
-                    "GLORIOUS_GOLDEN_POLE" => "Glorious Golden Pole",
-                    "SERVANT_IN_TRAINING" => "Servant-in-Training",
-                    "GOOD_LITTLE_SLAVE" => "10 Fishing Quests",
-                    "TROUT_MONKEY" => "Trout Monkey",
-                    "FAST_AND_FISHIOUS" => "Fast and Fishious",
-                    "SUPREME_HELPER_MINION" => "Supreme Helper Minion!",
-                    "HEAD_IN_THE_CLOUDS" => "Head in the Clouds",
-                    "BEGONE_EVIL" => "Begone, Evil!",
-                    "EXTRA_SHINY" => "Extra Shiny!",
-                    "DRAX_ATTAX" => "Drax Attax",
-                    "PHOTOSYNTHESIS" => "Photosynthesis",
-                    "GET_A_LIFE" => "Get a Life",
-                    "KILL_THE_SUN" => "Kill the Sun",
-                    "MECHA_MAYHEM" => "Mecha Mayhem",
-                    "PRISMANCER" => "Prismancer",
-                    "IT_CAN_TALK" => "It Can Talk?!",
-                    "GELATIN_WORLD_TOUR" => "Gelatin World Tour",
-                    "TOPPED_OFF" => "Topped Off",
-                    "DEFEAT_DREADNAUTILUS" => "Don't Dread on Me",
-                    "TEMPLE_RAIDER" => "Temple Raider",
-                    "ROBBING_THE_GRAVE" => "Robbing the Grave",
-                    "BALEFUL_HARVEST" => "Baleful Harvest",
-                    "ICE_SCREAM" => "Ice Scream",
-                    "SWORD_OF_THE_HERO" => "Sword of the Hero",
-                    "BIG_BOOTY" => "Big Booty",
-                    "REAL_ESTATE_AGENT" => "Real Estate Agent",
-                    "RAINBOWS_AND_UNICORNS" => "Rainbows and Unicorns",
-                    "SICK_THROW" => "Sick Throw",
-                    "YOU_AND_WHAT_ARMY" => "You and What Army?",
-                    _ => null,
-                };
-
-                if (name != null) ArchipelagoSystem.QueueLocationClient(name);
-            };
+            if (Main.netMode != NetmodeID.Server) Main.Achievements.OnAchievementCompleted += OnAchievementCompleted;
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             var message = reader.ReadString();
+            var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
             if (message == "")
             {
-                ArchipelagoSystem.Chat(ArchipelagoSystem.Status(), whoAmI);
+                archipelagoSystem.Chat(archipelagoSystem.Status(), whoAmI);
             }
             else
             {
-                ArchipelagoSystem.QueueLocation(message);
+                archipelagoSystem.QueueLocation(message);
             }
+        }
+
+        public override void Unload()
+        {
+            if (Main.netMode != NetmodeID.Server) Main.Achievements.OnAchievementCompleted -= OnAchievementCompleted;
+        }
+
+        void OnAchievementCompleted(Achievement achievement)
+        {
+            var name = achievement.Name switch
+            {
+                "TIMBER" => "Timber!!",
+                "NO_HOBO" => "No Hobo",
+                "OBTAIN_HAMMER" => "Stop! Hammer Time!",
+                "OOO_SHINY" => "Ooo! Shiny!",
+                "HEART_BREAKER" => "Heart Breaker",
+                "HEAVY_METAL" => "Heavy Metal",
+                "I_AM_LOOT" => "I Am Loot!",
+                "STAR_POWER" => "Star Power",
+                "HOLD_ON_TIGHT" => "Hold on Tight!",
+                "SMASHING_POPPET" => "Smashing, Poppet!",
+                "WHERES_MY_HONEY" => "Where's My Honey?",
+                "DUNGEON_HEIST" => "Dungeon Heist",
+                "ITS_GETTING_HOT_IN_HERE" => "It's Getting Hot in Here",
+                "MINER_FOR_FIRE" => "Miner for Fire",
+                "LIKE_A_BOSS" => "Like a Boss",
+                "BLOODBATH" => "Bloodbath",
+                "NOT_THE_BEES" => "Not the Bees!",
+                "JEEPERS_CREEPERS" => "Jeepers Creepers",
+                "FUNKYTOWN" => "Funkytown",
+                "INTO_ORBIT" => "Into Orbit",
+                "ROCK_BOTTOM" => "Rock Bottom",
+                "FASHION_STATEMENT" => "Fashion Statement",
+                "VEHICULAR_MANSLAUGHTER" => "Vehicular Manslaughter",
+                "LUCKY_BREAK" => "Lucky Break",
+                "THROWING_LINES" => "Throwing Lines",
+                "DYE_HARD" => "Dye Hard",
+                "THE_CAVALRY" => "The Cavalry",
+                "COMPLETELY_AWESOME" => "Completely Awesome",
+                "TIL_DEATH" => "Til Death...",
+                "WATCH_YOUR_STEP" => "Watch Your Step!",
+                "YOU_CAN_DO_IT" => "You Can Do It!",
+                "MATCHING_ATTIRE" => "Matching Attire",
+                "BENCHED" => "Benched",
+                "FOUND_GRAVEYARD" => "Quiet Neighborhood",
+                "GO_LAVA_FISHING" => "Hot Reels!",
+                "TALK_TO_NPC_AT_MAX_HAPPINESS" => "Leading Landlord",
+                "PET_THE_PET" => "Feeling Petty",
+                "DIE_TO_DEAD_MANS_CHEST" => "Dead Men Tell No Tales",
+                "STICKY_SITUATION" => "Sticky Situation",
+                "THERE_ARE_SOME_WHO_CALL_HIM" => "There are Some Who Call Him...",
+                "DECEIVER_OF_FOOLS" => "Deceiver of Fools",
+                "ARCHAEOLOGIST" => "Archaeologist",
+                "PRETTY_IN_PINK" => "Pretty in Pink",
+                "GET_TERRASPARK_BOOTS" => "Boots of the Hero",
+                "FLY_A_KITE_ON_A_WINDY_DAY" => "A Rather Blustery Day",
+                "TURN_GNOME_TO_STATUE" => "Heliophobia",
+                "THROW_A_PARTY" => "Jolly Jamboree",
+                "GLORIOUS_GOLDEN_POLE" => "Glorious Golden Pole",
+                "SERVANT_IN_TRAINING" => "Servant-in-Training",
+                "GOOD_LITTLE_SLAVE" => "10 Fishing Quests",
+                "TROUT_MONKEY" => "Trout Monkey",
+                "FAST_AND_FISHIOUS" => "Fast and Fishious",
+                "SUPREME_HELPER_MINION" => "Supreme Helper Minion!",
+                "HEAD_IN_THE_CLOUDS" => "Head in the Clouds",
+                "BEGONE_EVIL" => "Begone, Evil!",
+                "EXTRA_SHINY" => "Extra Shiny!",
+                "DRAX_ATTAX" => "Drax Attax",
+                "PHOTOSYNTHESIS" => "Photosynthesis",
+                "GET_A_LIFE" => "Get a Life",
+                "KILL_THE_SUN" => "Kill the Sun",
+                "MECHA_MAYHEM" => "Mecha Mayhem",
+                "PRISMANCER" => "Prismancer",
+                "IT_CAN_TALK" => "It Can Talk?!",
+                "GELATIN_WORLD_TOUR" => "Gelatin World Tour",
+                "TOPPED_OFF" => "Topped Off",
+                "DEFEAT_DREADNAUTILUS" => "Don't Dread on Me",
+                "TEMPLE_RAIDER" => "Temple Raider",
+                "ROBBING_THE_GRAVE" => "Robbing the Grave",
+                "BALEFUL_HARVEST" => "Baleful Harvest",
+                "ICE_SCREAM" => "Ice Scream",
+                "SWORD_OF_THE_HERO" => "Sword of the Hero",
+                "BIG_BOOTY" => "Big Booty",
+                "REAL_ESTATE_AGENT" => "Real Estate Agent",
+                "RAINBOWS_AND_UNICORNS" => "Rainbows and Unicorns",
+                "SICK_THROW" => "Sick Throw",
+                "YOU_AND_WHAT_ARMY" => "You and What Army?",
+                _ => null,
+            };
+
+            if (name != null) ModContent.GetInstance<ArchipelagoSystem>().QueueLocationClient(name);
         }
     }
 }

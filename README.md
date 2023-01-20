@@ -22,17 +22,6 @@ Because this mod adds an extra layer of multiplayer, there are many ways to use 
 * Randomize multiple singleplayer or multiplayer Terraria worlds between each other
 * Randomize Terraria with entirely separate games
 
-## Important Known Issue
-
-For achievements to work, the mod needs to be loaded twice. Whether you enabled the mod, causing
-a reload, or the game loaded the mod upon startup, you must click Workshop > Manage Mods > Force
-Reload.
-
-If you're experienced with Terraria modding, advice about this bug would be appreciated. Search for
-`On.Terraria.Achievements.AchievementCondition.Complete +=`, and you'll find the code enabling
-the bug. If you copy that statement into an empty mod, it exhibits the same problem. You can ping
-me on the [Archipelago Discord](https://discord.gg/8Z65BR2) `@Seldom`.
-
 ## Usage
 
 ### For the Terraria player
@@ -41,12 +30,10 @@ Clone/download this repo into Documents/My Games/Terraria/tModLoader/ModSources 
 SeldomArchipelago.sln is at
 Documents/My Games/Terraria/tModLoader/ModSources/SeldomArchipelago/SeldomArchipelago.sln.
 In tModLoader, go to Workshop > Develop Mods, and click "Build + Reload" under SeldomArchipelago.
-For good measure, also click Workshop > Manage Mods > Force Reload. You'll have to do this
-every time you start the game. In Workshop > Manage Mods, edit Archipelago Randomizer
-(Seldom's Implementation)'s settings. Since this game isn't on Archipelago's main server,
-you'll need to set all of the settings, including the advanced ones. If you're hosting, the address
-will probably be "localhost" and the server should tell you the port. If not, whoever's hosting
-should know.
+In Workshop > Manage Mods, edit Archipelago Randomizer (Seldom's Implementation)'s settings.
+Since this game isn't on Archipelago's main server, you'll need to set all of the settings,
+including the advanced ones. If you're hosting, the address will probably be "localhost"
+and the server should tell you the port. If not, whoever's hosting should know.
 
 You may use as many worlds as you like. When you're ready, run `/apstart` to enable sending
 and recieving checks. You may open your world in multiplayer for others to join.

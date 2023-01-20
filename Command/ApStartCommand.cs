@@ -17,10 +17,11 @@ namespace SeldomArchipelago.Command
                 return;
             }
 
-            if (ArchipelagoSystem.Enable())
-                ArchipelagoSystem.Chat("Enabled Archipelago");
+            var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
+            if (archipelagoSystem.Enable())
+                archipelagoSystem.Chat("Enabled Archipelago");
             else
-                ArchipelagoSystem.Chat("Could not enable Archipelago since you are not connected");
+                archipelagoSystem.Chat("Could not enable Archipelago since you are not connected");
         }
     }
 }
