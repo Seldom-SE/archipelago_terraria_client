@@ -115,6 +115,8 @@ namespace SeldomArchipelago.Systems
                 var item = session.Items.DequeueItem();
                 var itemName = session.Items.GetItemName(item.Item);
 
+                if (collectedItems.Contains(itemName)) continue;
+
                 switch (itemName)
                 {
                     case "Torch God's Favor": GiveItem(itemName, ItemID.TorchGodsFavor); break;
@@ -126,7 +128,7 @@ namespace SeldomArchipelago.Systems
                     case "Post-Queen Bee": NPC.downedQueenBee = true; break;
                     case "Post-Skeletron": NPC.downedBoss3 = true; break;
                     case "Post-Deerclops": NPC.downedDeerclops = true; break;
-                    case "Hardmode": WorldGen.StartHardmode(); collectedItems.Add("Hardmode"); break;
+                    case "Hardmode": WorldGen.StartHardmode(); break;
                     case "Post-Pirate Invasion": NPC.downedPirates = true; break;
                     case "Post-Frost Legion": NPC.downedFrost = true; break;
                     case "Post-Queen Slime": NPC.downedQueenSlime = true; break;
@@ -223,6 +225,7 @@ namespace SeldomArchipelago.Systems
                     case "Lucky Coin": GiveItem(itemName, ItemID.LuckyCoin); break;
                 }
 
+                collectedItems.Add(itemName);
                 Chat($"Recieved {itemName} from {session.Players.GetPlayerAlias(item.Player)}!");
             }
         }
@@ -334,8 +337,6 @@ namespace SeldomArchipelago.Systems
 
         public void GiveItem(string itemName, int item)
         {
-            if (collectedItems.Contains(itemName)) return;
-
             foreach (var player in Main.player)
             {
                 player.QuickSpawnItem(player.GetSource_GiftOrReward(), item);
