@@ -115,8 +115,6 @@ namespace SeldomArchipelago.Systems
                 var item = session.Items.DequeueItem();
                 var itemName = session.Items.GetItemName(item.Item);
 
-                if (collectedItems.Contains(itemName)) continue;
-
                 switch (itemName)
                 {
                     case "Torch God's Favor": GiveItem(itemName, ItemID.TorchGodsFavor); break;
@@ -241,15 +239,14 @@ namespace SeldomArchipelago.Systems
 
             locationBacklog.Clear();
             locationQueue = null;
-            session = null;
             enabled = false;
             collectedItems = new List<string>();
             collectedLocations = new List<string>();
 
             Main.Achievements?.ClearAll();
 
-            if (session == null) return;
-            session.Socket.Disconnect();
+            if (session != null) session.Socket.Disconnect();
+            session = null;
         }
 
         public string[] Status() => Tuple.Create(session != null, enabled) switch
@@ -311,7 +308,7 @@ namespace SeldomArchipelago.Systems
             }
 
             var location = session.Locations.GetLocationIdFromName("Terraria", locationName);
-            if (location == -1) return;
+            if (location == -1 || !session.Locations.AllMissingLocations.Contains(location)) return;
 
             if (!collectedLocations.Contains(locationName))
             {
@@ -337,12 +334,12 @@ namespace SeldomArchipelago.Systems
 
         public void GiveItem(string itemName, int item)
         {
+            if (collectedItems.Contains(itemName)) return;
+
             foreach (var player in Main.player)
             {
                 player.QuickSpawnItem(player.GetSource_GiftOrReward(), item);
             }
-
-            collectedItems.Add(itemName);
         }
     }
 }
