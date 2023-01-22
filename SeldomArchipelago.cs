@@ -14,7 +14,6 @@ namespace SeldomArchipelago
     public class SeldomArchipelago : Mod
     {
         // TODO
-        // Archipelago-end KeyError causing disconnect
         // Better achievement handling
 
         // Terraria is single-threaded so this *should* be fine
