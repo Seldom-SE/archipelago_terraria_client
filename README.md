@@ -26,14 +26,12 @@ Because this mod adds an extra layer of multiplayer, there are many ways to use 
 
 ### For the Terraria player
 
-Clone/download this repo into Documents/My Games/Terraria/tModLoader/ModSources such that
-SeldomArchipelago.sln is at
-Documents/My Games/Terraria/tModLoader/ModSources/SeldomArchipelago/SeldomArchipelago.sln.
-In tModLoader, go to Workshop > Develop Mods, and click "Build + Reload" under SeldomArchipelago.
-In Workshop > Manage Mods, edit Archipelago Randomizer (Seldom's Implementation)'s settings.
-Since this game isn't on Archipelago's main server, you'll need to set all of the settings,
-including the advanced ones. If you're hosting, the address will probably be "localhost"
-and the server should tell you the port. If not, whoever's hosting should know.
+Subscribe to the mod at
+[its Steam page](https://steamcommunity.com/sharedfiles/filedetails/?id=2922217554). In Workshop >
+Manage Mods, edit Archipelago Randomizer (Seldom's Implementation)'s settings. Since this game
+isn't on Archipelago's main server, you'll need to set all of the settings, including the advanced
+ones. If you're hosting, the address will probably be "localhost" and the server should tell you
+the port. If not, whoever's hosting should know.
 
 You may use as many worlds as you like. When you're ready, run `/apstart` to enable sending
 and recieving checks. You may open your world in multiplayer for others to join.
@@ -62,11 +60,11 @@ haven't kept my fork up to date. You may also host the game from `WebHost.py`, i
 - [X] Refactor!
 - [ ] More thorough chat integration
 - [X] Work on the README
-- [ ] Publish to Steam Workshop. Makes setup so much easier
+- [X] Publish to Steam Workshop. Makes setup so much easier
 - [X] Rebalance items
 - [X] Explore more item/location options, like achievements, NPCs, bestiary completion, Journey
 research, and item rewards
-- [ ] Docs
+- [X] Docs
 - [ ] Get my fork merged if people want it
 - [ ] Other Archipelago features like deathlink? Do people want deathlink?
 - [ ] Calamity maybe probably maybe

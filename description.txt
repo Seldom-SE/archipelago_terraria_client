@@ -1,3 +1,5 @@
 Archipelago multiworld randomizer integration for Terraria. Randomizes permanent world effects caused by defeating bosses. Optionally randomizes achievement checks and item rewards.
 
 For usage instructions, see the mod's homepage.
+
+https://github.com/Seldom-SE/archipelago_terraria_client
