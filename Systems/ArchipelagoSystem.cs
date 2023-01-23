@@ -152,7 +152,7 @@ namespace SeldomArchipelago.Systems
                     case "Post-Moon Lord": NPC.downedMoonlord = true; break;
                     case "Hermes Boots": GiveItem(ItemID.HermesBoots); break;
                     case "Magic Mirror": GiveItem(ItemID.MagicMirror); break;
-                    case "Cloud in a Bottle": GiveItem(ItemID.CloudinaBalloon); break;
+                    case "Cloud in a Bottle": GiveItem(ItemID.CloudinaBottle); break;
                     case "Grappling Hook": GiveItem(ItemID.GrapplingHook); break;
                     case "Climbing Claws": GiveItem(ItemID.ClimbingClaws); break;
                     case "Fledgling Wings": GiveItem(ItemID.CreativeWings); break;
