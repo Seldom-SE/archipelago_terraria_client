@@ -23,12 +23,13 @@ namespace SeldomArchipelago.Systems
         List<Task<LocationInfoPacket>> locationQueue;
         ArchipelagoSession session;
         bool enabled;
-        List<string> collectedItems = new List<string>();
+        int collectedItems;
+        int currentItem;
         List<string> collectedLocations = new List<string>();
 
         public override void LoadWorldData(TagCompound tag)
         {
-            collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<List<string>>("ApCollectedItems") : new List<string>();
+            collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
         }
 
         public override void OnWorldLoad()
@@ -115,7 +116,7 @@ namespace SeldomArchipelago.Systems
                 var item = session.Items.DequeueItem();
                 var itemName = session.Items.GetItemName(item.Item);
 
-                if (collectedItems.Contains(itemName)) continue;
+                if (currentItem++ < collectedItems) continue;
 
                 switch (itemName)
                 {
@@ -223,9 +224,10 @@ namespace SeldomArchipelago.Systems
                     case "Step Stool": GiveItem(ItemID.PortableStool); break;
                     case "Gold Ring": GiveItem(ItemID.GoldRing); break;
                     case "Lucky Coin": GiveItem(ItemID.LuckyCoin); break;
+                    case "50 Silver": GiveItem(ItemID.SilverCoin, 50); break;
                 }
 
-                collectedItems.Add(itemName);
+                collectedItems++;
                 Chat($"Recieved {itemName} from {session.Players.GetPlayerAlias(item.Player)}!");
             }
         }
@@ -243,7 +245,8 @@ namespace SeldomArchipelago.Systems
             locationBacklog.Clear();
             locationQueue = null;
             enabled = false;
-            collectedItems = new List<string>();
+            collectedItems = 0;
+            currentItem = 0;
             collectedLocations = new List<string>();
 
             Main.Achievements?.ClearAll();
@@ -335,12 +338,12 @@ namespace SeldomArchipelago.Systems
             packet.Send();
         }
 
-        public void GiveItem(int item)
+        public void GiveItem(int item, int count = 1)
         {
             for (var i = 0; i < Main.maxPlayers; i++)
             {
                 var player = Main.player[i];
-                if (player.active) player.QuickSpawnItem(player.GetSource_GiftOrReward(), item);
+                if (player.active) player.QuickSpawnItem(player.GetSource_GiftOrReward(), item, count);
             }
         }
     }
