@@ -34,7 +34,7 @@ ones. If you're hosting, the address will probably be "localhost" and the server
 the port. If not, whoever's hosting should know.
 
 You may use as many worlds as you like. When you're ready, run `/apstart` to enable sending
-and recieving checks. You may open your world in multiplayer for others to join.
+and receiving checks. You may open your world in multiplayer for others to join.
 
 ### For the host, if you have any Terraria players
 

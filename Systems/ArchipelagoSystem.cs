@@ -228,7 +228,7 @@ namespace SeldomArchipelago.Systems
                 }
 
                 collectedItems++;
-                Chat($"Recieved {itemName} from {session.Players.GetPlayerAlias(item.Player)}!");
+                Chat($"Received {itemName} from {session.Players.GetPlayerAlias(item.Player)}!");
             }
         }
 
