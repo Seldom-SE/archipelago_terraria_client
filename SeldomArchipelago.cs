@@ -31,7 +31,7 @@ namespace SeldomArchipelago
                 var cursor = new ILCursor(il);
 
                 cursor.GotoNext(i => i.MatchLdsfld(typeof(Main).GetField(nameof(Main.netMode))));
-                cursor.EmitDelegate<Action>(() => archipelagoSystem.QueueLocation("Torch God"));
+                cursor.EmitDelegate<Action>(() => archipelagoSystem.QueueLocationClient("Torch God"));
                 cursor.Emit(OpCodes.Ret);
             };
 
