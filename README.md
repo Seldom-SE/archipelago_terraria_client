@@ -11,7 +11,7 @@ might get Mothwing Cloak in their Hollow Knight game. But you can't enter the Du
 until your friend picks up the item at Vengeful Spirit's location in their game. Archipelago
 has support for a lot of games. Learn more on its [website](https://archipelago.gg/).
 
-This implementations uses boss kills and event clears as checks. The items are the permanent
+This implementation uses boss kills and event clears as checks. The items are the permanent
 changes to the world that bosses and events reward in vanilla. Things like "Post-Plantera" and
 "Hardmode". Bosses still drop their original loot, though. Optionally, you may also include
 achievement checks and item rewards.
