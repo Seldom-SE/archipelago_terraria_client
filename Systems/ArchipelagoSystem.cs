@@ -64,6 +64,8 @@ namespace SeldomArchipelago.Systems
             }
         }
 
+        bool[] flags = new[] { NPC.downedSlimeKing, NPC.downedBoss1, NPC.downedBoss2, DD2Event.DownedInvasionT1, NPC.downedGoblins, NPC.downedQueenBee, NPC.downedBoss3, NPC.downedDeerclops, Main.hardMode, NPC.downedPirates, NPC.downedQueenSlime, NPC.downedMechBoss1, NPC.downedMechBoss2, NPC.downedMechBoss3, NPC.downedPlantBoss, NPC.downedGolemBoss, DD2Event.DownedInvasionT2, NPC.downedMartians, NPC.downedFishron, NPC.downedHalloweenTree, NPC.downedHalloweenKing, NPC.downedChristmasTree, NPC.downedChristmasSantank, NPC.downedChristmasIceQueen, NPC.downedFrost, NPC.downedEmpressOfLight, NPC.downedAncientCultist, NPC.downedTowerNebula, NPC.downedMoonlord };
+
         public override void PostUpdateWorld()
         {
             if (session == null) return;
@@ -120,23 +122,22 @@ namespace SeldomArchipelago.Systems
 
                 switch (itemName)
                 {
-                    case "Torch God's Favor": GiveItem(ItemID.TorchGodsFavor); break;
-                    case "Post-Goblin Army": NPC.downedGoblins = true; break;
+                    case "Reward: Torch God's Favor": GiveItem(ItemID.TorchGodsFavor); break;
                     case "Post-King Slime": NPC.downedSlimeKing = true; break;
                     case "Post-Eye of Cthulhu": NPC.downedBoss1 = true; break;
-                    case "Post-Eater of Worlds or Brain of Cthulhu": NPC.downedBoss2 = true; break;
+                    case "Post-Evil Boss": NPC.downedBoss2 = true; break;
                     case "Post-Old One's Army Tier 1": DD2Event.DownedInvasionT1 = true; break;
+                    case "Post-Goblin Army": NPC.downedGoblins = true; break;
                     case "Post-Queen Bee": NPC.downedQueenBee = true; break;
                     case "Post-Skeletron": NPC.downedBoss3 = true; break;
                     case "Post-Deerclops": NPC.downedDeerclops = true; break;
                     case "Hardmode": WorldGen.StartHardmode(); break;
                     case "Post-Pirate Invasion": NPC.downedPirates = true; break;
-                    case "Post-Frost Legion": NPC.downedFrost = true; break;
                     case "Post-Queen Slime": NPC.downedQueenSlime = true; break;
                     case "Post-The Twins": NPC.downedMechBoss1 = NPC.downedMechBossAny = true; break;
+                    case "Post-Old One's Army Tier 2": DD2Event.DownedInvasionT2 = true; break;
                     case "Post-The Destroyer": NPC.downedMechBoss2 = NPC.downedMechBossAny = true; break;
                     case "Post-Skeletron Prime": NPC.downedMechBoss3 = NPC.downedMechBossAny = true; break;
-                    case "Post-Old One's Army Tier 2": DD2Event.DownedInvasionT2 = true; break;
                     case "Post-Plantera": NPC.downedPlantBoss = true; break;
                     case "Post-Golem": NPC.downedGolemBoss = true; break;
                     case "Post-Old One's Army Tier 3": DD2Event.DownedInvasionT3 = true; break;
@@ -147,84 +148,123 @@ namespace SeldomArchipelago.Systems
                     case "Post-Everscream": NPC.downedChristmasTree = true; break;
                     case "Post-Santa-NK1": NPC.downedChristmasSantank = true; break;
                     case "Post-Ice Queen": NPC.downedChristmasIceQueen = true; break;
+                    case "Post-Frost Legion": NPC.downedFrost = true; break;
                     case "Post-Empress of Light": NPC.downedEmpressOfLight = true; break;
                     case "Post-Lunatic Cultist": NPC.downedAncientCultist = true; break;
                     case "Post-Lunar Events": NPC.downedTowerNebula = NPC.downedTowerSolar = NPC.downedTowerStardust = NPC.downedTowerVortex = true; break;
                     case "Post-Moon Lord": NPC.downedMoonlord = true; break;
-                    case "Hermes Boots": GiveItem(ItemID.HermesBoots); break;
-                    case "Magic Mirror": GiveItem(ItemID.MagicMirror); break;
-                    case "Cloud in a Bottle": GiveItem(ItemID.CloudinaBottle); break;
-                    case "Grappling Hook": GiveItem(ItemID.GrapplingHook); break;
-                    case "Climbing Claws": GiveItem(ItemID.ClimbingClaws); break;
-                    case "Fledgling Wings": GiveItem(ItemID.CreativeWings); break;
-                    case "Demon Conch": GiveItem(ItemID.DemonConch); break;
-                    case "Magic Conch": GiveItem(ItemID.MagicConch); break;
-                    case "Anklet of the Wind": GiveItem(ItemID.AnkletoftheWind); break;
-                    case "Aglet": GiveItem(ItemID.Aglet); break;
-                    case "Ice Skates": GiveItem(ItemID.IceSkates); break;
-                    case "Lava Charm": GiveItem(ItemID.LavaCharm); break;
-                    case "Obsidian Rose": GiveItem(ItemID.ObsidianRose); break;
-                    case "Nature's Gift": GiveItem(ItemID.NaturesGift); break;
-                    case "Feral Claws": GiveItem(ItemID.FeralClaws); break;
-                    case "Magma Stone": GiveItem(ItemID.MagmaStone); break;
-                    case "Shark Tooth Necklace": GiveItem(ItemID.SharkToothNecklace); break;
-                    case "Cobalt Shield": GiveItem(ItemID.CobaltShield); break;
-                    case "Band of Regeneration": GiveItem(ItemID.BandofRegeneration); break;
-                    case "Philosopher's Stone": GiveItem(ItemID.PhilosophersStone); break;
-                    case "Cross Necklace": GiveItem(ItemID.CrossNecklace); break;
-                    case "Magic Quiver": GiveItem(ItemID.MagicQuiver); break;
-                    case "Rifle Scope": GiveItem(ItemID.RifleScope); break;
-                    case "Celestial Magnet": GiveItem(ItemID.CelestialMagnet); break;
-                    case "Rod of Discord": GiveItem(ItemID.RodofDiscord); break;
-                    case "Flying Carpet": GiveItem(ItemID.FlyingCarpet); break;
-                    case "Lifeform Analyzer": GiveItem(ItemID.LifeformAnalyzer); break;
-                    case "Ancient Chisel": GiveItem(ItemID.AncientChisel); break;
-                    case "Moon Charm": GiveItem(ItemID.MoonCharm); break;
-                    case "Neptune's Shell": GiveItem(ItemID.NeptunesShell); break;
-                    case "Shoe Spikes": GiveItem(ItemID.ShoeSpikes); break;
-                    case "Tabi": GiveItem(ItemID.Tabi); break;
-                    case "Black Belt": GiveItem(ItemID.BlackBelt); break;
-                    case "Flesh Knuckles": GiveItem(ItemID.FleshKnuckles); break;
-                    case "Putrid Scent": GiveItem(ItemID.PutridScent); break;
-                    case "Paladin's Shield": GiveItem(ItemID.PaladinsShield); break;
-                    case "Frozen Turtle Shell": GiveItem(ItemID.FrozenTurtleShell); break;
-                    case "Star Cloak": GiveItem(ItemID.StarCloak); break;
-                    case "Discount Card": GiveItem(ItemID.DiscountCard); break;
-                    case "Red Counterweight": GiveItem(ItemID.RedCounterweight); break;
-                    case "Yoyo Glove": GiveItem(ItemID.YoYoGlove); break;
-                    case "Depth Meter": GiveItem(ItemID.DepthMeter); break;
-                    case "Compass": GiveItem(ItemID.Compass); break;
-                    case "Radar": GiveItem(ItemID.Radar); break;
-                    case "DPS Meter": GiveItem(ItemID.DPSMeter); break;
-                    case "Metal Detector": GiveItem(ItemID.MetalDetector); break;
-                    case "Sextant": GiveItem(ItemID.Sextant); break;
-                    case "Stopwatch": GiveItem(ItemID.Stopwatch); break;
-                    case "Tally Counter": GiveItem(ItemID.TallyCounter); break;
-                    case "Fisherman's Pocket Guide": GiveItem(ItemID.FishermansGuide); break;
-                    case "High Test Fishing Line": GiveItem(ItemID.HighTestFishingLine); break;
-                    case "Angler Earring": GiveItem(ItemID.AnglerEarring); break;
-                    case "Tackle Box": GiveItem(ItemID.TackleBox); break;
-                    case "Lavaproof Fishing Hook": GiveItem(ItemID.LavaFishingHook); break;
-                    case "Weather Radio": GiveItem(ItemID.WeatherRadio); break;
-                    case "Blindfold": GiveItem(ItemID.Blindfold); break;
-                    case "Pocket Mirror": GiveItem(ItemID.PocketMirror); break;
-                    case "Vitamins": GiveItem(ItemID.Vitamins); break;
-                    case "Armor Polish": GiveItem(ItemID.ArmorPolish); break;
-                    case "Adhesive Bandage": GiveItem(ItemID.AdhesiveBandage); break;
-                    case "Bezoar": GiveItem(ItemID.Bezoar); break;
-                    case "Nazar": GiveItem(ItemID.Nazar); break;
-                    case "Megaphone": GiveItem(ItemID.Megaphone); break;
-                    case "Trifold Map": GiveItem(ItemID.TrifoldMap); break;
-                    case "Fast Clock": GiveItem(ItemID.FastClock); break;
-                    case "Brick Layer": GiveItem(ItemID.BrickLayer); break;
-                    case "Extendo Grip": GiveItem(ItemID.ExtendoGrip); break;
-                    case "Paint Sprayer": GiveItem(ItemID.PaintSprayer); break;
-                    case "Portable Cement Mixer": GiveItem(ItemID.PortableCementMixer); break;
-                    case "Treasure Magnet": GiveItem(ItemID.TreasureMagnet); break;
-                    case "Step Stool": GiveItem(ItemID.PortableStool); break;
-                    case "Gold Ring": GiveItem(ItemID.GoldRing); break;
-                    case "Lucky Coin": GiveItem(ItemID.LuckyCoin); break;
-                    case "50 Silver": GiveItem(ItemID.SilverCoin, 50); break;
+                    case "Reward: Hermes Boots": GiveItem(ItemID.HermesBoots); break;
+                    case "Reward: Magic Mirror": GiveItem(ItemID.MagicMirror); break;
+                    case "Reward: Demon Conch": GiveItem(ItemID.DemonConch); break;
+                    case "Reward: Magic Conch": GiveItem(ItemID.MagicConch); break;
+                    case "Reward: Grappling Hook": GiveItem(ItemID.GrapplingHook); break;
+                    case "Reward: Cloud in a Bottle": GiveItem(ItemID.CloudinaBottle); break;
+                    case "Reward: Climbing Claws": GiveItem(ItemID.ClimbingClaws); break;
+                    case "Reward: Ancient Chisel": GiveItem(ItemID.AncientChisel); break;
+                    case "Reward: Fledgling Wings": GiveItem(ItemID.CreativeWings); break;
+                    case "Reward: Rod of Discord": GiveItem(ItemID.RodofDiscord); break;
+                    case "Reward: Anklet of the Wind": GiveItem(ItemID.AnkletoftheWind); break;
+                    case "Reward: Aglet": GiveItem(ItemID.Aglet); break;
+                    case "Reward: Ice Skates": GiveItem(ItemID.IceSkates); break;
+                    case "Reward: Lava Charm": GiveItem(ItemID.LavaCharm); break;
+                    case "Reward: Obsidian Rose": GiveItem(ItemID.ObsidianRose); break;
+                    case "Reward: Nature's Gift": GiveItem(ItemID.NaturesGift); break;
+                    case "Reward: Feral Claws": GiveItem(ItemID.FeralClaws); break;
+                    case "Reward: Magma Stone": GiveItem(ItemID.MagmaStone); break;
+                    case "Reward: Shark Tooth Necklace": GiveItem(ItemID.SharkToothNecklace); break;
+                    case "Reward: Cobalt Shield": GiveItem(ItemID.CobaltShield); break;
+                    case "Reward: Band of Regeneration": GiveItem(ItemID.BandofRegeneration); break;
+                    case "Reward: Philosopher's Stone": GiveItem(ItemID.PhilosophersStone); break;
+                    case "Reward: Cross Necklace": GiveItem(ItemID.CrossNecklace); break;
+                    case "Reward: Magic Quiver": GiveItem(ItemID.MagicQuiver); break;
+                    case "Reward: Rifle Scope": GiveItem(ItemID.RifleScope); break;
+                    case "Reward: Celestial Magnet": GiveItem(ItemID.CelestialMagnet); break;
+                    case "Reward: Flying Carpet": GiveItem(ItemID.FlyingCarpet); break;
+                    case "Reward: Lifeform Analyzer": GiveItem(ItemID.LifeformAnalyzer); break;
+                    case "Reward: Moon Charm": GiveItem(ItemID.MoonCharm); break;
+                    case "Reward: Neptune's Shell": GiveItem(ItemID.NeptunesShell); break;
+                    case "Reward: Shoe Spikes": GiveItem(ItemID.ShoeSpikes); break;
+                    case "Reward: Tabi": GiveItem(ItemID.Tabi); break;
+                    case "Reward: Black Belt": GiveItem(ItemID.BlackBelt); break;
+                    case "Reward: Flesh Knuckles": GiveItem(ItemID.FleshKnuckles); break;
+                    case "Reward: Putrid Scent": GiveItem(ItemID.PutridScent); break;
+                    case "Reward: Paladin's Shield": GiveItem(ItemID.PaladinsShield); break;
+                    case "Reward: Frozen Turtle Shell": GiveItem(ItemID.FrozenTurtleShell); break;
+                    case "Reward: Star Cloak": GiveItem(ItemID.StarCloak); break;
+                    case "Reward: Discount Card": GiveItem(ItemID.DiscountCard); break;
+                    case "Reward: Red Counterweight": GiveItem(ItemID.RedCounterweight); break;
+                    case "Reward: Yoyo Glove": GiveItem(ItemID.YoYoGlove); break;
+                    case "Reward: Depth Meter": GiveItem(ItemID.DepthMeter); break;
+                    case "Reward: Compass": GiveItem(ItemID.Compass); break;
+                    case "Reward: Radar": GiveItem(ItemID.Radar); break;
+                    case "Reward: DPS Meter": GiveItem(ItemID.DPSMeter); break;
+                    case "Reward: Metal Detector": GiveItem(ItemID.MetalDetector); break;
+                    case "Reward: Sextant": GiveItem(ItemID.Sextant); break;
+                    case "Reward: Stopwatch": GiveItem(ItemID.Stopwatch); break;
+                    case "Reward: Tally Counter": GiveItem(ItemID.TallyCounter); break;
+                    case "Reward: Fisherman's Pocket Guide": GiveItem(ItemID.FishermansGuide); break;
+                    case "Reward: High Test Fishing Line": GiveItem(ItemID.HighTestFishingLine); break;
+                    case "Reward: Angler Earring": GiveItem(ItemID.AnglerEarring); break;
+                    case "Reward: Tackle Box": GiveItem(ItemID.TackleBox); break;
+                    case "Reward: Lavaproof Fishing Hook": GiveItem(ItemID.LavaFishingHook); break;
+                    case "Reward: Weather Radio": GiveItem(ItemID.WeatherRadio); break;
+                    case "Reward: Blindfold": GiveItem(ItemID.Blindfold); break;
+                    case "Reward: Pocket Mirror": GiveItem(ItemID.PocketMirror); break;
+                    case "Reward: Vitamins": GiveItem(ItemID.Vitamins); break;
+                    case "Reward: Armor Polish": GiveItem(ItemID.ArmorPolish); break;
+                    case "Reward: Adhesive Bandage": GiveItem(ItemID.AdhesiveBandage); break;
+                    case "Reward: Bezoar": GiveItem(ItemID.Bezoar); break;
+                    case "Reward: Nazar": GiveItem(ItemID.Nazar); break;
+                    case "Reward: Megaphone": GiveItem(ItemID.Megaphone); break;
+                    case "Reward: Trifold Map": GiveItem(ItemID.TrifoldMap); break;
+                    case "Reward: Fast Clock": GiveItem(ItemID.FastClock); break;
+                    case "Reward: Brick Layer": GiveItem(ItemID.BrickLayer); break;
+                    case "Reward: Extendo Grip": GiveItem(ItemID.ExtendoGrip); break;
+                    case "Reward: Paint Sprayer": GiveItem(ItemID.PaintSprayer); break;
+                    case "Reward: Portable Cement Mixer": GiveItem(ItemID.PortableCementMixer); break;
+                    case "Reward: Treasure Magnet": GiveItem(ItemID.TreasureMagnet); break;
+                    case "Reward: Step Stool": GiveItem(ItemID.PortableStool); break;
+                    case "Reward: Gold Ring": GiveItem(ItemID.GoldRing); break;
+                    case "Reward: Lucky Coin": GiveItem(ItemID.LuckyCoin); break;
+                    case "Reward: Coins":
+                        var flagCount = 0;
+                        foreach (var flag in flags) if (flag) flagCount++;
+                        GiveItem(ItemID.SilverCoin, 50);
+                        var silver = flagCount switch
+                        {
+                            0 => 5,
+                            1 => 6,
+                            2 => 8,
+                            3 => 10,
+                            4 => 15,
+                            5 => 20,
+                            6 => 30,
+                            7 => 50,
+                            8 => 60,
+                            9 => 80,
+                            10 => 100,
+                            11 => 150,
+                            12 => 200,
+                            13 => 300,
+                            14 => 500,
+                            15 => 600,
+                            16 => 800,
+                            17 => 1000,
+                            18 => 1500,
+                            19 => 2000,
+                            20 => 3000,
+                            21 => 5000,
+                            22 => 7000,
+                            23 => 10000,
+                            24 => 15000,
+                            25 => 20000,
+                            26 => 25000,
+                            27 => 30000,
+                            28 => 40000,
+                            _ => 50000,
+                        };
+                        GiveItem(ItemID.SilverCoin, silver);
+                        break;
                 }
 
                 collectedItems++;
