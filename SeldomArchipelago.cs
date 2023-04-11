@@ -173,7 +173,7 @@ namespace SeldomArchipelago
                 "OOO_SHINY" => "Ooo! Shiny!",
                 "NO_HOBO" => "No Hobo",
                 "HEAVY_METAL" => "Heavy Metal",
-                "FREQUENT_FLYER" => "Frequent Flyer",
+                "FREQUENT_FLYER" => "The Frequent Flyer",
                 "DYE_HARD" => "Dye Hard",
                 "LUCKY_BREAK" => "Lucky Break",
                 "STAR_POWER" => "Star Power",
