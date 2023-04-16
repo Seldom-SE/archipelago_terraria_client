@@ -2,6 +2,7 @@ using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -17,6 +18,7 @@ using Terraria.Social;
 
 namespace SeldomArchipelago.Systems
 {
+    // TODO Use a separate class for data and logic
     public class ArchipelagoSystem : ModSystem
     {
         List<string> locationBacklog = new List<string>();
@@ -26,6 +28,8 @@ namespace SeldomArchipelago.Systems
         int collectedItems;
         int currentItem;
         List<string> collectedLocations = new List<string>();
+        List<string> goals = new List<string>();
+        bool victory = false;
 
         public override void LoadWorldData(TagCompound tag)
         {
@@ -43,9 +47,11 @@ namespace SeldomArchipelago.Systems
             var config = ModContent.GetInstance<Config.Config>();
             session = ArchipelagoSessionFactory.CreateSession(config.address, config.port);
 
+            LoginResult result;
             try
             {
-                if (session.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.AllItems) is LoginFailure)
+                result = session.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.AllItems);
+                if (result is LoginFailure)
                 {
                     session = null;
                     return;
@@ -62,6 +68,11 @@ namespace SeldomArchipelago.Systems
             {
                 collectedLocations = new List<string>(locations);
             }
+
+            var success = (LoginSuccessful)result;
+            this.goals = new List<string>(((JArray)success.SlotData["goal"]).ToObject<string[]>());
+
+            victory = false;
         }
 
         bool[] flags = new[] { NPC.downedSlimeKing, NPC.downedBoss1, NPC.downedBoss2, DD2Event.DownedInvasionT1, NPC.downedGoblins, NPC.downedQueenBee, NPC.downedBoss3, NPC.downedDeerclops, Main.hardMode, NPC.downedPirates, NPC.downedQueenSlime, NPC.downedMechBoss1, NPC.downedMechBoss2, NPC.downedMechBoss3, NPC.downedPlantBoss, NPC.downedGolemBoss, DD2Event.DownedInvasionT2, NPC.downedMartians, NPC.downedFishron, NPC.downedHalloweenTree, NPC.downedHalloweenKing, NPC.downedChristmasTree, NPC.downedChristmasSantank, NPC.downedChristmasIceQueen, NPC.downedFrost, NPC.downedEmpressOfLight, NPC.downedAncientCultist, NPC.downedTowerNebula, NPC.downedMoonlord };
@@ -274,6 +285,16 @@ namespace SeldomArchipelago.Systems
                 collectedItems++;
                 Chat($"Received {itemName} from {session.Players.GetPlayerAlias(item.Player)}!");
             }
+
+            if (victory) return;
+
+            foreach (var goal in goals) if (!collectedLocations.Contains(goal)) return;
+
+            var victoryPacket = new StatusUpdatePacket();
+            victoryPacket.Status = ArchipelagoClientState.ClientGoal;
+            session.Socket.SendPacket(victoryPacket);
+
+            victory = true;
         }
 
         public override void SaveWorldData(TagCompound tag)
@@ -292,6 +313,8 @@ namespace SeldomArchipelago.Systems
             collectedItems = 0;
             currentItem = 0;
             collectedLocations = new List<string>();
+            goals = new List<string>();
+            victory = false;
 
             Main.Achievements?.ClearAll();
 

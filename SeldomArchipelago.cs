@@ -13,13 +13,6 @@ namespace SeldomArchipelago
 {
     public class SeldomArchipelago : Mod
     {
-        // TODO
-        // Make achievements UI sync
-        // Save temp achievement criteria
-        // /apstart reconnect
-        // Magic Storage compat
-        // Broken on Linux
-
         // Terraria is single-threaded so this *should* be fine
         bool temp;
 
