@@ -23,5 +23,9 @@ namespace SeldomArchipelago.Config
         [Label("Server Address")]
         [DefaultValue("archipelago.gg")]
         public string address;
+
+        [Label("Password")]
+        [DefaultValue("")]
+        public string password;
     }
 }

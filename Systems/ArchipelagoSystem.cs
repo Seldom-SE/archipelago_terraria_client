@@ -50,7 +50,7 @@ namespace SeldomArchipelago.Systems
             LoginResult result;
             try
             {
-                result = session.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.AllItems);
+                result = session.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.AllItems, null, null, null, config.password == "" ? null : config.password);
                 if (result is LoginFailure)
                 {
                     session = null;
