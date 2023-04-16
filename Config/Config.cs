@@ -15,7 +15,7 @@ namespace SeldomArchipelago.Config
 
         [Label("Port")]
         [Range(0, 65535)]
-        [DefaultValue(46376)]
+        [DefaultValue(38281)]
         public int port;
 
         [Header("Advanced")]
