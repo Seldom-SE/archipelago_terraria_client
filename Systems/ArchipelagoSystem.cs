@@ -325,8 +325,9 @@ namespace SeldomArchipelago.Systems
         public string[] Status() => Tuple.Create(session != null, enabled) switch
         {
             (false, _) => new string[] {
-                "The world is not connected to Archipelago and will need to reload.",
-                "If you are the host, check your config in Workshop > Manage Mods > Config."
+                @"The world is not connected to Archipelago! Reload the world or run ""/apconnect"".",
+                "If you are the host, check your config in the main menu at Workshop > Manage Mods > Config",
+                "Or in-game at Settings > Mod Configuration",
             },
             (true, false) => new string[] { @"Archipelago is connected but not enabled. Once everyone's joined, run ""/apstart"" to start it." },
             (true, true) => new string[] { "Archipelago is active!" },
