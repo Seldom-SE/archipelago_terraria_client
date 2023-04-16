@@ -167,6 +167,7 @@ namespace SeldomArchipelago.Systems
                     case "Reward: Anklet of the Wind": GiveItem(ItemID.AnkletoftheWind); break;
                     case "Reward: Ice Skates": GiveItem(ItemID.IceSkates); break;
                     case "Reward: Lava Charm": GiveItem(ItemID.LavaCharm); break;
+                    case "Reward: Water Walking Boots": GiveItem(ItemID.WaterWalkingBoots); break;
                     case "Reward: Flipper": GiveItem(ItemID.Flipper); break;
                     case "Reward: Frog Leg": GiveItem(ItemID.FrogLeg); break;
                     case "Reward: Shoe Spikes": GiveItem(ItemID.ShoeSpikes); break;
@@ -208,6 +209,7 @@ namespace SeldomArchipelago.Systems
                     case "Reward: Feral Claws": GiveItem(ItemID.FeralClaws); break;
                     case "Reward: Cross Necklace": GiveItem(ItemID.CrossNecklace); break;
                     case "Reward: Star Cloak": GiveItem(ItemID.StarCloak); break;
+                    case "Reward: Titan Glove": GiveItem(ItemID.TitanGlove); break;
                     case "Reward: Obsidian Rose": GiveItem(ItemID.ObsidianRose); break;
                     case "Reward: Magma Stone": GiveItem(ItemID.MagmaStone); break;
                     case "Reward: Shark Tooth Necklace": GiveItem(ItemID.SharkToothNecklace); break;
