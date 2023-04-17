@@ -73,6 +73,16 @@ namespace SeldomArchipelago.Systems
             this.goals = new List<string>(((JArray)success.SlotData["goal"]).ToObject<string[]>());
 
             victory = false;
+
+            session.MessageLog.OnMessageReceived += (message) =>
+            {
+                var text = "";
+                foreach (var part in message.Parts)
+                {
+                    text += part.Text;
+                }
+                Chat(text);
+            };
         }
 
         bool[] flags = new[] { NPC.downedSlimeKing, NPC.downedBoss1, NPC.downedBoss2, DD2Event.DownedInvasionT1, NPC.downedGoblins, NPC.downedQueenBee, NPC.downedBoss3, NPC.downedDeerclops, Main.hardMode, NPC.downedPirates, NPC.downedQueenSlime, NPC.downedMechBoss1, NPC.downedMechBoss2, NPC.downedMechBoss3, NPC.downedPlantBoss, NPC.downedGolemBoss, DD2Event.DownedInvasionT2, NPC.downedMartians, NPC.downedFishron, NPC.downedHalloweenTree, NPC.downedHalloweenKing, NPC.downedChristmasTree, NPC.downedChristmasSantank, NPC.downedChristmasIceQueen, NPC.downedFrost, NPC.downedEmpressOfLight, NPC.downedAncientCultist, NPC.downedTowerNebula, NPC.downedMoonlord };
