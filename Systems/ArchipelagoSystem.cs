@@ -361,6 +361,20 @@ namespace SeldomArchipelago.Systems
             return true;
         }
 
+        public bool SendCommand(string command)
+        {
+            if (session == null)
+            {
+                return false;
+            }
+
+            var packet = new SayPacket();
+            packet.Text = command;
+            session.Socket.SendPacket(packet);
+
+            return true;
+        }
+
         public void Chat(string message, int player = -1)
         {
             if (player == -1)
