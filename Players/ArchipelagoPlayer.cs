@@ -17,7 +17,7 @@ namespace SeldomArchipelago.Players
 {
     public class ArchipelagoPlayer : ModPlayer
     {
-        TagCompound achievements;
+        TagCompound achievements = new();
 
         public override void OnEnterWorld(Player player)
         {
