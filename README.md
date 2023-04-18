@@ -58,7 +58,7 @@ haven't kept my fork up to date. You may also host the game from `WebHost.py`, i
 - [X] Prevent accidental checks when loading older worlds
 - [X] Wall, Plantera, and Zenith goals (maybe more)
 - [X] Refactor!
-- [ ] More thorough chat integration
+- [X] More thorough chat integration
 - [X] Work on the README
 - [X] Publish to Steam Workshop. Makes setup so much easier
 - [X] Rebalance items

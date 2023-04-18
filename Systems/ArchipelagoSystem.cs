@@ -121,7 +121,7 @@ namespace SeldomArchipelago.Systems
                     }
                     else
                     {
-                        Chat($"Sent an item to a player...but failed to get info about it!");
+                        Chat("Sent an item to a player...but failed to get info about it!");
                     }
 
                     unqueue.Add(i);
@@ -325,8 +325,6 @@ namespace SeldomArchipelago.Systems
             collectedLocations = new List<string>();
             goals = new List<string>();
             victory = false;
-
-            Main.Achievements?.ClearAll();
 
             if (session != null) session.Socket.Disconnect();
             session = null;
