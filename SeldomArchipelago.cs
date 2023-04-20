@@ -53,36 +53,41 @@ namespace SeldomArchipelago
                 var cursor = new ILCursor(il);
 
                 cursor.Emit(OpCodes.Ldarg_1);
-                cursor.EmitDelegate<Action<int>>((int id) => archipelagoSystem.QueueLocation(id switch
+                cursor.EmitDelegate<Action<int>>((int id) =>
                 {
-                    GameEventClearedID.DefeatedSlimeKing => "King Slime",
-                    GameEventClearedID.DefeatedEyeOfCthulu => "Eye of Cthulhu",
-                    GameEventClearedID.DefeatedEaterOfWorldsOrBrainOfChtulu => "Evil Boss",
-                    GameEventClearedID.DefeatedGoblinArmy => "Goblin Army",
-                    GameEventClearedID.DefeatedQueenBee => "Queen Bee",
-                    GameEventClearedID.DefeatedSkeletron => "Skeletron",
-                    GameEventClearedID.DefeatedDeerclops => "Deerclops",
-                    GameEventClearedID.DefeatedWallOfFleshAndStartedHardmode => "Wall of Flesh",
-                    GameEventClearedID.DefeatedPirates => "Pirate Invasion",
-                    GameEventClearedID.DefeatedQueenSlime => "Queen Slime",
-                    GameEventClearedID.DefeatedTheTwins => "The Twins",
-                    GameEventClearedID.DefeatedDestroyer => "The Destroyer",
-                    GameEventClearedID.DefeatedSkeletronPrime => "Skeletron Prime",
-                    GameEventClearedID.DefeatedPlantera => "Plantera",
-                    GameEventClearedID.DefeatedGolem => "Golem",
-                    GameEventClearedID.DefeatedMartians => "Martian Invasion",
-                    GameEventClearedID.DefeatedFishron => "Duke Fishron",
-                    GameEventClearedID.DefeatedHalloweenTree => "Mourning Wood",
-                    GameEventClearedID.DefeatedHalloweenKing => "Pumpking",
-                    GameEventClearedID.DefeatedChristmassTree => "Everscream",
-                    GameEventClearedID.DefeatedSantank => "Santa-NK1",
-                    GameEventClearedID.DefeatedIceQueen => "Ice Queen",
-                    GameEventClearedID.DefeatedFrostArmy => "Frost Legion",
-                    GameEventClearedID.DefeatedEmpressOfLight => "Empress of Light",
-                    GameEventClearedID.DefeatedAncientCultist => "Lunatic Cultist",
-                    GameEventClearedID.DefeatedMoonlord => "Moon Lord",
-                    _ => throw new ArgumentOutOfRangeException(),
-                }));
+                    var location = id switch
+                    {
+                        GameEventClearedID.DefeatedSlimeKing => "King Slime",
+                        GameEventClearedID.DefeatedEyeOfCthulu => "Eye of Cthulhu",
+                        GameEventClearedID.DefeatedEaterOfWorldsOrBrainOfChtulu => "Evil Boss",
+                        GameEventClearedID.DefeatedGoblinArmy => "Goblin Army",
+                        GameEventClearedID.DefeatedQueenBee => "Queen Bee",
+                        GameEventClearedID.DefeatedSkeletron => "Skeletron",
+                        GameEventClearedID.DefeatedDeerclops => "Deerclops",
+                        GameEventClearedID.DefeatedWallOfFleshAndStartedHardmode => "Wall of Flesh",
+                        GameEventClearedID.DefeatedPirates => "Pirate Invasion",
+                        GameEventClearedID.DefeatedQueenSlime => "Queen Slime",
+                        GameEventClearedID.DefeatedTheTwins => "The Twins",
+                        GameEventClearedID.DefeatedDestroyer => "The Destroyer",
+                        GameEventClearedID.DefeatedSkeletronPrime => "Skeletron Prime",
+                        GameEventClearedID.DefeatedPlantera => "Plantera",
+                        GameEventClearedID.DefeatedGolem => "Golem",
+                        GameEventClearedID.DefeatedMartians => "Martian Invasion",
+                        GameEventClearedID.DefeatedFishron => "Duke Fishron",
+                        GameEventClearedID.DefeatedHalloweenTree => "Mourning Wood",
+                        GameEventClearedID.DefeatedHalloweenKing => "Pumpking",
+                        GameEventClearedID.DefeatedChristmassTree => "Everscream",
+                        GameEventClearedID.DefeatedSantank => "Santa-NK1",
+                        GameEventClearedID.DefeatedIceQueen => "Ice Queen",
+                        GameEventClearedID.DefeatedFrostArmy => "Frost Legion",
+                        GameEventClearedID.DefeatedEmpressOfLight => "Empress of Light",
+                        GameEventClearedID.DefeatedAncientCultist => "Lunatic Cultist",
+                        GameEventClearedID.DefeatedMoonlord => "Moon Lord",
+                        _ => null,
+                    };
+
+                    if (location != null) archipelagoSystem.QueueLocation(location);
+                });
                 cursor.Emit(OpCodes.Ret);
             };
 
