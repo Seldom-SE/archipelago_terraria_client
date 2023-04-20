@@ -71,4 +71,6 @@ research, and item rewards
 
 ## License
 
-Archipelago Terraria Client is licensed under MIT.
+Archipelago Terraria Client is licensed under MIT. The Archipelago logo, by Krista Corkos
+and Chistopher Wilson, is licensed under CC BY-NC 4.0. The logo used by this mod is a modified
+version of the Archipelago logo, made to fit Terraria's style.
