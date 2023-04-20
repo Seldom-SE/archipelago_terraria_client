@@ -85,7 +85,7 @@ namespace SeldomArchipelago.Systems
             };
         }
 
-        bool[] flags = new[] { NPC.downedSlimeKing, NPC.downedBoss1, NPC.downedBoss2, DD2Event.DownedInvasionT1, NPC.downedGoblins, NPC.downedQueenBee, NPC.downedBoss3, NPC.downedDeerclops, Main.hardMode, NPC.downedPirates, NPC.downedQueenSlime, NPC.downedMechBoss1, NPC.downedMechBoss2, NPC.downedMechBoss3, NPC.downedPlantBoss, NPC.downedGolemBoss, DD2Event.DownedInvasionT2, NPC.downedMartians, NPC.downedFishron, NPC.downedHalloweenTree, NPC.downedHalloweenKing, NPC.downedChristmasTree, NPC.downedChristmasSantank, NPC.downedChristmasIceQueen, NPC.downedFrost, NPC.downedEmpressOfLight, NPC.downedAncientCultist, NPC.downedTowerNebula, NPC.downedMoonlord };
+        Func<bool>[] flags = new[] { () => NPC.downedSlimeKing, () => NPC.downedBoss1, () => NPC.downedBoss2, () => DD2Event.DownedInvasionT1, () => NPC.downedGoblins, () => NPC.downedQueenBee, () => NPC.downedBoss3, () => NPC.downedDeerclops, () => Main.hardMode, () => NPC.downedPirates, () => NPC.downedQueenSlime, () => NPC.downedMechBoss1, () => NPC.downedMechBoss2, () => NPC.downedMechBoss3, () => NPC.downedPlantBoss, () => NPC.downedGolemBoss, () => DD2Event.DownedInvasionT2, () => NPC.downedMartians, () => NPC.downedFishron, () => NPC.downedHalloweenTree, () => NPC.downedHalloweenKing, () => NPC.downedChristmasTree, () => NPC.downedChristmasSantank, () => NPC.downedChristmasIceQueen, () => NPC.downedFrost, () => NPC.downedEmpressOfLight, () => NPC.downedAncientCultist, () => NPC.downedTowerNebula, () => NPC.downedMoonlord };
 
         public override void PostUpdateWorld()
         {
@@ -253,31 +253,30 @@ namespace SeldomArchipelago.Systems
                     case "Reward: Yoyo Glove": GiveItem(ItemID.YoYoGlove); break;
                     case "Reward: Coins":
                         var flagCount = 0;
-                        foreach (var flag in flags) if (flag) flagCount++;
-                        GiveItem(ItemID.SilverCoin, 50);
+                        foreach (var flag in flags) if (flag()) flagCount++;
                         var silver = flagCount switch
                         {
-                            0 => 5,
-                            1 => 6,
-                            2 => 8,
-                            3 => 10,
-                            4 => 15,
-                            5 => 20,
-                            6 => 30,
-                            7 => 50,
-                            8 => 60,
-                            9 => 80,
-                            10 => 100,
-                            11 => 150,
-                            12 => 200,
-                            13 => 300,
-                            14 => 500,
-                            15 => 600,
-                            16 => 800,
-                            17 => 1000,
-                            18 => 1500,
-                            19 => 2000,
-                            20 => 3000,
+                            0 => 15,
+                            1 => 20,
+                            2 => 25,
+                            3 => 30,
+                            4 => 40,
+                            5 => 50,
+                            6 => 70,
+                            7 => 100,
+                            8 => 150,
+                            9 => 200,
+                            10 => 250,
+                            11 => 300,
+                            12 => 400,
+                            13 => 500,
+                            14 => 700,
+                            15 => 1000,
+                            16 => 1500,
+                            17 => 2000,
+                            18 => 2500,
+                            19 => 3000,
+                            20 => 4000,
                             21 => 5000,
                             22 => 7000,
                             23 => 10000,
