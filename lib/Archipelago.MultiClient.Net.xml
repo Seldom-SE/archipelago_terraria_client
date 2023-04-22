@@ -11,7 +11,7 @@
             </summary>
             <returns>The roominfo send from the server</returns>
         </member>
-        <member name="M:Archipelago.MultiClient.Net.ArchipelagoSession.LoginAsync(System.String,System.String,Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags,System.Version,System.String[],System.String,System.String)">
+        <member name="M:Archipelago.MultiClient.Net.ArchipelagoSession.LoginAsync(System.String,System.String,Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags,System.Version,System.String[],System.String,System.String,System.Boolean)">
             <summary>
                 Attempt to log in to the Archipelago server by opening a websocket connection and sending a Connect packet.
                 Determining success for this attempt is done by attaching a listener to Socket.PacketReceived and listening for a Connected packet.
@@ -23,6 +23,7 @@
             <param name="tags">The tags this client supports.</param>
             <param name="uuid">The uuid of this client.</param>
             <param name="password">The password to connect to this AP room.</param>
+            <param name="requestSlotData">Decides if the <see cref="T:Archipelago.MultiClient.Net.LoginSuccessful"/> result will contain any slot data</param>
             <returns>
                 <see cref="T:Archipelago.MultiClient.Net.LoginSuccessful"/> if the connection is succeeded and the server accepted the login attempt.
                 <see cref="T:Archipelago.MultiClient.Net.LoginFailure"/> if the connection to the server failed in some way.
@@ -32,7 +33,7 @@
                 Most connections are instantaneous however the timeout is 5 seconds before it returns <see cref="T:Archipelago.MultiClient.Net.LoginFailure"/>.
             </remarks>
         </member>
-        <member name="M:Archipelago.MultiClient.Net.ArchipelagoSession.TryConnectAndLogin(System.String,System.String,Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags,System.Version,System.String[],System.String,System.String)">
+        <member name="M:Archipelago.MultiClient.Net.ArchipelagoSession.TryConnectAndLogin(System.String,System.String,Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags,System.Version,System.String[],System.String,System.String,System.Boolean)">
             <summary>
                 Attempt to log in to the Archipelago server by opening a websocket connection and sending a Connect packet.
                 Determining success for this attempt is done by attaching a listener to Socket.PacketReceived and listening for a Connected packet.
@@ -44,6 +45,7 @@
             <param name="tags">The tags this client supports.</param>
             <param name="uuid">The uuid of this client.</param>
             <param name="password">The password to connect to this AP room.</param>
+            <param name="requestSlotData">Decides if the <see cref="T:Archipelago.MultiClient.Net.LoginSuccessful"/> result will contain any slot data</param>
             <returns>
                 <see cref="T:Archipelago.MultiClient.Net.LoginSuccessful"/> if the connection is succeeded and the server accepted the login attempt.
                 <see cref="T:Archipelago.MultiClient.Net.LoginFailure"/> if the connection to the server failed in some way.
@@ -121,6 +123,11 @@
             InvalidItemsHandling indicates a wrong value type or flag combination was sent.
             </summary>
         </member>
+        <member name="T:Archipelago.MultiClient.Net.Enums.Scope">
+            <summary>
+            Scope for DataStorage keys
+            </summary>
+        </member>
         <member name="F:Archipelago.MultiClient.Net.Enums.Scope.Global">
             <summary>
             Keys in this scope are shared with all clients
@@ -139,6 +146,11 @@
         <member name="F:Archipelago.MultiClient.Net.Enums.Scope.Slot">
             <summary>
             Keys in this scope are with shared with clients connected to your slot
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Enums.Scope.ReadOnly">
+            <summary>
+            Keys in this scope are read-only and can only be updated by the server
             </summary>
         </member>
         <member name="T:Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags">
@@ -359,38 +371,38 @@
         </member>
         <member name="M:Archipelago.MultiClient.Net.Helpers.IConnectionInfoProvider.UpdateConnectionOptions(System.String[])">
             <summary>
-                Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
+            Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
             </summary>
             <param name="tags">New tags for the current connection.</param>
         </member>
         <member name="M:Archipelago.MultiClient.Net.Helpers.IConnectionInfoProvider.UpdateConnectionOptions(Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags)">
             <summary>
-                Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
+            Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
             </summary>
             <param name="itemsHandlingFlags">New ItemsHandlingFlags for the current connection.</param>
         </member>
         <member name="M:Archipelago.MultiClient.Net.Helpers.IConnectionInfoProvider.UpdateConnectionOptions(System.String[],Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags)">
             <summary>
-                Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
+            Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
             </summary>
             <param name="tags">New tags for the current connection.</param>
             <param name="itemsHandlingFlags">New ItemsHandlingFlags for the current connection.</param>
         </member>
         <member name="M:Archipelago.MultiClient.Net.Helpers.ConnectionInfoHelper.UpdateConnectionOptions(System.String[])">
             <summary>
-                Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
+            Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
             </summary>
             <param name="tags">New tags for the current connection.</param>
         </member>
         <member name="M:Archipelago.MultiClient.Net.Helpers.ConnectionInfoHelper.UpdateConnectionOptions(Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags)">
             <summary>
-                Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
+            Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
             </summary>
             <param name="itemsHandlingFlags">New ItemsHandlingFlags for the current connection.</param>
         </member>
         <member name="M:Archipelago.MultiClient.Net.Helpers.ConnectionInfoHelper.UpdateConnectionOptions(System.String[],Archipelago.MultiClient.Net.Enums.ItemsHandlingFlags)">
             <summary>
-                Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
+            Send a ConnectUpdate packet and set the tags and ItemsHandlingFlags for the current connection to the provided params.
             </summary>
             <param name="tags">New tags for the current connection.</param>
             <param name="itemsHandlingFlags">New ItemsHandlingFlags for the current connection.</param>
@@ -413,6 +425,59 @@
             </summary>
             <param name="key">The key under which the value should be stored or retrieved</param>
             <returns>A value </returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.GetHints(System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            Retrieves all unlocked hints for the specified player slot and team
+            </summary>
+            <param name="slot">the slot id of the player to request hints for, defaults to the current player's slot if left empty</param>
+            <param name="team">the team id of the player to request hints for, defaults to the current player's team if left empty</param>
+            <returns>An array of unlocked hints or null if the slot or team does not exist</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.GetHintsAsync(System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            Retrieves all unlocked hints for the specified player slot and team
+            </summary>
+            <param name="slot">the slot id of the player to request hints for, defaults to the current player's slot if left empty</param>
+            <param name="team">the team id of the player to request hints for, defaults to the current player's team if left empty</param>
+            <returns>An array of unlocked hints or null if the slot or team does not exist</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.TrackHints(System.Action{Archipelago.MultiClient.Net.Models.Hint[]},System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>
+            Sets a callback to be called with all updates to the unlocked hints for the specified player slot and team
+            </summary>
+            <param name="onHintsUpdated">the method to call with the updated hints</param>
+            <param name="retrieveCurrentlyUnlockedHints">should the currently unlocked hints be retrieved or just the updates</param>
+            <param name="slot">the slot id of the player to request hints for, defaults to the current player's slot if left empty</param>
+            <param name="team">the team id of the player to request hints for, defaults to the current player's team if left empty</param>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.GetSlotData(System.Nullable{System.Int32})">
+            <summary>
+            Retrieves the custom slot data for the specified slot
+            </summary>
+            <param name="slot">the slot id of the player to request slot data for, defaults to the current player's slot if left empty</param>
+            <returns>An Dictionary with string keys, and custom defined values, the keys and values differ per game</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.GetSlotDataAsync(System.Nullable{System.Int32})">
+            <summary>
+            Retrieves the custom slot data for the specified slot
+            </summary>
+            <param name="slot">the slot id of the player to request slot data for, defaults to the current player's slot if left empty</param>
+            <returns>An Dictionary with string keys, and custom defined values, the keys and values differ per game</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.GetItemNameGroups(System.String)">
+            <summary>
+            Retrieves the defined item name groups for the specified game
+            </summary>
+            <param name="game">the game name to request item name groups for, defaults to the current player's game if left empty</param>
+            <returns>An Dictionary with item group names for keys and an array of item names as value</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.GetItemNameGroupsAsync(System.String)">
+            <summary>
+            Retrieves the defined item name groups for the specified game
+            </summary>
+            <param name="game">the game name to request item name groups for, defaults to the current player's game if left empty</param>
+            <returns>An Dictionary with item group names for keys and an array of item names as value</returns>
         </member>
         <member name="M:Archipelago.MultiClient.Net.Helpers.LocationCheckHelper.CompleteLocationChecks(System.Int64[])">
             <summary>
@@ -607,6 +672,11 @@
             The amount of points it costs to receive a hint from the server.
             </summary>
         </member>
+        <member name="P:Archipelago.MultiClient.Net.Helpers.RoomStateHelper.HintCostPercentage">
+            <summary>
+            The percentage of total locations that need to be checked to receive a hint from the server.
+            </summary>
+        </member>
         <member name="P:Archipelago.MultiClient.Net.Helpers.RoomStateHelper.LocationCheckPoints">
             <summary>
             The amount of hint points you receive per item/location check completed.
@@ -728,6 +798,10 @@
             <exception cref="T:Archipelago.MultiClient.Net.Exceptions.ArchipelagoSocketClosedException">
                 The websocket connection is not alive
             </exception>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Models.DataStorageElement.ToString">
+            <summary>Returns a string that represents the current object.</summary>
+            <returns>A string that represents the current object.</returns>
         </member>
         <member name="M:Archipelago.MultiClient.Net.Models.Callback.Add(Archipelago.MultiClient.Net.Helpers.DataStorageHelper.DataStorageUpdatedHandler)">
             <summary>

@@ -1,4 +1,5 @@
 using Archipelago.MultiClient.Net;
+using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using Microsoft.Xna.Framework;
@@ -9,6 +10,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.Chat;
+using Terraria.DataStructures;
 using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.Localization;
@@ -24,12 +26,14 @@ namespace SeldomArchipelago.Systems
         List<string> locationBacklog = new List<string>();
         List<Task<LocationInfoPacket>> locationQueue;
         ArchipelagoSession session;
+        DeathLinkService deathlink;
         bool enabled;
         int collectedItems;
         int currentItem;
         List<string> collectedLocations = new List<string>();
         List<string> goals = new List<string>();
         bool victory = false;
+        int slot = 0;
 
         public override void LoadWorldData(TagCompound tag)
         {
@@ -83,6 +87,16 @@ namespace SeldomArchipelago.Systems
                 }
                 Chat(text);
             };
+
+            if ((bool)success.SlotData["deathlink"])
+            {
+                deathlink = session.CreateDeathLinkService();
+                deathlink.EnableDeathLink();
+
+                deathlink.OnDeathLinkReceived += ReceiveDeathlink;
+            }
+
+            slot = success.Slot;
         }
 
         Func<bool>[] flags = new[] { () => NPC.downedSlimeKing, () => NPC.downedBoss1, () => NPC.downedBoss2, () => DD2Event.DownedInvasionT1, () => NPC.downedGoblins, () => NPC.downedQueenBee, () => NPC.downedBoss3, () => NPC.downedDeerclops, () => Main.hardMode, () => NPC.downedPirates, () => NPC.downedQueenSlime, () => NPC.downedMechBoss1, () => NPC.downedMechBoss2, () => NPC.downedMechBoss3, () => NPC.downedPlantBoss, () => NPC.downedGolemBoss, () => DD2Event.DownedInvasionT2, () => NPC.downedMartians, () => NPC.downedFishron, () => NPC.downedHalloweenTree, () => NPC.downedHalloweenKing, () => NPC.downedChristmasTree, () => NPC.downedChristmasSantank, () => NPC.downedChristmasIceQueen, () => NPC.downedFrost, () => NPC.downedEmpressOfLight, () => NPC.downedAncientCultist, () => NPC.downedTowerNebula, () => NPC.downedMoonlord };
@@ -95,6 +109,7 @@ namespace SeldomArchipelago.Systems
             {
                 Chat("Disconnected from Archipelago. Reload the world to reconnect.");
                 session = null;
+                deathlink = null;
                 enabled = false;
                 return;
             }
@@ -112,27 +127,15 @@ namespace SeldomArchipelago.Systems
                     _ => false,
                 })
                 {
-                    if (status == TaskStatus.RanToCompletion)
-                    {
-                        foreach (var item in locationQueue[i].Result.Locations)
-                        {
-                            Chat($"Sent {session.Items.GetItemName(item.Item)} to {session.Players.GetPlayerAlias(item.Player)}!");
-                        }
-                    }
-                    else
-                    {
-                        Chat("Sent an item to a player...but failed to get info about it!");
-                    }
+                    if (status == TaskStatus.RanToCompletion) foreach (var item in locationQueue[i].Result.Locations) Chat($"Sent {session.Items.GetItemName(item.Item)} to {session.Players.GetPlayerAlias(item.Player)}!");
+                    else Chat("Sent an item to a player...but failed to get info about it!");
 
                     unqueue.Add(i);
                 }
             }
 
             unqueue.Reverse();
-            foreach (var i in unqueue)
-            {
-                locationQueue.RemoveAt(i);
-            }
+            foreach (var i in unqueue) locationQueue.RemoveAt(i);
 
             while (session.Items.Any())
             {
@@ -317,6 +320,7 @@ namespace SeldomArchipelago.Systems
 
             locationBacklog.Clear();
             locationQueue = null;
+            deathlink = null;
             enabled = false;
             collectedItems = 0;
             currentItem = 0;
@@ -341,17 +345,11 @@ namespace SeldomArchipelago.Systems
 
         public bool Enable()
         {
-            if (session == null)
-            {
-                return false;
-            }
+            if (session == null) return false;
 
             enabled = true;
 
-            foreach (var location in locationBacklog)
-            {
-                QueueLocation(location);
-            }
+            foreach (var location in locationBacklog) QueueLocation(location);
             locationBacklog.Clear();
 
             return true;
@@ -359,10 +357,7 @@ namespace SeldomArchipelago.Systems
 
         public bool SendCommand(string command)
         {
-            if (session == null)
-            {
-                return false;
-            }
+            if (session == null) return false;
 
             var packet = new SayPacket();
             packet.Text = command;
@@ -387,10 +382,7 @@ namespace SeldomArchipelago.Systems
 
         public void Chat(string[] messages, int player = -1)
         {
-            foreach (var message in messages)
-            {
-                Chat(message, player);
-            }
+            foreach (var message in messages) Chat(message, player);
         }
 
         public void QueueLocation(string locationName)
@@ -444,6 +436,27 @@ namespace SeldomArchipelago.Systems
                     }
                     else player.QuickSpawnItem(player.GetSource_GiftOrReward(), item, count);
                 }
+            }
+        }
+
+        public void TriggerDeathlink(string message, int player)
+        {
+            if (deathlink == null) return;
+
+            var death = new DeathLink(session.Players.GetPlayerAlias(slot), message);
+            deathlink.SendDeathLink(death);
+            //ReceiveDeathlink(death);
+        }
+
+        public void ReceiveDeathlink(DeathLink death)
+        {
+            Chat("testtest");
+            var message = $"[DeathLink] {(death.Source == null ? "" : $"{death.Source} died")}{(death.Source != null && death.Cause != null ? ": " : "")}{(death.Cause == null ? "" : $"{death.Cause}")}";
+
+            for (var i = 0; i < Main.maxPlayers; i++)
+            {
+                var player = Main.player[i];
+                if (player.active && !player.dead) player.Hurt(PlayerDeathReason.ByCustomReason(message), 9999999, 1);
             }
         }
     }

@@ -1,13 +1,9 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
-using Newtonsoft.Json.Linq;
 using SeldomArchipelago.Systems;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using Terraria;
 using Terraria.Achievements;
+using Terraria.DataStructures;
 using Terraria.GameContent.Achievements;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -88,12 +84,24 @@ namespace SeldomArchipelago.Players
             if (Main.netMode == NetmodeID.Server) return;
 
             achievements = new();
-            if (!tag.ContainsKey("apachievements"))
-            {
-                return;
-            }
+            if (!tag.ContainsKey("apachievements")) return;
 
             this.achievements = tag.Get<TagCompound>("apachievements");
+        }
+
+        public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
+        {
+            if (damageSource.SourceCustomReason != null && damageSource.SourceCustomReason.StartsWith("[DeathLink]")) return;
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                ModContent.GetInstance<ArchipelagoSystem>().TriggerDeathlink(damageSource.GetDeathText(Player.name).ToString(), Main.myPlayer);
+                return;
+            }
+            else if (Main.netMode == NetmodeID.Server) return;
+
+            var packet = ModContent.GetInstance<SeldomArchipelago>().GetPacket();
+            packet.Write($"deathlink{damageSource.GetDeathText(Player.name).ToString()}");
+            packet.Send();
         }
     }
 }

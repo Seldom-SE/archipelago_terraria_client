@@ -4,6 +4,7 @@ using System;
 using SeldomArchipelago.Systems;
 using Terraria;
 using Terraria.Achievements;
+using Terraria.DataStructures;
 using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -144,14 +145,10 @@ namespace SeldomArchipelago
         {
             var message = reader.ReadString();
             var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
-            if (message == "")
-            {
-                archipelagoSystem.Chat(archipelagoSystem.Status(), whoAmI);
-            }
-            else
-            {
-                archipelagoSystem.QueueLocation(message);
-            }
+
+            if (message == "") archipelagoSystem.Chat(archipelagoSystem.Status(), whoAmI);
+            else if (message.StartsWith("deathlink")) archipelagoSystem.TriggerDeathlink(message.Substring(9), whoAmI);
+            else archipelagoSystem.QueueLocation(message);
         }
 
         public override void Unload()
