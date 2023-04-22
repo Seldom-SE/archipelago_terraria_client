@@ -431,7 +431,19 @@ namespace SeldomArchipelago.Systems
             for (var i = 0; i < Main.maxPlayers; i++)
             {
                 var player = Main.player[i];
-                if (player.active) player.QuickSpawnItem(player.GetSource_GiftOrReward(), item, count);
+                if (player.active)
+                {
+                    if (item == ItemID.SilverCoin)
+                    {
+                        var platinum = count / 10000;
+                        var gold = (count % 10000) / 100;
+                        var silver = count % 100;
+                        if (platinum > 0) player.QuickSpawnItem(player.GetSource_GiftOrReward(), ItemID.PlatinumCoin, platinum);
+                        if (gold > 0) player.QuickSpawnItem(player.GetSource_GiftOrReward(), ItemID.GoldCoin, gold);
+                        if (silver > 0) player.QuickSpawnItem(player.GetSource_GiftOrReward(), ItemID.SilverCoin, silver);
+                    }
+                    else player.QuickSpawnItem(player.GetSource_GiftOrReward(), item, count);
+                }
             }
         }
     }
