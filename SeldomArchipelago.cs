@@ -148,6 +148,11 @@ namespace SeldomArchipelago
 
             if (message == "") archipelagoSystem.Chat(archipelagoSystem.Status(), whoAmI);
             else if (message.StartsWith("deathlink")) archipelagoSystem.TriggerDeathlink(message.Substring(9), whoAmI);
+            else if (message.StartsWith("[DeathLink]"))
+            {
+                var player = Main.player[Main.myPlayer];
+                if (player.active && !player.dead) player.Hurt(PlayerDeathReason.ByCustomReason(message), 999999, 1);
+            }
             else archipelagoSystem.QueueLocation(message);
         }
 

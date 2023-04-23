@@ -445,19 +445,22 @@ namespace SeldomArchipelago.Systems
 
             var death = new DeathLink(session.Players.GetPlayerAlias(slot), message);
             deathlink.SendDeathLink(death);
-            //ReceiveDeathlink(death);
+            ReceiveDeathlink(death);
         }
 
         public void ReceiveDeathlink(DeathLink death)
         {
-            Chat("testtest");
             var message = $"[DeathLink] {(death.Source == null ? "" : $"{death.Source} died")}{(death.Source != null && death.Cause != null ? ": " : "")}{(death.Cause == null ? "" : $"{death.Cause}")}";
 
             for (var i = 0; i < Main.maxPlayers; i++)
             {
                 var player = Main.player[i];
-                if (player.active && !player.dead) player.Hurt(PlayerDeathReason.ByCustomReason(message), 9999999, 1);
+                if (player.active && !player.dead) player.Hurt(PlayerDeathReason.ByCustomReason(message), 999999, 1);
             }
+
+            var packet = ModContent.GetInstance<SeldomArchipelago>().GetPacket();
+            packet.Write(message);
+            packet.Send();
         }
     }
 }
