@@ -66,7 +66,7 @@ haven't kept my fork up to date. You may also host the game from `WebHost.py`, i
 research, and item rewards
 - [X] Docs
 - [ ] Get my fork merged if people want it
-- [ ] Other Archipelago features like deathlink? Do people want deathlink?
+- [X] Other Archipelago features like deathlink? Do people want deathlink?
 - [ ] Calamity maybe probably maybe
 
 ## License
