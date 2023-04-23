@@ -314,7 +314,7 @@ namespace SeldomArchipelago.Systems
             if (enabled) session.DataStorage[Scope.Slot, "CollectedLocations"] = collectedLocations.ToArray();
         }
 
-        public override void OnWorldUnload()
+        public void Reset()
         {
             typeof(SocialAPI).GetField("_mode", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, SocialMode.Steam);
 
@@ -322,7 +322,6 @@ namespace SeldomArchipelago.Systems
             locationQueue = null;
             deathlink = null;
             enabled = false;
-            collectedItems = 0;
             currentItem = 0;
             collectedLocations = new List<string>();
             goals = new List<string>();
@@ -330,6 +329,12 @@ namespace SeldomArchipelago.Systems
 
             if (session != null) session.Socket.Disconnect();
             session = null;
+        }
+
+        public override void OnWorldUnload()
+        {
+            collectedItems = 0;
+            Reset();
         }
 
         public string[] Status() => Tuple.Create(session != null, enabled) switch
