@@ -194,6 +194,7 @@ namespace SeldomArchipelago
                 "WATCH_YOUR_STEP" => "Watch Your Step!",
                 "THROWING_LINES" => "Throwing Lines",
                 "VEHICULAR_MANSLAUGHTER" => "Vehicular Manslaughter",
+                "FIND_A_FAIRY" => "Hey! Listen!",
                 "I_AM_LOOT" => "I Am Loot!",
                 "HEART_BREAKER" => "Heart Breaker",
                 "HOLD_ON_TIGHT" => "Hold on Tight!",
