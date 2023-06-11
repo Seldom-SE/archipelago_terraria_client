@@ -327,7 +327,7 @@ namespace SeldomArchipelago.Systems
             goals = new List<string>();
             victory = false;
 
-            if (session != null) session.Socket.Disconnect();
+            if (session != null) session.Socket.DisconnectAsync();
             session = null;
         }
 
