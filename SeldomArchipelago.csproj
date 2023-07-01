@@ -14,6 +14,9 @@
     <Reference Include="Archipelago.MultiClient.Net">
       <HintPath>lib\Archipelago.MultiClient.Net.dll</HintPath>
     </Reference>
+    <Reference Include="CalamityMod">
+      <HintPath>lib\MMHOOK_CalamityMod.FNA.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
