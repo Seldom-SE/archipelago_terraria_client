@@ -464,13 +464,17 @@ namespace SeldomArchipelago
         void OnSlimeGodCoreOnKill(OnKill orig, ModNPC self)
         {
             if (temp) orig(self);
-            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Slime God");
+            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("The Slime God");
         }
 
         void EditCalamityGlobalNPCOnKill(ILContext il)
         {
             var seldomArchipelago = ModContent.GetInstance<ArchipelagoSystem>();
             var cursor = new ILCursor(il);
+
+            cursor.GotoNext(i => i.MatchLdcI4(NPCID.WallofFlesh));
+            cursor.Emit(OpCodes.Pop);
+            cursor.Emit(OpCodes.Ldc_I4_0);
 
             cursor.GotoNext(i => i.MatchLdcI4(NPCID.BloodNautilus));
             cursor.GotoNext(i => i.MatchLdcI4(NPCID.BloodNautilus));

@@ -232,7 +232,7 @@ namespace SeldomArchipelago.Systems
                     case "Post-Queen Bee": NPC.downedQueenBee = true; break;
                     case "Post-Skeletron": NPC.downedBoss3 = true; break;
                     case "Post-Deerclops": NPC.downedDeerclops = true; break;
-                    case "Hardmode": WorldGen.StartHardmode(); break;
+                    case "Hardmode": StartHardmode(); break;
                     case "Post-Pirate Invasion": NPC.downedPirates = true; break;
                     case "Post-Queen Slime": NPC.downedQueenSlime = true; break;
                     case "Post-The Twins": NPC.downedMechBoss1 = NPC.downedMechBossAny = true; break;
@@ -598,6 +598,39 @@ namespace SeldomArchipelago.Systems
                 if (gold > 0) player.QuickSpawnItem(player.GetSource_GiftOrReward(), ItemID.GoldCoin, gold);
                 if (silver > 0) player.QuickSpawnItem(player.GetSource_GiftOrReward(), ItemID.SilverCoin, silver);
             });
+        }
+
+        void StartHardmode()
+        {
+            WorldGen.StartHardmode();
+
+            if (ModLoader.GetMod("CalamityMod") != null) CalamityStartHardmode();
+        }
+
+        void CalamityStartHardmode()
+        {
+            CalamityMod.NPCs.CalamityGlobalNPC.SetNewShopVariable(new int[]
+            {
+                17,
+                19,
+                20,
+                227,
+                228,
+                353,
+                207,
+                38,
+                208,
+                54,
+                453,
+                633,
+                0
+            }, false);
+
+            if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
+
+            WorldGen.altarCount++;
+            CalamityMod.CalamityUtils.SpawnOre(107, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
+            CalamityMod.CalamityUtils.SpawnOre(221, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
         }
 
         void GiveCosmolight() => GiveItem<CalamityMod.Items.Tools.ClimateChange.Cosmolight>();
