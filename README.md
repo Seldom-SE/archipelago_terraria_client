@@ -65,7 +65,7 @@ haven't kept my fork up to date. You may also host the game from `WebHost.py`, i
 - [X] Explore more item/location options, like achievements, NPCs, bestiary completion, Journey
 research, and item rewards
 - [X] Docs
-- [ ] Get my fork merged if people want it
+- [X] Get my fork merged if people want it
 - [X] Other Archipelago features like deathlink? Do people want deathlink?
 - [ ] Calamity maybe probably maybe
 
