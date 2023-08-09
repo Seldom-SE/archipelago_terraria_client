@@ -34,18 +34,29 @@ ones. If you're hosting, the address will probably be "localhost" and the server
 the port. If not, whoever's hosting should know.
 
 You may use as many worlds as you like. When you're ready, run `/apstart` to enable sending
-and receiving checks. You may open your world in multiplayer for others to join.
+and receiving checks. You may open your world in multiplayer for others to join. Use `/ap` to use
+the Archipelago console, and `/apflags` to check what boss and event flags you have.
+
+Linux currently is not supported. This should be resolved when the mod is updated for 1.4.4.
 
 ### For the host, if you have any Terraria players
 
-You should have some technical knowledge to get through this part. Run
-[my Archipelago fork](https://github.com/Seldom-SE/Archipelago/tree/terraria) from source (see this
-[guide](https://github.com/Seldom-SE/Archipelago/blob/terraria/docs/running%20from%20source.md)).
+For shorter runs, if it's up, you can use
+[Archipelago's beta site](http://archipelago.gg:24242/). If you want to avoid resets, you can
+generate on the beta site, but host on the main site.
+
+Or, if you know how to use them, you can run locally with Terraria's `.apworld`. Check the
+`Terraria` thread in `#future-game-design` on Archipelago's Discord for the latest `.apworld` if
+there is one.
+
+Alternatively, if you have the technical knowledge, you can run from source. Run
+[Archipelago](https://github.com/ArchipelagoMW/Archipelago) from source (see this
+[guide](https://github.com/ArchipelagoMW/Archipelago/blob/main/docs/running%20from%20source.md)).
 You will need to run `Generate.py` and `MultiServer.py`. To create the `yaml` files, you can run
 `WebHost.py`. This will run a website, so watch the console for an address including `localhost`,
 and go there on your browser. Terraria players have to setup their `yaml` files from this website,
-but other games should work fine from [the official site](https://archipelago.gg/), unless I
-haven't kept my fork up to date. You may also host the game from `WebHost.py`, if you prefer.
+but other games should work fine from [the official site](https://archipelago.gg/). You may instead
+host the game with `WebHost.py`, if you prefer.
 
 ## Future Work
 
