@@ -114,9 +114,9 @@ namespace SeldomArchipelago.Systems
             "Hardmode" => Main.hardMode,
             "Post-Pirate Invasion" => NPC.downedPirates,
             "Post-Queen Slime" => NPC.downedQueenSlime,
-            "Post-The Twins" => NPC.downedMechBoss1,
+            "Post-The Twins" => NPC.downedMechBoss2,
             "Post-Old One's Army Tier 2" => DD2Event.DownedInvasionT2,
-            "Post-The Destroyer" => NPC.downedMechBoss2,
+            "Post-The Destroyer" => NPC.downedMechBoss1,
             "Post-Skeletron Prime" => NPC.downedMechBoss3,
             "Post-Plantera" => NPC.downedPlantBoss,
             "Post-Golem" => NPC.downedGolemBoss,
@@ -235,9 +235,9 @@ namespace SeldomArchipelago.Systems
                     case "Hardmode": StartHardmode(); break;
                     case "Post-Pirate Invasion": NPC.downedPirates = true; break;
                     case "Post-Queen Slime": NPC.downedQueenSlime = true; break;
-                    case "Post-The Twins": NPC.downedMechBoss1 = NPC.downedMechBossAny = true; break;
+                    case "Post-The Twins": NPC.downedMechBoss2 = NPC.downedMechBossAny = true; break;
                     case "Post-Old One's Army Tier 2": DD2Event.DownedInvasionT2 = true; break;
-                    case "Post-The Destroyer": NPC.downedMechBoss2 = NPC.downedMechBossAny = true; break;
+                    case "Post-The Destroyer": NPC.downedMechBoss1 = NPC.downedMechBossAny = true; break;
                     case "Post-Skeletron Prime": NPC.downedMechBoss3 = NPC.downedMechBossAny = true; break;
                     case "Post-Plantera": NPC.downedPlantBoss = true; break;
                     case "Post-Golem": NPC.downedGolemBoss = true; break;
