@@ -55,6 +55,7 @@ namespace SeldomArchipelago
         public static MethodInfo yharonOnKill = null;
         public static MethodInfo aresBodyDoMiscDeathEffects = null;
         public static MethodInfo supremeCalamitasOnKill = null;
+        public static MethodInfo calamityGlobalNpcSetNewBossJustDowned = null;
 
         public override void Load()
         {
@@ -195,7 +196,10 @@ namespace SeldomArchipelago
                     case "HiveMind": hiveMindOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                     case "PerforatorHive": perforatorHiveOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                     case "SlimeGodCore": slimeGodCoreOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
-                    case "CalamityGlobalNPC": calamityGlobalNPCOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
+                    case "CalamityGlobalNPC":
+                        calamityGlobalNPCOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public);
+                        calamityGlobalNpcSetNewBossJustDowned = type.GetMethod("SetNewBossJustDowned", BindingFlags.Static | BindingFlags.Public);
+                        break;
                     case "AquaticScourgeHead": aquaticScourgeHeadOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                     case "Mauler": maulerOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                     case "BrimstoneElemental": brimstoneElementalOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
@@ -255,6 +259,7 @@ namespace SeldomArchipelago
             onYharonOnKill += OnYharonOnKill;
             onAresBodyDoMiscDeathEffects += OnAresBodyDoMiscDeathEffects;
             onSupremeCalamitasOnKill += OnSupremeCalamitasOnKill;
+            onCalamityGlobalNpcSetNewBossJustDowned += OnCalamityGlobalNpcSetNewBossJustDowned;
         }
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
@@ -311,6 +316,7 @@ namespace SeldomArchipelago
             onYharonOnKill -= OnYharonOnKill;
             onAresBodyDoMiscDeathEffects -= OnAresBodyDoMiscDeathEffects;
             onSupremeCalamitasOnKill -= OnSupremeCalamitasOnKill;
+            onCalamityGlobalNpcSetNewBossJustDowned -= OnCalamityGlobalNpcSetNewBossJustDowned;
         }
 
         void OnAchievementCompleted(Achievement achievement)
@@ -631,6 +637,9 @@ namespace SeldomArchipelago
             else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Supreme Witch, Calamitas");
         }
 
+        delegate void CalamityGlobalNpcSetNewBossJustDowned(ModNPC self);
+        void OnCalamityGlobalNpcSetNewBossJustDowned(CalamityGlobalNpcSetNewBossJustDowned orig, NPC self) { }
+
         delegate void OnOnKill(OnKill orig, ModNPC self);
 
         static event OnOnKill onDesertScourgeHeadOnKill
@@ -831,6 +840,13 @@ namespace SeldomArchipelago
         {
             add => HookEndpointManager.Add<OnOnKill>(supremeCalamitasOnKill, value);
             remove => HookEndpointManager.Remove<OnOnKill>(supremeCalamitasOnKill, value);
+        }
+
+        delegate void OnCalamityGlobalNpcSetNewBossJustDownedTy(CalamityGlobalNpcSetNewBossJustDowned orig, NPC self);
+        static event OnCalamityGlobalNpcSetNewBossJustDownedTy onCalamityGlobalNpcSetNewBossJustDowned
+        {
+            add => HookEndpointManager.Add<OnCalamityGlobalNpcSetNewBossJustDownedTy>(calamityGlobalNpcSetNewBossJustDowned, value);
+            remove => HookEndpointManager.Remove<OnCalamityGlobalNpcSetNewBossJustDownedTy>(calamityGlobalNpcSetNewBossJustDowned, value);
         }
     }
 }

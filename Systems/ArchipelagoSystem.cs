@@ -254,41 +254,41 @@ namespace SeldomArchipelago.Systems
                     case "Post-Lunatic Cultist": NPC.downedAncientCultist = true; break;
                     case "Post-Lunar Events": NPC.downedTowerNebula = NPC.downedTowerSolar = NPC.downedTowerStardust = NPC.downedTowerVortex = true; break;
                     case "Post-Moon Lord": NPC.downedMoonlord = true; break;
-                    case "Post-Desert Scourge": CalamityOnKill(SeldomArchipelago.desertScourgeHeadOnKill); break;
+                    case "Post-Desert Scourge": CalamityOnKillDesertScourge(); break;
                     case "Post-Giant Clam": CalamityOnKillGiantClam(false); break;
                     case "Post-Acid Rain Tier 1": CalamityAcidRainTier1Downed(); break;
-                    case "Post-Crabulon": CalamityOnKill(SeldomArchipelago.crabulonOnKill); break;
-                    case "Post-The Hive Mind": CalamityOnKill(SeldomArchipelago.hiveMindOnKill); break;
-                    case "Post-The Perforators": CalamityOnKill(SeldomArchipelago.perforatorHiveOnKill); break;
-                    case "Post-The Slime God": CalamityOnKill(SeldomArchipelago.slimeGodCoreOnKill); break;
+                    case "Post-Crabulon": CalamityOnKillCrabulon(); break;
+                    case "Post-The Hive Mind": CalamityOnKillTheHiveMind(); break;
+                    case "Post-The Perforators": CalamityOnKillThePerforators(); break;
+                    case "Post-The Slime God": CalamityOnKillTheSlimeGod(); break;
                     case "Post-Dreadnautilus": CalamityDreadnautilusDowned(); break;
                     case "Post-Hardmode Giant Clam": CalamityOnKillGiantClam(true); break;
-                    case "Post-Aquatic Scourge": CalamityOnKill(SeldomArchipelago.aquaticScourgeHeadOnKill); break;
-                    case "Post-Cragmaw Mire": CalamityOnKill(SeldomArchipelago.cragmawMireOnKill); break;
+                    case "Post-Aquatic Scourge": CalamityOnKillAquaticScourge(); break;
+                    case "Post-Cragmaw Mire": CalamityOnKillCragmawMire(); break;
                     case "Post-Acid Rain Tier 2": CalamityAcidRainTier2Downed(); break;
-                    case "Post-Brimstone Elemental": CalamityOnKill(SeldomArchipelago.brimstoneElementalOnKill); break;
-                    case "Post-Cryogen": CalamityOnKill(SeldomArchipelago.cryogenOnKill); break;
-                    case "Post-Calamitas Clone": CalamityOnKill(SeldomArchipelago.calamitasCloneOnKill); break;
-                    case "Post-Great Sand Shark": CalamityOnKill(SeldomArchipelago.greatSandSharkOnKill); break;
+                    case "Post-Brimstone Elemental": CalamityOnKillBrimstoneElemental(); break;
+                    case "Post-Cryogen": CalamityOnKillCryogen(); break;
+                    case "Post-Calamitas Clone": CalamityOnKillCalamitasClone(); break;
+                    case "Post-Great Sand Shark": CalamityOnKillGreatSandShark(); break;
                     case "Post-Leviathan and Anahita": CalamityOnKillLeviathanAndAnahita(); break;
-                    case "Post-Astrum Aureus": CalamityOnKill(SeldomArchipelago.astrumAureusOnKill); break;
-                    case "Post-The Plaguebringer Goliath": CalamityOnKill(SeldomArchipelago.plaguebringerGoliathOnKill); break;
-                    case "Post-Ravager": CalamityOnKill(SeldomArchipelago.ravagerBodyOnKill); break;
-                    case "Post-Astrum Deus": CalamityOnKill(SeldomArchipelago.astrumDeusHeadOnKill); break;
-                    case "Post-Profaned Guardians": CalamityOnKill(SeldomArchipelago.profanedGuardianCommanderOnKill); break;
-                    case "Post-The Dragonfolly": CalamityOnKill(SeldomArchipelago.bumblefuckOnKill); break;
-                    case "Post-Providence, the Profaned Goddess": CalamityOnKill(SeldomArchipelago.providenceOnKill); break;
-                    case "Post-Storm Weaver": CalamityOnKill(SeldomArchipelago.stormWeaverHeadOnKill); break;
-                    case "Post-Ceaseless Void": CalamityOnKill(SeldomArchipelago.ceaselessVoidOnKill); break;
-                    case "Post-Signus, Envoy of the Devourer": CalamityOnKill(SeldomArchipelago.signusOnKill); break;
-                    case "Post-Polterghast": CalamityOnKill(SeldomArchipelago.polterghastOnKill); break;
-                    case "Post-Mauler": CalamityOnKill(SeldomArchipelago.maulerOnKill); break;
-                    case "Post-Nuclear Terror": CalamityOnKill(SeldomArchipelago.nuclearTerrorOnKill); break;
-                    case "Post-The Old Duke": CalamityOnKill(SeldomArchipelago.oldDukeOnKill); break;
-                    case "Post-The Devourer of Gods": CalamityOnKill(SeldomArchipelago.devourerofGodsHeadOnKill); break;
-                    case "Post-Yharon, Dragon of Rebirth": CalamityOnKill(SeldomArchipelago.yharonOnKill); break;
-                    case "Post-Exo Mechs": CalamityOnKill(SeldomArchipelago.aresBodyDoMiscDeathEffects); break;
-                    case "Post-Supreme Witch, Calamitas": CalamityOnKill(SeldomArchipelago.supremeCalamitasOnKill); break;
+                    case "Post-Astrum Aureus": CalamityOnKillAstrumAureus(); break;
+                    case "Post-The Plaguebringer Goliath": CalamityOnKillThePlaguebringerGoliath(); break;
+                    case "Post-Ravager": CalamityOnKillRavager(); break;
+                    case "Post-Astrum Deus": CalamityOnKillAstrumDeus(); break;
+                    case "Post-Profaned Guardians": CalamityOnKillProfanedGuardians(); break;
+                    case "Post-The Dragonfolly": CalamityOnKillTheDragonfolly(); break;
+                    case "Post-Providence, the Profaned Goddess": CalamityOnKillProvidenceTheProfanedGoddess(); break;
+                    case "Post-Storm Weaver": CalamityOnKillStormWeaver(); break;
+                    case "Post-Ceaseless Void": CalamityOnKillCeaselessVoid(); break;
+                    case "Post-Signus, Envoy of the Devourer": CalamityOnKillSignusEnvoyOfTheDevourer(); break;
+                    case "Post-Polterghast": CalamityOnKillPolterghast(); break;
+                    case "Post-Mauler": CalamityOnKillMauler(); break;
+                    case "Post-Nuclear Terror": CalamityOnKillNuclearTerror(); break;
+                    case "Post-The Old Duke": CalamityOnKillTheOldDuke(); break;
+                    case "Post-The Devourer of Gods": CalamityOnKillTheDevourerOfGods(); break;
+                    case "Post-Yharon, Dragon of Rebirth": CalamityOnKillYharonDragonOfRebirth(); break;
+                    case "Post-Exo Mechs": CalamityOnKillExoMechs(); break;
+                    case "Post-Supreme Witch, Calamitas": CalamityOnKillSupremeWitchCalamitas(); break;
                     case "Post-Adult Eidolon Wyrm": CalamityAdultEidolonWyrmDowned(); break;
                     case "Post-Boss Rush": CalamityBossRushDowned(); break;
                     case "Reward: Hermes Boots": GiveItem(ItemID.HermesBoots); break;
@@ -671,11 +671,11 @@ namespace SeldomArchipelago.Systems
         void GiveSpritGlyph() => GiveItem<CalamityMod.Items.Accessories.SpiritGlyph>();
         void GiveAbyssalAmulet() => GiveItem<CalamityMod.Items.Accessories.AbyssalAmulet>();
 
-        void CalamityOnKill(MethodInfo method)
+        void CalamityOnKill(object obj, MethodInfo method)
         {
             var seldomArchipelago = ModContent.GetInstance<SeldomArchipelago>();
             seldomArchipelago.temp = true;
-            method.Invoke(null, new object[] { });
+            method.Invoke(obj, new object[] { });
             seldomArchipelago.temp = false;
         }
 
@@ -684,7 +684,7 @@ namespace SeldomArchipelago.Systems
             var downed = hardmode ? CalamityMod.DownedBossSystem.downedCLAM : CalamityMod.DownedBossSystem.downedCLAMHardMode;
             var isHardmode = Main.hardMode;
             Main.hardMode = hardmode;
-            CalamityOnKill(SeldomArchipelago.giantClamOnKill);
+            CalamityOnKill(new CalamityMod.NPCs.SunkenSea.GiantClam(), SeldomArchipelago.giantClamOnKill);
             if (hardmode) CalamityMod.DownedBossSystem.downedCLAM = downed;
             else CalamityMod.DownedBossSystem.downedCLAMHardMode = downed;
             Main.hardMode = isHardmode;
@@ -694,7 +694,7 @@ namespace SeldomArchipelago.Systems
         {
             var seldomArchipelago = ModContent.GetInstance<SeldomArchipelago>();
             seldomArchipelago.temp = true;
-            SeldomArchipelago.leviathanRealOnKill.Invoke(null, new object[] { null });
+            SeldomArchipelago.leviathanRealOnKill.Invoke(new CalamityMod.NPCs.Leviathan.Leviathan(), new object[] { null });
             seldomArchipelago.temp = false;
         }
 
@@ -703,5 +703,35 @@ namespace SeldomArchipelago.Systems
         void CalamityAcidRainTier2Downed() => CalamityMod.DownedBossSystem.downedAquaticScourgeAcidRain = true;
         void CalamityAdultEidolonWyrmDowned() => CalamityMod.DownedBossSystem.downedAdultEidolonWyrm = true;
         void CalamityBossRushDowned() => CalamityMod.DownedBossSystem.downedBossRush = true;
+
+        void CalamityOnKillDesertScourge() => CalamityOnKill(new CalamityMod.NPCs.DesertScourge.DesertScourgeHead(), SeldomArchipelago.desertScourgeHeadOnKill);
+        void CalamityOnKillCrabulon() => CalamityOnKill(new CalamityMod.NPCs.Crabulon.Crabulon(), SeldomArchipelago.crabulonOnKill);
+        void CalamityOnKillTheHiveMind() => CalamityOnKill(new CalamityMod.NPCs.HiveMind.HiveMind(), SeldomArchipelago.hiveMindOnKill);
+        void CalamityOnKillThePerforators() => CalamityOnKill(new CalamityMod.NPCs.Perforator.PerforatorHive(), SeldomArchipelago.perforatorHiveOnKill);
+        void CalamityOnKillTheSlimeGod() => CalamityOnKill(new CalamityMod.NPCs.SlimeGod.SlimeGodCore(), SeldomArchipelago.slimeGodCoreOnKill);
+        void CalamityOnKillAquaticScourge() => CalamityOnKill(new CalamityMod.NPCs.AquaticScourge.AquaticScourgeHead(), SeldomArchipelago.aquaticScourgeHeadOnKill);
+        void CalamityOnKillCragmawMire() => CalamityOnKill(new CalamityMod.NPCs.AcidRain.CragmawMire(), SeldomArchipelago.cragmawMireOnKill);
+        void CalamityOnKillBrimstoneElemental() => CalamityOnKill(new CalamityMod.NPCs.BrimstoneElemental.BrimstoneElemental(), SeldomArchipelago.brimstoneElementalOnKill);
+        void CalamityOnKillCryogen() => CalamityOnKill(new CalamityMod.NPCs.Cryogen.Cryogen(), SeldomArchipelago.cryogenOnKill);
+        void CalamityOnKillCalamitasClone() => CalamityOnKill(new CalamityMod.NPCs.CalClone.CalamitasClone(), SeldomArchipelago.calamitasCloneOnKill);
+        void CalamityOnKillGreatSandShark() => CalamityOnKill(new CalamityMod.NPCs.GreatSandShark.GreatSandShark(), SeldomArchipelago.greatSandSharkOnKill);
+        void CalamityOnKillAstrumAureus() => CalamityOnKill(new CalamityMod.NPCs.AstrumAureus.AstrumAureus(), SeldomArchipelago.astrumAureusOnKill);
+        void CalamityOnKillThePlaguebringerGoliath() => CalamityOnKill(new CalamityMod.NPCs.PlaguebringerGoliath.PlaguebringerGoliath(), SeldomArchipelago.plaguebringerGoliathOnKill);
+        void CalamityOnKillRavager() => CalamityOnKill(new CalamityMod.NPCs.Ravager.RavagerBody(), SeldomArchipelago.ravagerBodyOnKill);
+        void CalamityOnKillAstrumDeus() => CalamityOnKill(new CalamityMod.NPCs.AstrumDeus.AstrumDeusHead(), SeldomArchipelago.astrumDeusHeadOnKill);
+        void CalamityOnKillProfanedGuardians() => CalamityOnKill(new CalamityMod.NPCs.ProfanedGuardians.ProfanedGuardianCommander(), SeldomArchipelago.profanedGuardianCommanderOnKill);
+        void CalamityOnKillTheDragonfolly() => CalamityOnKill(new CalamityMod.NPCs.Bumblebirb.Bumblefuck(), SeldomArchipelago.bumblefuckOnKill);
+        void CalamityOnKillProvidenceTheProfanedGoddess() => CalamityOnKill(new CalamityMod.NPCs.Providence.Providence(), SeldomArchipelago.providenceOnKill);
+        void CalamityOnKillStormWeaver() => CalamityOnKill(new CalamityMod.NPCs.StormWeaver.StormWeaverHead(), SeldomArchipelago.stormWeaverHeadOnKill);
+        void CalamityOnKillCeaselessVoid() => CalamityOnKill(new CalamityMod.NPCs.CeaselessVoid.CeaselessVoid(), SeldomArchipelago.ceaselessVoidOnKill);
+        void CalamityOnKillSignusEnvoyOfTheDevourer() => CalamityOnKill(new CalamityMod.NPCs.Signus.Signus(), SeldomArchipelago.signusOnKill);
+        void CalamityOnKillPolterghast() => CalamityOnKill(new CalamityMod.NPCs.Polterghast.Polterghast(), SeldomArchipelago.polterghastOnKill);
+        void CalamityOnKillMauler() => CalamityOnKill(new CalamityMod.NPCs.AcidRain.Mauler(), SeldomArchipelago.maulerOnKill);
+        void CalamityOnKillNuclearTerror() => CalamityOnKill(new CalamityMod.NPCs.AcidRain.NuclearTerror(), SeldomArchipelago.nuclearTerrorOnKill);
+        void CalamityOnKillTheOldDuke() => CalamityOnKill(new CalamityMod.NPCs.OldDuke.OldDuke(), SeldomArchipelago.oldDukeOnKill);
+        void CalamityOnKillTheDevourerOfGods() => CalamityOnKill(new CalamityMod.NPCs.DevourerofGods.DevourerofGodsHead(), SeldomArchipelago.devourerofGodsHeadOnKill);
+        void CalamityOnKillYharonDragonOfRebirth() => CalamityOnKill(new CalamityMod.NPCs.Yharon.Yharon(), SeldomArchipelago.yharonOnKill);
+        void CalamityOnKillExoMechs() => CalamityOnKill(new CalamityMod.NPCs.ExoMechs.Ares.AresBody(), SeldomArchipelago.aresBodyDoMiscDeathEffects);
+        void CalamityOnKillSupremeWitchCalamitas() => CalamityOnKill(new CalamityMod.NPCs.SupremeCalamitas.SupremeCalamitas(), SeldomArchipelago.supremeCalamitasOnKill);
     }
 }
