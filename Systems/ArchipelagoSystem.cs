@@ -463,6 +463,8 @@ namespace SeldomArchipelago.Systems
                 if (player.active && !player.dead) player.Hurt(PlayerDeathReason.ByCustomReason(message), 999999, 1);
             }
 
+            if (Main.netMode == NetmodeID.SinglePlayer) return;
+
             var packet = ModContent.GetInstance<SeldomArchipelago>().GetPacket();
             packet.Write(message);
             packet.Send();
