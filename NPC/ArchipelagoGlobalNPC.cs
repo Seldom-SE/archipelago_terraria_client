@@ -4,11 +4,12 @@ using Terraria.ModLoader;
 
 namespace SeldomArchipelago
 {
+    [ExtendsFromMod("CalamityMod")]
     public class ArchipelagoGlobalNPC : GlobalNPC
     {
         public override void OnKill(NPC npc)
         {
-            if (ModLoader.GetMod("CalamityMod") != null) CalamityOnKill(npc.type);
+            if (ModLoader.HasMod("CalamityMod")) CalamityOnKill(npc.type);
         }
 
         void CalamityOnKill(int npc)

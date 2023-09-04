@@ -182,8 +182,8 @@ namespace SeldomArchipelago
 
             // Unmaintainable reflection
 
+            if (!ModLoader.HasMod("CalamityMod")) return;
             var calamity = ModLoader.GetMod("CalamityMod");
-            if (calamity == null) return;
 
             var calamityAssembly = calamity.GetType().Assembly;
             foreach (var type in calamityAssembly.GetTypes()) switch (type.Name)
@@ -281,7 +281,7 @@ namespace SeldomArchipelago
         {
             if (Main.netMode != NetmodeID.Server) Main.Achievements.OnAchievementCompleted -= OnAchievementCompleted;
 
-            if (ModLoader.GetMod("CalamityMod") == null) return;
+            if (!ModLoader.HasMod("CalamityMod")) return;
 
             onDesertScourgeHeadOnKill -= OnDesertScourgeHeadOnKill;
             onGiantClamOnKill -= OnGiantClamOnKill;
@@ -422,7 +422,11 @@ namespace SeldomArchipelago
         void OnGiantClamOnKill(OnKill orig, ModNPC self)
         {
             if (temp) orig(self);
-            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Giant Clam");
+            else
+            {
+                ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Giant Clam");
+                if (Main.hardMode) ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Hardmode Giant Clam");
+            }
         }
 
         void OnCragmawMireOnKill(OnKill orig, ModNPC self)
@@ -434,6 +438,7 @@ namespace SeldomArchipelago
         void EditAcidRainEventUpdateInvasion(ILContext il)
         {
             var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
+            var calamitySystem = ModContent.GetInstance<CalamitySystem>();
             var cursor = new ILCursor(il);
 
             cursor.GotoNext(i => i.MatchLdarg(0));
@@ -442,8 +447,8 @@ namespace SeldomArchipelago
             {
                 if (won)
                 {
-                    archipelagoSystem.QueueLocation("Post-Acid Rain Tier 1");
-                    if (CalamityMod.DownedBossSystem.downedAquaticScourge) archipelagoSystem.QueueLocation("Post-Acid Rain Tier 2");
+                    archipelagoSystem.QueueLocation("Acid Rain Tier 1");
+                    if (calamitySystem.DownedAquaticScourge()) archipelagoSystem.QueueLocation("Acid Rain Tier 2");
                 }
             });
             cursor.Emit(OpCodes.Ldc_I4_0);
@@ -458,13 +463,13 @@ namespace SeldomArchipelago
         void OnHiveMindOnKill(OnKill orig, ModNPC self)
         {
             if (temp) orig(self);
-            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Hive Mind");
+            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("The Hive Mind");
         }
 
         void OnPerforatorHiveOnKill(OnKill orig, ModNPC self)
         {
             if (temp) orig(self);
-            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Perforator Hive");
+            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("The Perforators");
         }
 
         void OnSlimeGodCoreOnKill(OnKill orig, ModNPC self)
@@ -543,7 +548,7 @@ namespace SeldomArchipelago
         void OnPlaguebringerGoliathOnKill(OnKill orig, ModNPC self)
         {
             if (temp) orig(self);
-            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Plaguebringer Goliath");
+            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("The Plaguebringer Goliath");
         }
 
         void OnRavagerBodyOnKill(OnKill orig, ModNPC self)

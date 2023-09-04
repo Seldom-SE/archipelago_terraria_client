@@ -99,7 +99,7 @@ namespace SeldomArchipelago.Systems
             slot = success.Slot;
         }
 
-        public string[] flags = new[] { "Post-King Slime", "Post-Desert Scourge", "Post-Giant Clam", "Post-Eye of Cthulhu", "Post-Acid Rain Tier 1", "Post-Crabulon", "Post-Evil Boss", "Post-Old One's Army Tier 1", "Post-Goblin Army", "Post-Queen Bee", "Post-The Hive Mind", "Post-The Perforators", "Post-Skeletron", "Post-Deerclops", "Post-The Slime God", "Hardmode", "Post-Dreadnautilus", "Post-Hardmode Giant Clam", "Post-Pirate Invasion", "Post-Queen Slime", "Post-Aquatic Scourge", "Post-Cragmaw Mire", "Post-Acid Rain Tier 2", "Post-The Twins", "Post-Old One's Army Tier 2", "Post-Brimstone Elemental", "Post-The Destroyer", "Post-Cryogen", "Post-Skeletron Prime", "Post-Calamitas Clone", "Post-Plantera", "Post-Great Sand Shark", "Post-Leviathan and Anahita", "Post-Astrum Aureus", "Post-Golem", "Post-Old One's Army Tier 3", "Post-Martian Madness", "Post-The Plaguebringer Goliath", "Post-Duke Fishron", "Post-Mourning Wood", "Post-Pumpking", "Post-Everscream", "Post-Santa-NK1", "Post-Ice Queen", "Post-Frost Legion", "Post-Ravager", "Post-Empress of Light", "Post-Lunatic Cultist", "Post-Astrum Deus", "Post-Lunar Events", "Post-Moon Lord", "Post-Profaned Guardians", "Post-The Dragonfolly", "Post-Providence, the Profaned Goddess", "Post-Storm Weaver", "Post-Ceaseless Void", "Post-Signus, Envoy of the Devourer", "Post-Polterghast", "Post-Mauler", "Post-Nuclear Terror", "Post-The Old Duke", "Post-The Devourer of Gods", "Post-Yharon, Dragon of Rebirth", "Post-Exo Mechs", "Post-Supreme Witch, Calamitas", "Post-Adult Eidolon Wyrm", "Post-Boss Rush" };
+        public string[] flags = { "Post-King Slime", "Post-Desert Scourge", "Post-Giant Clam", "Post-Eye of Cthulhu", "Post-Acid Rain Tier 1", "Post-Crabulon", "Post-Evil Boss", "Post-Old One's Army Tier 1", "Post-Goblin Army", "Post-Queen Bee", "Post-The Hive Mind", "Post-The Perforators", "Post-Skeletron", "Post-Deerclops", "Post-The Slime God", "Hardmode", "Post-Dreadnautilus", "Post-Hardmode Giant Clam", "Post-Pirate Invasion", "Post-Queen Slime", "Post-Aquatic Scourge", "Post-Cragmaw Mire", "Post-Acid Rain Tier 2", "Post-The Twins", "Post-Old One's Army Tier 2", "Post-Brimstone Elemental", "Post-The Destroyer", "Post-Cryogen", "Post-Skeletron Prime", "Post-Calamitas Clone", "Post-Plantera", "Post-Great Sand Shark", "Post-Leviathan and Anahita", "Post-Astrum Aureus", "Post-Golem", "Post-Old One's Army Tier 3", "Post-Martian Madness", "Post-The Plaguebringer Goliath", "Post-Duke Fishron", "Post-Mourning Wood", "Post-Pumpking", "Post-Everscream", "Post-Santa-NK1", "Post-Ice Queen", "Post-Frost Legion", "Post-Ravager", "Post-Empress of Light", "Post-Lunatic Cultist", "Post-Astrum Deus", "Post-Lunar Events", "Post-Moon Lord", "Post-Profaned Guardians", "Post-The Dragonfolly", "Post-Providence, the Profaned Goddess", "Post-Storm Weaver", "Post-Ceaseless Void", "Post-Signus, Envoy of the Devourer", "Post-Polterghast", "Post-Mauler", "Post-Nuclear Terror", "Post-The Old Duke", "Post-The Devourer of Gods", "Post-Yharon, Dragon of Rebirth", "Post-Exo Mechs", "Post-Supreme Witch, Calamitas", "Post-Adult Eidolon Wyrm", "Post-Boss Rush" };
 
         public bool CheckFlag(string flag) => flag switch
         {
@@ -133,49 +133,7 @@ namespace SeldomArchipelago.Systems
             "Post-Lunatic Cultist" => NPC.downedAncientCultist,
             "Post-Lunar Events" => NPC.downedTowerNebula,
             "Post-Moon Lord" => NPC.downedMoonlord,
-            _ => CheckCalamityFlag(flag),
-        };
-
-        public bool CheckCalamityFlag(string flag) => flag switch
-        {
-            "Post-Desert Scourge" => CalamityMod.DownedBossSystem.downedDesertScourge,
-            "Post-Giant Clam" => CalamityMod.DownedBossSystem.downedCLAM,
-            "Post-Acid Rain Tier 1" => CalamityMod.DownedBossSystem.downedEoCAcidRain,
-            "Post-Crabulon" => CalamityMod.DownedBossSystem.downedCrabulon,
-            "Post-The Hive Mind" => CalamityMod.DownedBossSystem.downedHiveMind,
-            "Post-The Perforators" => CalamityMod.DownedBossSystem.downedPerforator,
-            "Post-The Slime God" => CalamityMod.DownedBossSystem.downedSlimeGod,
-            "Post-Dreadnautilus" => CalamityMod.DownedBossSystem.downedDreadnautilus,
-            "Post-Hardmode Giant Clam" => CalamityMod.DownedBossSystem.downedCLAMHardMode,
-            "Post-Aquatic Scourge" => CalamityMod.DownedBossSystem.downedAquaticScourge,
-            "Post-Cragmaw Mire" => CalamityMod.DownedBossSystem.downedCragmawMire,
-            "Post-Acid Rain Tier 2" => CalamityMod.DownedBossSystem.downedAquaticScourgeAcidRain,
-            "Post-Brimstone Elemental" => CalamityMod.DownedBossSystem.downedBrimstoneElemental,
-            "Post-Cryogen" => CalamityMod.DownedBossSystem.downedCryogen,
-            "Post-Calamitas Clone" => CalamityMod.DownedBossSystem.downedCalamitasClone,
-            "Post-Great Sand Shark" => CalamityMod.DownedBossSystem.downedGSS,
-            "Post-Leviathan and Anahita" => CalamityMod.DownedBossSystem.downedLeviathan,
-            "Post-Astrum Aureus" => CalamityMod.DownedBossSystem.downedAstrumAureus,
-            "Post-The Plaguebringer Goliath" => CalamityMod.DownedBossSystem.downedPlaguebringer,
-            "Post-Ravager" => CalamityMod.DownedBossSystem.downedRavager,
-            "Post-Astrum Deus" => CalamityMod.DownedBossSystem.downedAstrumDeus,
-            "Post-Profaned Guardians" => CalamityMod.DownedBossSystem.downedGuardians,
-            "Post-The Dragonfolly" => CalamityMod.DownedBossSystem.downedDragonfolly,
-            "Post-Providence, the Profaned Goddess" => CalamityMod.DownedBossSystem.downedProvidence,
-            "Post-Storm Weaver" => CalamityMod.DownedBossSystem.downedStormWeaver,
-            "Post-Ceaseless Void" => CalamityMod.DownedBossSystem.downedCeaselessVoid,
-            "Post-Signus, Envoy of the Devourer" => CalamityMod.DownedBossSystem.downedSignus,
-            "Post-Polterghast" => CalamityMod.DownedBossSystem.downedPolterghast,
-            "Post-Mauler" => CalamityMod.DownedBossSystem.downedMauler,
-            "Post-Nuclear Terror" => CalamityMod.DownedBossSystem.downedNuclearTerror,
-            "Post-The Old Duke" => CalamityMod.DownedBossSystem.downedBoomerDuke,
-            "Post-The Devourer of Gods" => CalamityMod.DownedBossSystem.downedDoG,
-            "Post-Yharon, Dragon of Rebirth" => CalamityMod.DownedBossSystem.downedYharon,
-            "Post-Exo Mechs" => CalamityMod.DownedBossSystem.downedExoMechs,
-            "Post-Supreme Witch, Calamitas" => CalamityMod.DownedBossSystem.downedCalamitas,
-            "Post-Adult Eidolon Wyrm" => CalamityMod.DownedBossSystem.downedAdultEidolonWyrm,
-            "Post-Boss Rush" => CalamityMod.DownedBossSystem.downedBossRush,
-            _ => false,
+            _ => ModContent.GetInstance<CalamitySystem>().CheckCalamityFlag(flag),
         };
 
         public override void PostUpdateWorld()
@@ -254,43 +212,43 @@ namespace SeldomArchipelago.Systems
                     case "Post-Lunatic Cultist": NPC.downedAncientCultist = true; break;
                     case "Post-Lunar Events": NPC.downedTowerNebula = NPC.downedTowerSolar = NPC.downedTowerStardust = NPC.downedTowerVortex = true; break;
                     case "Post-Moon Lord": NPC.downedMoonlord = true; break;
-                    case "Post-Desert Scourge": CalamityOnKillDesertScourge(); break;
-                    case "Post-Giant Clam": CalamityOnKillGiantClam(false); break;
-                    case "Post-Acid Rain Tier 1": CalamityAcidRainTier1Downed(); break;
-                    case "Post-Crabulon": CalamityOnKillCrabulon(); break;
-                    case "Post-The Hive Mind": CalamityOnKillTheHiveMind(); break;
-                    case "Post-The Perforators": CalamityOnKillThePerforators(); break;
-                    case "Post-The Slime God": CalamityOnKillTheSlimeGod(); break;
-                    case "Post-Dreadnautilus": CalamityDreadnautilusDowned(); break;
-                    case "Post-Hardmode Giant Clam": CalamityOnKillGiantClam(true); break;
-                    case "Post-Aquatic Scourge": CalamityOnKillAquaticScourge(); break;
-                    case "Post-Cragmaw Mire": CalamityOnKillCragmawMire(); break;
-                    case "Post-Acid Rain Tier 2": CalamityAcidRainTier2Downed(); break;
-                    case "Post-Brimstone Elemental": CalamityOnKillBrimstoneElemental(); break;
-                    case "Post-Cryogen": CalamityOnKillCryogen(); break;
-                    case "Post-Calamitas Clone": CalamityOnKillCalamitasClone(); break;
-                    case "Post-Great Sand Shark": CalamityOnKillGreatSandShark(); break;
-                    case "Post-Leviathan and Anahita": CalamityOnKillLeviathanAndAnahita(); break;
-                    case "Post-Astrum Aureus": CalamityOnKillAstrumAureus(); break;
-                    case "Post-The Plaguebringer Goliath": CalamityOnKillThePlaguebringerGoliath(); break;
-                    case "Post-Ravager": CalamityOnKillRavager(); break;
-                    case "Post-Astrum Deus": CalamityOnKillAstrumDeus(); break;
-                    case "Post-Profaned Guardians": CalamityOnKillProfanedGuardians(); break;
-                    case "Post-The Dragonfolly": CalamityOnKillTheDragonfolly(); break;
-                    case "Post-Providence, the Profaned Goddess": CalamityOnKillProvidenceTheProfanedGoddess(); break;
-                    case "Post-Storm Weaver": CalamityOnKillStormWeaver(); break;
-                    case "Post-Ceaseless Void": CalamityOnKillCeaselessVoid(); break;
-                    case "Post-Signus, Envoy of the Devourer": CalamityOnKillSignusEnvoyOfTheDevourer(); break;
-                    case "Post-Polterghast": CalamityOnKillPolterghast(); break;
-                    case "Post-Mauler": CalamityOnKillMauler(); break;
-                    case "Post-Nuclear Terror": CalamityOnKillNuclearTerror(); break;
-                    case "Post-The Old Duke": CalamityOnKillTheOldDuke(); break;
-                    case "Post-The Devourer of Gods": CalamityOnKillTheDevourerOfGods(); break;
-                    case "Post-Yharon, Dragon of Rebirth": CalamityOnKillYharonDragonOfRebirth(); break;
-                    case "Post-Exo Mechs": CalamityOnKillExoMechs(); break;
-                    case "Post-Supreme Witch, Calamitas": CalamityOnKillSupremeWitchCalamitas(); break;
-                    case "Post-Adult Eidolon Wyrm": CalamityAdultEidolonWyrmDowned(); break;
-                    case "Post-Boss Rush": CalamityBossRushDowned(); break;
+                    case "Post-Desert Scourge": ModContent.GetInstance<CalamitySystem>().CalamityOnKillDesertScourge(); break;
+                    case "Post-Giant Clam": ModContent.GetInstance<CalamitySystem>().CalamityOnKillGiantClam(false); break;
+                    case "Post-Acid Rain Tier 1": ModContent.GetInstance<CalamitySystem>().CalamityAcidRainTier1Downed(); break;
+                    case "Post-Crabulon": ModContent.GetInstance<CalamitySystem>().CalamityOnKillCrabulon(); break;
+                    case "Post-The Hive Mind": ModContent.GetInstance<CalamitySystem>().CalamityOnKillTheHiveMind(); break;
+                    case "Post-The Perforators": ModContent.GetInstance<CalamitySystem>().CalamityOnKillThePerforators(); break;
+                    case "Post-The Slime God": ModContent.GetInstance<CalamitySystem>().CalamityOnKillTheSlimeGod(); break;
+                    case "Post-Dreadnautilus": ModContent.GetInstance<CalamitySystem>().CalamityDreadnautilusDowned(); break;
+                    case "Post-Hardmode Giant Clam": ModContent.GetInstance<CalamitySystem>().CalamityOnKillGiantClam(true); break;
+                    case "Post-Aquatic Scourge": ModContent.GetInstance<CalamitySystem>().CalamityOnKillAquaticScourge(); break;
+                    case "Post-Cragmaw Mire": ModContent.GetInstance<CalamitySystem>().CalamityOnKillCragmawMire(); break;
+                    case "Post-Acid Rain Tier 2": ModContent.GetInstance<CalamitySystem>().CalamityAcidRainTier2Downed(); break;
+                    case "Post-Brimstone Elemental": ModContent.GetInstance<CalamitySystem>().CalamityOnKillBrimstoneElemental(); break;
+                    case "Post-Cryogen": ModContent.GetInstance<CalamitySystem>().CalamityOnKillCryogen(); break;
+                    case "Post-Calamitas Clone": ModContent.GetInstance<CalamitySystem>().CalamityOnKillCalamitasClone(); break;
+                    case "Post-Great Sand Shark": ModContent.GetInstance<CalamitySystem>().CalamityOnKillGreatSandShark(); break;
+                    case "Post-Leviathan and Anahita": ModContent.GetInstance<CalamitySystem>().CalamityOnKillLeviathanAndAnahita(); break;
+                    case "Post-Astrum Aureus": ModContent.GetInstance<CalamitySystem>().CalamityOnKillAstrumAureus(); break;
+                    case "Post-The Plaguebringer Goliath": ModContent.GetInstance<CalamitySystem>().CalamityOnKillThePlaguebringerGoliath(); break;
+                    case "Post-Ravager": ModContent.GetInstance<CalamitySystem>().CalamityOnKillRavager(); break;
+                    case "Post-Astrum Deus": ModContent.GetInstance<CalamitySystem>().CalamityOnKillAstrumDeus(); break;
+                    case "Post-Profaned Guardians": ModContent.GetInstance<CalamitySystem>().CalamityOnKillProfanedGuardians(); break;
+                    case "Post-The Dragonfolly": ModContent.GetInstance<CalamitySystem>().CalamityOnKillTheDragonfolly(); break;
+                    case "Post-Providence, the Profaned Goddess": ModContent.GetInstance<CalamitySystem>().CalamityOnKillProvidenceTheProfanedGoddess(); break;
+                    case "Post-Storm Weaver": ModContent.GetInstance<CalamitySystem>().CalamityOnKillStormWeaver(); break;
+                    case "Post-Ceaseless Void": ModContent.GetInstance<CalamitySystem>().CalamityOnKillCeaselessVoid(); break;
+                    case "Post-Signus, Envoy of the Devourer": ModContent.GetInstance<CalamitySystem>().CalamityOnKillSignusEnvoyOfTheDevourer(); break;
+                    case "Post-Polterghast": ModContent.GetInstance<CalamitySystem>().CalamityOnKillPolterghast(); break;
+                    case "Post-Mauler": ModContent.GetInstance<CalamitySystem>().CalamityOnKillMauler(); break;
+                    case "Post-Nuclear Terror": ModContent.GetInstance<CalamitySystem>().CalamityOnKillNuclearTerror(); break;
+                    case "Post-The Old Duke": ModContent.GetInstance<CalamitySystem>().CalamityOnKillTheOldDuke(); break;
+                    case "Post-The Devourer of Gods": ModContent.GetInstance<CalamitySystem>().CalamityOnKillTheDevourerOfGods(); break;
+                    case "Post-Yharon, Dragon of Rebirth": ModContent.GetInstance<CalamitySystem>().CalamityOnKillYharonDragonOfRebirth(); break;
+                    case "Post-Exo Mechs": ModContent.GetInstance<CalamitySystem>().CalamityOnKillExoMechs(); break;
+                    case "Post-Supreme Witch, Calamitas": ModContent.GetInstance<CalamitySystem>().CalamityOnKillSupremeWitchCalamitas(); break;
+                    case "Post-Adult Eidolon Wyrm": ModContent.GetInstance<CalamitySystem>().CalamityAdultEidolonWyrmDowned(); break;
+                    case "Post-Boss Rush": ModContent.GetInstance<CalamitySystem>().CalamityBossRushDowned(); break;
                     case "Reward: Hermes Boots": GiveItem(ItemID.HermesBoots); break;
                     case "Reward: Magic Mirror": GiveItem(ItemID.MagicMirror); break;
                     case "Reward: Demon Conch": GiveItem(ItemID.DemonConch); break;
@@ -369,50 +327,50 @@ namespace SeldomArchipelago.Systems
                     case "Reward: Red Counterweight": GiveItem(ItemID.RedCounterweight); break;
                     case "Reward: Yoyo Glove": GiveItem(ItemID.YoYoGlove); break;
                     case "Reward: Coins": GiveCoins(); break;
-                    case "Reward: Cosmolight": GiveCosmolight(); break;
+                    case "Reward: Cosmolight": ModContent.GetInstance<CalamitySystem>().GiveCosmolight(); break;
                     case "Reward: Diving Helmet": GiveItem(ItemID.DivingHelmet); break;
                     case "Reward: Jellyfish Necklace": GiveItem(ItemID.JellyfishNecklace); break;
-                    case "Reward: Corrupt Flask": GiveCorruptFlask(); break;
-                    case "Reward: Crimson Flask": GiveCrimsonFlask(); break;
-                    case "Reward: Craw Carapace": GiveCrawCarapace(); break;
-                    case "Reward: Giant Shell": GiveGiantShell(); break;
-                    case "Reward: Fungal Carapace": GiveFungalCarapace(); break;
-                    case "Reward: Life Jelly": GiveLifeJelly(); break;
-                    case "Reward: Vital Jelly": GiveVitalJelly(); break;
-                    case "Reward: Mana Jelly": GiveManaJelly(); break;
-                    case "Reward: Giant Tortoise Shell": GiveGiantTortoiseShell(); break;
-                    case "Reward: Coin of Deceit": GiveCoinOfDeceit(); break;
-                    case "Reward: Ink Bomb": GiveInkBomb(); break;
-                    case "Reward: Voltaic Jelly": GiveVoltaicJelly(); break;
-                    case "Reward: Wulfrum Battery": GiveWulfrumBattery(); break;
-                    case "Reward: Luxor's Gift": GiveLuxorsGift(); break;
-                    case "Reward: Raider's Talisman": GiveRaidersTalisman(); break;
-                    case "Reward: Rotten Dogtooth": GiveRottenDogtooth(); break;
-                    case "Reward: Scuttler's Jewel": GiveScuttlersJewel(); break;
-                    case "Reward: Unstable Granite Core": GiveUnstableGraniteCore(); break;
-                    case "Reward: Amidias' Spark": GiveAmidiasSpark(); break;
-                    case "Reward: Ursa Sergeant": GiveUrsaSergeant(); break;
-                    case "Reward: Trinket of Chi": GiveTrinketOfChi(); break;
-                    case "Reward: The Transformer": GiveTheTransformer(); break;
-                    case "Reward: Rover Drive": GiveRoverDrive(); break;
-                    case "Reward: Marnite Repulsion Shield": GiveMarniteRepulsionShield(); break;
-                    case "Reward: Frost Barrier": GiveFrostBarrier(); break;
-                    case "Reward: Ancient Fossil": GiveAncientFossil(); break;
-                    case "Reward: Spelunker's Amulet": GiveSpelunkersAmulet(); break;
-                    case "Reward: Fungal Symbiote": GiveFungalSymbiote(); break;
-                    case "Reward: Gladiator's Locket": GiveGladiatorsLocket(); break;
-                    case "Reward: Wulfrum Acrobatics Pack": GiveWulfrumAcrobaticsPack(); break;
-                    case "Reward: Depths Charm": GiveDepthsCharm(); break;
-                    case "Reward: Anechoic Plating": GiveAnechoicPlating(); break;
-                    case "Reward: Iron Boots": GiveIronBoots(); break;
-                    case "Reward: Sprit Glyph": GiveSpritGlyph(); break;
-                    case "Reward: Abyssal Amulet": GiveAbyssalAmulet(); break;
+                    case "Reward: Corrupt Flask": ModContent.GetInstance<CalamitySystem>().GiveCorruptFlask(); break;
+                    case "Reward: Crimson Flask": ModContent.GetInstance<CalamitySystem>().GiveCrimsonFlask(); break;
+                    case "Reward: Craw Carapace": ModContent.GetInstance<CalamitySystem>().GiveCrawCarapace(); break;
+                    case "Reward: Giant Shell": ModContent.GetInstance<CalamitySystem>().GiveGiantShell(); break;
+                    case "Reward: Fungal Carapace": ModContent.GetInstance<CalamitySystem>().GiveFungalCarapace(); break;
+                    case "Reward: Life Jelly": ModContent.GetInstance<CalamitySystem>().GiveLifeJelly(); break;
+                    case "Reward: Vital Jelly": ModContent.GetInstance<CalamitySystem>().GiveVitalJelly(); break;
+                    case "Reward: Mana Jelly": ModContent.GetInstance<CalamitySystem>().GiveManaJelly(); break;
+                    case "Reward: Giant Tortoise Shell": ModContent.GetInstance<CalamitySystem>().GiveGiantTortoiseShell(); break;
+                    case "Reward: Coin of Deceit": ModContent.GetInstance<CalamitySystem>().GiveCoinOfDeceit(); break;
+                    case "Reward: Ink Bomb": ModContent.GetInstance<CalamitySystem>().GiveInkBomb(); break;
+                    case "Reward: Voltaic Jelly": ModContent.GetInstance<CalamitySystem>().GiveVoltaicJelly(); break;
+                    case "Reward: Wulfrum Battery": ModContent.GetInstance<CalamitySystem>().GiveWulfrumBattery(); break;
+                    case "Reward: Luxor's Gift": ModContent.GetInstance<CalamitySystem>().GiveLuxorsGift(); break;
+                    case "Reward: Raider's Talisman": ModContent.GetInstance<CalamitySystem>().GiveRaidersTalisman(); break;
+                    case "Reward: Rotten Dogtooth": ModContent.GetInstance<CalamitySystem>().GiveRottenDogtooth(); break;
+                    case "Reward: Scuttler's Jewel": ModContent.GetInstance<CalamitySystem>().GiveScuttlersJewel(); break;
+                    case "Reward: Unstable Granite Core": ModContent.GetInstance<CalamitySystem>().GiveUnstableGraniteCore(); break;
+                    case "Reward: Amidias' Spark": ModContent.GetInstance<CalamitySystem>().GiveAmidiasSpark(); break;
+                    case "Reward: Ursa Sergeant": ModContent.GetInstance<CalamitySystem>().GiveUrsaSergeant(); break;
+                    case "Reward: Trinket of Chi": ModContent.GetInstance<CalamitySystem>().GiveTrinketOfChi(); break;
+                    case "Reward: The Transformer": ModContent.GetInstance<CalamitySystem>().GiveTheTransformer(); break;
+                    case "Reward: Rover Drive": ModContent.GetInstance<CalamitySystem>().GiveRoverDrive(); break;
+                    case "Reward: Marnite Repulsion Shield": ModContent.GetInstance<CalamitySystem>().GiveMarniteRepulsionShield(); break;
+                    case "Reward: Frost Barrier": ModContent.GetInstance<CalamitySystem>().GiveFrostBarrier(); break;
+                    case "Reward: Ancient Fossil": ModContent.GetInstance<CalamitySystem>().GiveAncientFossil(); break;
+                    case "Reward: Spelunker's Amulet": ModContent.GetInstance<CalamitySystem>().GiveSpelunkersAmulet(); break;
+                    case "Reward: Fungal Symbiote": ModContent.GetInstance<CalamitySystem>().GiveFungalSymbiote(); break;
+                    case "Reward: Gladiator's Locket": ModContent.GetInstance<CalamitySystem>().GiveGladiatorsLocket(); break;
+                    case "Reward: Wulfrum Acrobatics Pack": ModContent.GetInstance<CalamitySystem>().GiveWulfrumAcrobaticsPack(); break;
+                    case "Reward: Depths Charm": ModContent.GetInstance<CalamitySystem>().GiveDepthsCharm(); break;
+                    case "Reward: Anechoic Plating": ModContent.GetInstance<CalamitySystem>().GiveAnechoicPlating(); break;
+                    case "Reward: Iron Boots": ModContent.GetInstance<CalamitySystem>().GiveIronBoots(); break;
+                    case "Reward: Sprit Glyph": ModContent.GetInstance<CalamitySystem>().GiveSpritGlyph(); break;
+                    case "Reward: Abyssal Amulet": ModContent.GetInstance<CalamitySystem>().GiveAbyssalAmulet(); break;
                 }
 
                 collectedItems++;
             }
 
-            if (ModLoader.GetMod("CalamityMod") != null) CalamityPostUpdateWorld();
+            if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().CalamityPostUpdateWorld();
 
             if (victory) return;
 
@@ -423,11 +381,6 @@ namespace SeldomArchipelago.Systems
             session.Socket.SendPacket(victoryPacket);
 
             victory = true;
-        }
-
-        void CalamityPostUpdateWorld()
-        {
-            if (CalamityMod.DownedBossSystem.downedBossRush) QueueLocation("Boss Rush");
         }
 
         public override void SaveWorldData(TagCompound tag)
@@ -581,9 +534,9 @@ namespace SeldomArchipelago.Systems
         }
 
         void GiveItem(int item) => GiveItem(player => player.QuickSpawnItem(player.GetSource_GiftOrReward(), item, 1));
-        void GiveItem<T>() where T : ModItem => GiveItem(ModContent.ItemType<T>());
+        public void GiveItem<T>() where T : ModItem => GiveItem(ModContent.ItemType<T>());
 
-        int[] baseCoins = new int[] { 15, 20, 25, 30, 40, 50, 70, 100 };
+        int[] baseCoins = { 15, 20, 25, 30, 40, 50, 70, 100 };
 
         void GiveCoins()
         {
@@ -592,7 +545,7 @@ namespace SeldomArchipelago.Systems
             var count = baseCoins[flagCount % 8] * (int)Math.Pow(10, flagCount / 8);
 
             var platinum = count / 10000;
-            var gold = (count % 10000) / 100;
+            var gold = count % 10000 / 100;
             var silver = count % 100;
             GiveItem(player =>
             {
@@ -606,134 +559,7 @@ namespace SeldomArchipelago.Systems
         {
             WorldGen.StartHardmode();
 
-            if (ModLoader.GetMod("CalamityMod") != null) CalamityStartHardmode();
+            if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().CalamityStartHardmode();
         }
-
-        void CalamityStartHardmode()
-        {
-            CalamityMod.NPCs.CalamityGlobalNPC.SetNewShopVariable(new int[]
-            {
-                17,
-                19,
-                20,
-                227,
-                228,
-                353,
-                207,
-                38,
-                208,
-                54,
-                453,
-                633,
-                0
-            }, false);
-
-            if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
-
-            WorldGen.altarCount++;
-            CalamityMod.CalamityUtils.SpawnOre(107, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
-            CalamityMod.CalamityUtils.SpawnOre(221, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
-        }
-
-        void GiveCosmolight() => GiveItem<CalamityMod.Items.Tools.ClimateChange.Cosmolight>();
-
-        void GiveCorruptFlask() => GiveItem<CalamityMod.Items.Accessories.CorruptFlask>();
-        void GiveCrimsonFlask() => GiveItem<CalamityMod.Items.Accessories.CrimsonFlask>();
-        void GiveCrawCarapace() => GiveItem<CalamityMod.Items.Accessories.CrawCarapace>();
-        void GiveGiantShell() => GiveItem<CalamityMod.Items.Accessories.GiantShell>();
-        void GiveFungalCarapace() => GiveItem<CalamityMod.Items.Accessories.FungalCarapace>();
-        void GiveLifeJelly() => GiveItem<CalamityMod.Items.Accessories.LifeJelly>();
-        void GiveVitalJelly() => GiveItem<CalamityMod.Items.Accessories.VitalJelly>();
-        void GiveManaJelly() => GiveItem<CalamityMod.Items.Accessories.ManaJelly>();
-        void GiveGiantTortoiseShell() => GiveItem<CalamityMod.Items.Accessories.GiantTortoiseShell>();
-        void GiveCoinOfDeceit() => GiveItem<CalamityMod.Items.Accessories.CoinofDeceit>();
-        void GiveInkBomb() => GiveItem<CalamityMod.Items.Accessories.InkBomb>();
-        void GiveVoltaicJelly() => GiveItem<CalamityMod.Items.Accessories.VoltaicJelly>();
-        void GiveWulfrumBattery() => GiveItem<CalamityMod.Items.Accessories.WulfrumBattery>();
-        void GiveLuxorsGift() => GiveItem<CalamityMod.Items.Accessories.LuxorsGift>();
-        void GiveRaidersTalisman() => GiveItem<CalamityMod.Items.Accessories.RaidersTalisman>();
-        void GiveRottenDogtooth() => GiveItem<CalamityMod.Items.Accessories.RottenDogtooth>();
-        void GiveScuttlersJewel() => GiveItem<CalamityMod.Items.Accessories.ScuttlersJewel>();
-        void GiveUnstableGraniteCore() => GiveItem<CalamityMod.Items.Accessories.UnstableGraniteCore>();
-        void GiveAmidiasSpark() => GiveItem<CalamityMod.Items.Accessories.AmidiasSpark>();
-        void GiveUrsaSergeant() => GiveItem<CalamityMod.Items.Fishing.AstralCatches.UrsaSergeant>();
-        void GiveTrinketOfChi() => GiveItem<CalamityMod.Items.Accessories.TrinketofChi>();
-        void GiveTheTransformer() => GiveItem<CalamityMod.Items.Accessories.TheTransformer>();
-        void GiveRoverDrive() => GiveItem<CalamityMod.Items.Accessories.RoverDrive>();
-        void GiveMarniteRepulsionShield() => GiveItem<CalamityMod.Items.Accessories.MarniteRepulsionShield>();
-        void GiveFrostBarrier() => GiveItem<CalamityMod.Items.Accessories.FrostBarrier>();
-        void GiveAncientFossil() => GiveItem<CalamityMod.Items.Accessories.AncientFossil>();
-        void GiveSpelunkersAmulet() => GiveItem<CalamityMod.Items.Accessories.SpelunkersAmulet>();
-        void GiveFungalSymbiote() => GiveItem<CalamityMod.Items.Accessories.FungalSymbiote>();
-        void GiveGladiatorsLocket() => GiveItem<CalamityMod.Items.Accessories.GladiatorsLocket>();
-        void GiveWulfrumAcrobaticsPack() => GiveItem<CalamityMod.Items.Accessories.WulfrumAcrobaticsPack>();
-        void GiveDepthsCharm() => GiveItem<CalamityMod.Items.Accessories.DepthCharm>();
-        void GiveAnechoicPlating() => GiveItem<CalamityMod.Items.Accessories.AnechoicPlating>();
-        void GiveIronBoots() => GiveItem<CalamityMod.Items.Accessories.IronBoots>();
-        void GiveSpritGlyph() => GiveItem<CalamityMod.Items.Accessories.SpiritGlyph>();
-        void GiveAbyssalAmulet() => GiveItem<CalamityMod.Items.Accessories.AbyssalAmulet>();
-
-        void CalamityOnKill(object obj, MethodInfo method)
-        {
-            var seldomArchipelago = ModContent.GetInstance<SeldomArchipelago>();
-            seldomArchipelago.temp = true;
-            method.Invoke(obj, new object[] { });
-            seldomArchipelago.temp = false;
-        }
-
-        void CalamityOnKillGiantClam(bool hardmode)
-        {
-            var downed = hardmode ? CalamityMod.DownedBossSystem.downedCLAM : CalamityMod.DownedBossSystem.downedCLAMHardMode;
-            var isHardmode = Main.hardMode;
-            Main.hardMode = hardmode;
-            CalamityOnKill(new CalamityMod.NPCs.SunkenSea.GiantClam(), SeldomArchipelago.giantClamOnKill);
-            if (hardmode) CalamityMod.DownedBossSystem.downedCLAM = downed;
-            else CalamityMod.DownedBossSystem.downedCLAMHardMode = downed;
-            Main.hardMode = isHardmode;
-        }
-
-        void CalamityOnKillLeviathanAndAnahita()
-        {
-            var seldomArchipelago = ModContent.GetInstance<SeldomArchipelago>();
-            seldomArchipelago.temp = true;
-            SeldomArchipelago.leviathanRealOnKill.Invoke(new CalamityMod.NPCs.Leviathan.Leviathan(), new object[] { null });
-            seldomArchipelago.temp = false;
-        }
-
-        void CalamityAcidRainTier1Downed() => CalamityMod.DownedBossSystem.downedEoCAcidRain = true;
-        void CalamityDreadnautilusDowned() => CalamityMod.DownedBossSystem.downedDreadnautilus = true;
-        void CalamityAcidRainTier2Downed() => CalamityMod.DownedBossSystem.downedAquaticScourgeAcidRain = true;
-        void CalamityAdultEidolonWyrmDowned() => CalamityMod.DownedBossSystem.downedAdultEidolonWyrm = true;
-        void CalamityBossRushDowned() => CalamityMod.DownedBossSystem.downedBossRush = true;
-
-        void CalamityOnKillDesertScourge() => CalamityOnKill(new CalamityMod.NPCs.DesertScourge.DesertScourgeHead(), SeldomArchipelago.desertScourgeHeadOnKill);
-        void CalamityOnKillCrabulon() => CalamityOnKill(new CalamityMod.NPCs.Crabulon.Crabulon(), SeldomArchipelago.crabulonOnKill);
-        void CalamityOnKillTheHiveMind() => CalamityOnKill(new CalamityMod.NPCs.HiveMind.HiveMind(), SeldomArchipelago.hiveMindOnKill);
-        void CalamityOnKillThePerforators() => CalamityOnKill(new CalamityMod.NPCs.Perforator.PerforatorHive(), SeldomArchipelago.perforatorHiveOnKill);
-        void CalamityOnKillTheSlimeGod() => CalamityOnKill(new CalamityMod.NPCs.SlimeGod.SlimeGodCore(), SeldomArchipelago.slimeGodCoreOnKill);
-        void CalamityOnKillAquaticScourge() => CalamityOnKill(new CalamityMod.NPCs.AquaticScourge.AquaticScourgeHead(), SeldomArchipelago.aquaticScourgeHeadOnKill);
-        void CalamityOnKillCragmawMire() => CalamityOnKill(new CalamityMod.NPCs.AcidRain.CragmawMire(), SeldomArchipelago.cragmawMireOnKill);
-        void CalamityOnKillBrimstoneElemental() => CalamityOnKill(new CalamityMod.NPCs.BrimstoneElemental.BrimstoneElemental(), SeldomArchipelago.brimstoneElementalOnKill);
-        void CalamityOnKillCryogen() => CalamityOnKill(new CalamityMod.NPCs.Cryogen.Cryogen(), SeldomArchipelago.cryogenOnKill);
-        void CalamityOnKillCalamitasClone() => CalamityOnKill(new CalamityMod.NPCs.CalClone.CalamitasClone(), SeldomArchipelago.calamitasCloneOnKill);
-        void CalamityOnKillGreatSandShark() => CalamityOnKill(new CalamityMod.NPCs.GreatSandShark.GreatSandShark(), SeldomArchipelago.greatSandSharkOnKill);
-        void CalamityOnKillAstrumAureus() => CalamityOnKill(new CalamityMod.NPCs.AstrumAureus.AstrumAureus(), SeldomArchipelago.astrumAureusOnKill);
-        void CalamityOnKillThePlaguebringerGoliath() => CalamityOnKill(new CalamityMod.NPCs.PlaguebringerGoliath.PlaguebringerGoliath(), SeldomArchipelago.plaguebringerGoliathOnKill);
-        void CalamityOnKillRavager() => CalamityOnKill(new CalamityMod.NPCs.Ravager.RavagerBody(), SeldomArchipelago.ravagerBodyOnKill);
-        void CalamityOnKillAstrumDeus() => CalamityOnKill(new CalamityMod.NPCs.AstrumDeus.AstrumDeusHead(), SeldomArchipelago.astrumDeusHeadOnKill);
-        void CalamityOnKillProfanedGuardians() => CalamityOnKill(new CalamityMod.NPCs.ProfanedGuardians.ProfanedGuardianCommander(), SeldomArchipelago.profanedGuardianCommanderOnKill);
-        void CalamityOnKillTheDragonfolly() => CalamityOnKill(new CalamityMod.NPCs.Bumblebirb.Bumblefuck(), SeldomArchipelago.bumblefuckOnKill);
-        void CalamityOnKillProvidenceTheProfanedGoddess() => CalamityOnKill(new CalamityMod.NPCs.Providence.Providence(), SeldomArchipelago.providenceOnKill);
-        void CalamityOnKillStormWeaver() => CalamityOnKill(new CalamityMod.NPCs.StormWeaver.StormWeaverHead(), SeldomArchipelago.stormWeaverHeadOnKill);
-        void CalamityOnKillCeaselessVoid() => CalamityOnKill(new CalamityMod.NPCs.CeaselessVoid.CeaselessVoid(), SeldomArchipelago.ceaselessVoidOnKill);
-        void CalamityOnKillSignusEnvoyOfTheDevourer() => CalamityOnKill(new CalamityMod.NPCs.Signus.Signus(), SeldomArchipelago.signusOnKill);
-        void CalamityOnKillPolterghast() => CalamityOnKill(new CalamityMod.NPCs.Polterghast.Polterghast(), SeldomArchipelago.polterghastOnKill);
-        void CalamityOnKillMauler() => CalamityOnKill(new CalamityMod.NPCs.AcidRain.Mauler(), SeldomArchipelago.maulerOnKill);
-        void CalamityOnKillNuclearTerror() => CalamityOnKill(new CalamityMod.NPCs.AcidRain.NuclearTerror(), SeldomArchipelago.nuclearTerrorOnKill);
-        void CalamityOnKillTheOldDuke() => CalamityOnKill(new CalamityMod.NPCs.OldDuke.OldDuke(), SeldomArchipelago.oldDukeOnKill);
-        void CalamityOnKillTheDevourerOfGods() => CalamityOnKill(new CalamityMod.NPCs.DevourerofGods.DevourerofGodsHead(), SeldomArchipelago.devourerofGodsHeadOnKill);
-        void CalamityOnKillYharonDragonOfRebirth() => CalamityOnKill(new CalamityMod.NPCs.Yharon.Yharon(), SeldomArchipelago.yharonOnKill);
-        void CalamityOnKillExoMechs() => CalamityOnKill(new CalamityMod.NPCs.ExoMechs.Ares.AresBody(), SeldomArchipelago.aresBodyDoMiscDeathEffects);
-        void CalamityOnKillSupremeWitchCalamitas() => CalamityOnKill(new CalamityMod.NPCs.SupremeCalamitas.SupremeCalamitas(), SeldomArchipelago.supremeCalamitasOnKill);
     }
 }
