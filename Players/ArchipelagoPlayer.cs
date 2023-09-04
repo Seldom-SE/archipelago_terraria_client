@@ -86,7 +86,7 @@ namespace SeldomArchipelago.Players
             achievements = new();
             if (!tag.ContainsKey("apachievements")) return;
 
-            this.achievements = tag.Get<TagCompound>("apachievements");
+            achievements = tag.Get<TagCompound>("apachievements");
         }
 
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
@@ -100,7 +100,7 @@ namespace SeldomArchipelago.Players
             else if (Main.netMode == NetmodeID.Server) return;
 
             var packet = ModContent.GetInstance<SeldomArchipelago>().GetPacket();
-            packet.Write($"deathlink{damageSource.GetDeathText(Player.name).ToString()}");
+            packet.Write($"deathlink{damageSource.GetDeathText(Player.name)}");
             packet.Send();
         }
     }
