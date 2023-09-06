@@ -80,7 +80,7 @@ research, and item rewards
 - [X] Docs
 - [X] Get my fork merged if people want it
 - [X] Other Archipelago features like deathlink? Do people want deathlink?
-- [ ] Calamity maybe probably maybe
+- [X] Calamity maybe probably maybe
 - [ ] Update to 1.4.4
 
 ## License

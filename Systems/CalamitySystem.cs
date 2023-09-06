@@ -101,8 +101,8 @@ namespace SeldomArchipelago.Systems
 
         public void CalamityStartHardmode()
         {
-            CalamityMod.NPCs.CalamityGlobalNPC.SetNewShopVariable(new int[]
-            {
+            CalamityMod.NPCs.CalamityGlobalNPC.SetNewShopVariable(
+            [
                 17,
                 19,
                 20,
@@ -116,7 +116,7 @@ namespace SeldomArchipelago.Systems
                 453,
                 633,
                 0
-            }, false);
+            ], false);
 
             if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
 
