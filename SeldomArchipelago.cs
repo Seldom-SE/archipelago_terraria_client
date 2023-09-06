@@ -69,7 +69,7 @@ namespace SeldomArchipelago
                 var cursor = new ILCursor(il);
 
                 cursor.GotoNext(i => i.MatchLdsfld(typeof(Main).GetField(nameof(Main.netMode))));
-                cursor.EmitDelegate<Action>(() => archipelagoSystem.QueueLocationClient("Torch God"));
+                cursor.EmitDelegate(() => archipelagoSystem.QueueLocationClient("Torch God"));
                 cursor.Emit(OpCodes.Ret);
             };
 
@@ -93,8 +93,15 @@ namespace SeldomArchipelago
             {
                 var cursor = new ILCursor(il);
 
+                var label = cursor.DefineLabel();
+                cursor.MarkLabel(label);
+                cursor.Emit(OpCodes.Pop);
+                cursor.Index--;
                 cursor.Emit(OpCodes.Ldarg_1);
-                cursor.EmitDelegate<Action<int>>((int id) =>
+                cursor.Emit(OpCodes.Dup);
+                cursor.Emit(OpCodes.Ldc_I4_M1);
+                cursor.Emit(OpCodes.Beq, label);
+                cursor.EmitDelegate((int id) =>
                 {
                     var location = id switch
                     {
@@ -147,7 +154,7 @@ namespace SeldomArchipelago
                     cursor.GotoNext(i => i.MatchStsfld(flag));
                     cursor.EmitDelegate<Action>(() => temp = (bool)flag.GetValue(null));
                     cursor.Index++;
-                    cursor.EmitDelegate<Action>(() =>
+                    cursor.EmitDelegate(() =>
                     {
                         flag.SetValue(null, temp);
                         archipelagoSystem.QueueLocation($"Old One's Army Tier {tier}");
@@ -169,7 +176,7 @@ namespace SeldomArchipelago
 
                 // Prevent Hardmode generation Terraria.NPC:69104
                 cursor.GotoNext(i => i.MatchCall(typeof(WorldGen).GetMethod(nameof(WorldGen.StartHardmode))));
-                cursor.EmitDelegate<Action>(() =>
+                cursor.EmitDelegate(() =>
                 {
                     temp = Main.hardMode;
                     Main.hardMode = true;

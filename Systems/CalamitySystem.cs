@@ -92,7 +92,11 @@ namespace SeldomArchipelago.Systems
             "Post-Supreme Witch, Calamitas" => CalamityMod.DownedBossSystem.downedCalamitas,
             "Post-Adult Eidolon Wyrm" => CalamityMod.DownedBossSystem.downedAdultEidolonWyrm,
             "Post-Boss Rush" => CalamityMod.DownedBossSystem.downedBossRush,
-            _ => false,
+            _ => ((Func<bool>)(() =>
+            {
+                ModContent.GetInstance<ArchipelagoSystem>().Chat($"Unknown flag: {flag}");
+                return false;
+            }))(),
         };
 
         public void CalamityStartHardmode()
@@ -121,11 +125,12 @@ namespace SeldomArchipelago.Systems
             CalamityMod.CalamityUtils.SpawnOre(221, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
         }
 
-        public void CalamityOnKill(object obj, MethodInfo method)
+        public void CalamityOnKill(ModNPC npc, MethodInfo method)
         {
+            typeof(ModType<NPC>).GetProperty("Entity").SetValue(npc, new NPC());
             var seldomArchipelago = ModContent.GetInstance<SeldomArchipelago>();
             seldomArchipelago.temp = true;
-            method.Invoke(obj, new object[] { });
+            method.Invoke(npc, new object[] { });
             seldomArchipelago.temp = false;
         }
 
