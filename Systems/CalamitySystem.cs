@@ -127,7 +127,11 @@ namespace SeldomArchipelago.Systems
 
         public void CalamityOnKill(ModNPC npc, MethodInfo method)
         {
-            typeof(ModType<NPC>).GetProperty("Entity").SetValue(npc, new NPC());
+            var entity = new NPC
+            {
+                target = 0
+            };
+            typeof(ModType<NPC>).GetProperty("Entity").SetValue(npc, entity);
             var seldomArchipelago = ModContent.GetInstance<SeldomArchipelago>();
             seldomArchipelago.temp = true;
             method.Invoke(npc, new object[] { });
@@ -188,5 +192,30 @@ namespace SeldomArchipelago.Systems
         public void CalamityOnKillYharonDragonOfRebirth() => CalamityOnKill(new CalamityMod.NPCs.Yharon.Yharon(), SeldomArchipelago.yharonOnKill);
         public void CalamityOnKillExoMechs() => CalamityOnKill(new CalamityMod.NPCs.ExoMechs.Ares.AresBody(), SeldomArchipelago.aresBodyDoMiscDeathEffects);
         public void CalamityOnKillSupremeWitchCalamitas() => CalamityOnKill(new CalamityMod.NPCs.SupremeCalamitas.SupremeCalamitas(), SeldomArchipelago.supremeCalamitasOnKill);
+
+        public bool GetAndUnsetRework()
+        {
+            var rework = CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework;
+            CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework = false;
+            return rework;
+        }
+
+        public void SetRework(bool rework)
+        {
+            CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework = rework;
+        }
+
+        public void SpawnHardOres()
+        {
+            if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
+            CalamityMod.CalamityUtils.SpawnOre(107, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
+            CalamityMod.CalamityUtils.SpawnOre(221, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
+        }
+
+        public void SpawnMechOres()
+        {
+            if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
+            typeof(CalamityMod.NPCs.CalamityGlobalNPC).GetMethod("SpawnMechBossHardmodeOres", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(new CalamityMod.NPCs.CalamityGlobalNPC(), null);
+        }
     }
 }

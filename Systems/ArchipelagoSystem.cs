@@ -190,13 +190,25 @@ namespace SeldomArchipelago.Systems
                     case "Post-Queen Bee": NPC.downedQueenBee = true; break;
                     case "Post-Skeletron": NPC.downedBoss3 = true; break;
                     case "Post-Deerclops": NPC.downedDeerclops = true; break;
-                    case "Hardmode": StartHardmode(); break;
+                    case "Hardmode":
+                        if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().SpawnHardOres();
+                        StartHardmode();
+                        break;
                     case "Post-Pirate Invasion": NPC.downedPirates = true; break;
                     case "Post-Queen Slime": NPC.downedQueenSlime = true; break;
-                    case "Post-The Twins": NPC.downedMechBoss2 = NPC.downedMechBossAny = true; break;
+                    case "Post-The Twins":
+                        if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().SpawnMechOres();
+                        NPC.downedMechBoss2 = NPC.downedMechBossAny = true;
+                        break;
                     case "Post-Old One's Army Tier 2": DD2Event.DownedInvasionT2 = true; break;
-                    case "Post-The Destroyer": NPC.downedMechBoss1 = NPC.downedMechBossAny = true; break;
-                    case "Post-Skeletron Prime": NPC.downedMechBoss3 = NPC.downedMechBossAny = true; break;
+                    case "Post-The Destroyer":
+                        if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().SpawnMechOres();
+                        NPC.downedMechBoss1 = NPC.downedMechBossAny = true;
+                        break;
+                    case "Post-Skeletron Prime":
+                        if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().SpawnMechOres();
+                        NPC.downedMechBoss3 = NPC.downedMechBossAny = true;
+                        break;
                     case "Post-Plantera": NPC.downedPlantBoss = true; break;
                     case "Post-Golem": NPC.downedGolemBoss = true; break;
                     case "Post-Old One's Army Tier 3": DD2Event.DownedInvasionT3 = true; break;

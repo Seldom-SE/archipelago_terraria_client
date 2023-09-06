@@ -30,7 +30,7 @@ namespace SeldomArchipelago
         public static MethodInfo hiveMindOnKill = null;
         public static MethodInfo perforatorHiveOnKill = null;
         public static MethodInfo slimeGodCoreOnKill = null;
-        public static MethodInfo calamityGlobalNPCOnKill = null;
+        public static MethodInfo calamityGlobalNpcOnKill = null;
         public static MethodInfo aquaticScourgeHeadOnKill = null;
         public static MethodInfo maulerOnKill = null;
         public static MethodInfo brimstoneElementalOnKill = null;
@@ -204,7 +204,7 @@ namespace SeldomArchipelago
                     case "PerforatorHive": perforatorHiveOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                     case "SlimeGodCore": slimeGodCoreOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                     case "CalamityGlobalNPC":
-                        calamityGlobalNPCOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public);
+                        calamityGlobalNpcOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public);
                         calamityGlobalNpcSetNewBossJustDowned = type.GetMethod("SetNewBossJustDowned", BindingFlags.Static | BindingFlags.Public);
                         break;
                     case "AquaticScourgeHead": aquaticScourgeHeadOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
@@ -241,6 +241,7 @@ namespace SeldomArchipelago
             onHiveMindOnKill += OnHiveMindOnKill;
             onPerforatorHiveOnKill += OnPerforatorHiveOnKill;
             onSlimeGodCoreOnKill += OnSlimeGodCoreOnKill;
+            onCalamityGlobalNpcOnKill += OnCalamityGlobalNpcOnKill;
             editCalamityGlobalNPCOnKill += EditCalamityGlobalNPCOnKill;
             onAquaticScourgeHeadOnKill += OnAquaticScourgeHeadOnKill;
             onMaulerOnKill += OnMaulerOnKill;
@@ -298,6 +299,7 @@ namespace SeldomArchipelago
             onHiveMindOnKill -= OnHiveMindOnKill;
             onPerforatorHiveOnKill -= OnPerforatorHiveOnKill;
             onSlimeGodCoreOnKill -= OnSlimeGodCoreOnKill;
+            onCalamityGlobalNpcOnKill -= OnCalamityGlobalNpcOnKill;
             editCalamityGlobalNPCOnKill -= EditCalamityGlobalNPCOnKill;
             onAquaticScourgeHeadOnKill -= OnAquaticScourgeHeadOnKill;
             onMaulerOnKill -= OnMaulerOnKill;
@@ -483,6 +485,14 @@ namespace SeldomArchipelago
         {
             if (temp) orig(self);
             else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("The Slime God");
+        }
+
+        delegate void CalamityGlobalNpcOnKill(object self, NPC npc);
+        void OnCalamityGlobalNpcOnKill(CalamityGlobalNpcOnKill orig, object self, NPC npc)
+        {
+            var rework = ModContent.GetInstance<CalamitySystem>().GetAndUnsetRework();
+            orig(self, npc);
+            ModContent.GetInstance<CalamitySystem>().SetRework(rework);
         }
 
         void EditCalamityGlobalNPCOnKill(ILContext il)
@@ -702,10 +712,17 @@ namespace SeldomArchipelago
             remove => HookEndpointManager.Remove<OnOnKill>(slimeGodCoreOnKill, value);
         }
 
+        delegate void OnCalamityGlobalNpcOnKillTy(CalamityGlobalNpcOnKill orig, object self, NPC npc);
+        static event OnCalamityGlobalNpcOnKillTy onCalamityGlobalNpcOnKill
+        {
+            add => HookEndpointManager.Add<CalamityGlobalNpcOnKill>(calamityGlobalNpcOnKill, value);
+            remove => HookEndpointManager.Remove<CalamityGlobalNpcOnKill>(calamityGlobalNpcOnKill, value);
+        }
+
         static event ILContext.Manipulator editCalamityGlobalNPCOnKill
         {
-            add => HookEndpointManager.Modify(calamityGlobalNPCOnKill, value);
-            remove => HookEndpointManager.Unmodify(calamityGlobalNPCOnKill, value);
+            add => HookEndpointManager.Modify(calamityGlobalNpcOnKill, value);
+            remove => HookEndpointManager.Unmodify(calamityGlobalNpcOnKill, value);
         }
 
         static event OnOnKill onAquaticScourgeHeadOnKill
