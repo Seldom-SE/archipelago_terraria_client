@@ -1,6 +1,5 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using MonoMod.RuntimeDetour.HookGen;
 using SeldomArchipelago.Systems;
 using System;
 using System.IO;
@@ -64,7 +63,7 @@ namespace SeldomArchipelago
             // Begin cursed IL editing
 
             // Torch God reward Terraria.Player:13794
-            IL.Terraria.Player.TorchAttack += il =>
+            IL_Player.TorchAttack += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -74,7 +73,7 @@ namespace SeldomArchipelago
             };
 
             // Allow Torch God even if you have `unlockedBiomeTorches`
-            IL.Terraria.Player.UpdateTorchLuck_ConsumeCountersAndCalculate += il =>
+            IL_Player.UpdateTorchLuck_ConsumeCountersAndCalculate += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -89,7 +88,7 @@ namespace SeldomArchipelago
             };
 
             // General event clear locations
-            IL.Terraria.NPC.SetEventFlagCleared += il =>
+            IL_NPC.SetEventFlagCleared += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -140,7 +139,7 @@ namespace SeldomArchipelago
             };
 
             // Old One's Army locations
-            IL.Terraria.GameContent.Events.DD2Event.WinInvasionInternal += il =>
+            IL_DD2Event.WinInvasionInternal += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -162,7 +161,7 @@ namespace SeldomArchipelago
                 }
             };
 
-            IL.Terraria.NPC.DoDeathEvents += il =>
+            IL_NPC.DoDeathEvents += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -659,223 +658,223 @@ namespace SeldomArchipelago
             else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Supreme Witch, Calamitas");
         }
 
-        delegate void CalamityGlobalNpcSetNewBossJustDowned(ModNPC self);
-        void OnCalamityGlobalNpcSetNewBossJustDowned(CalamityGlobalNpcSetNewBossJustDowned orig, NPC self) { }
+        delegate void CalamityGlobalNpcSetNewBossJustDowned(NPC npc);
+        void OnCalamityGlobalNpcSetNewBossJustDowned(CalamityGlobalNpcSetNewBossJustDowned orig, NPC npc) { }
 
         delegate void OnOnKill(OnKill orig, ModNPC self);
 
         static event OnOnKill onDesertScourgeHeadOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(desertScourgeHeadOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(desertScourgeHeadOnKill, value);
+            add => MonoModHooks.Add(desertScourgeHeadOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onGiantClamOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(giantClamOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(giantClamOnKill, value);
+            add => MonoModHooks.Add(giantClamOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onCragmawMireOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(cragmawMireOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(cragmawMireOnKill, value);
+            add => MonoModHooks.Add(cragmawMireOnKill, value);
+            remove { }
         }
 
         static event ILContext.Manipulator editAcidRainEventUpdateInvasion
         {
-            add => HookEndpointManager.Modify(acidRainEventUpdateInvasion, value);
-            remove => HookEndpointManager.Unmodify(acidRainEventUpdateInvasion, value);
+            add => MonoModHooks.Modify(acidRainEventUpdateInvasion, value);
+            remove { }
         }
 
         static event OnOnKill onCrabulonOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(crabulonOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(crabulonOnKill, value);
+            add => MonoModHooks.Add(crabulonOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onHiveMindOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(hiveMindOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(hiveMindOnKill, value);
+            add => MonoModHooks.Add(hiveMindOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onPerforatorHiveOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(perforatorHiveOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(perforatorHiveOnKill, value);
+            add => MonoModHooks.Add(perforatorHiveOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onSlimeGodCoreOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(slimeGodCoreOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(slimeGodCoreOnKill, value);
+            add => MonoModHooks.Add(slimeGodCoreOnKill, value);
+            remove { }
         }
 
         delegate void OnCalamityGlobalNpcOnKillTy(CalamityGlobalNpcOnKill orig, object self, NPC npc);
         static event OnCalamityGlobalNpcOnKillTy onCalamityGlobalNpcOnKill
         {
-            add => HookEndpointManager.Add<CalamityGlobalNpcOnKill>(calamityGlobalNpcOnKill, value);
-            remove => HookEndpointManager.Remove<CalamityGlobalNpcOnKill>(calamityGlobalNpcOnKill, value);
+            add => MonoModHooks.Add(calamityGlobalNpcOnKill, value);
+            remove { }
         }
 
         static event ILContext.Manipulator editCalamityGlobalNPCOnKill
         {
-            add => HookEndpointManager.Modify(calamityGlobalNpcOnKill, value);
-            remove => HookEndpointManager.Unmodify(calamityGlobalNpcOnKill, value);
+            add => MonoModHooks.Modify(calamityGlobalNpcOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onAquaticScourgeHeadOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(aquaticScourgeHeadOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(aquaticScourgeHeadOnKill, value);
+            add => MonoModHooks.Add(aquaticScourgeHeadOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onMaulerOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(maulerOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(maulerOnKill, value);
+            add => MonoModHooks.Add(maulerOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onBrimstoneElementalOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(brimstoneElementalOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(brimstoneElementalOnKill, value);
+            add => MonoModHooks.Add(brimstoneElementalOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onCryogenOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(cryogenOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(cryogenOnKill, value);
+            add => MonoModHooks.Add(cryogenOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onCalamitasCloneOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(calamitasCloneOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(calamitasCloneOnKill, value);
+            add => MonoModHooks.Add(calamitasCloneOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onGreatSandSharkOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(greatSandSharkOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(greatSandSharkOnKill, value);
+            add => MonoModHooks.Add(greatSandSharkOnKill, value);
+            remove { }
         }
 
         delegate void OnRealOnKill(RealOnKill orig, NPC npc);
         static event OnRealOnKill onLeviathanRealOnKill
         {
-            add => HookEndpointManager.Add<OnRealOnKill>(leviathanRealOnKill, value);
-            remove => HookEndpointManager.Remove<OnRealOnKill>(leviathanRealOnKill, value);
+            add => MonoModHooks.Add(leviathanRealOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onAstrumAureusOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(astrumAureusOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(astrumAureusOnKill, value);
+            add => MonoModHooks.Add(astrumAureusOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onPlaguebringerGoliathOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(plaguebringerGoliathOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(plaguebringerGoliathOnKill, value);
+            add => MonoModHooks.Add(plaguebringerGoliathOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onRavagerBodyOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(ravagerBodyOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(ravagerBodyOnKill, value);
+            add => MonoModHooks.Add(ravagerBodyOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onAstrumDeusHeadOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(astrumDeusHeadOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(astrumDeusHeadOnKill, value);
+            add => MonoModHooks.Add(astrumDeusHeadOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onProfanedGuardianCommanderOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(profanedGuardianCommanderOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(profanedGuardianCommanderOnKill, value);
+            add => MonoModHooks.Add(profanedGuardianCommanderOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onBumblefuckOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(bumblefuckOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(bumblefuckOnKill, value);
+            add => MonoModHooks.Add(bumblefuckOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onProvidenceOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(providenceOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(providenceOnKill, value);
+            add => MonoModHooks.Add(providenceOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onStormWeaverHeadOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(stormWeaverHeadOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(stormWeaverHeadOnKill, value);
+            add => MonoModHooks.Add(stormWeaverHeadOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onCeaselessVoidOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(ceaselessVoidOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(ceaselessVoidOnKill, value);
+            add => MonoModHooks.Add(ceaselessVoidOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onSignusOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(signusOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(signusOnKill, value);
+            add => MonoModHooks.Add(signusOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onPolterghastOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(polterghastOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(polterghastOnKill, value);
+            add => MonoModHooks.Add(polterghastOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onNuclearTerrorOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(nuclearTerrorOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(nuclearTerrorOnKill, value);
+            add => MonoModHooks.Add(nuclearTerrorOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onOldDukeOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(oldDukeOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(oldDukeOnKill, value);
+            add => MonoModHooks.Add(oldDukeOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onDevourerofGodsHeadOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(devourerofGodsHeadOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(devourerofGodsHeadOnKill, value);
+            add => MonoModHooks.Add(devourerofGodsHeadOnKill, value);
+            remove { }
         }
 
         static event OnOnKill onYharonOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(yharonOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(yharonOnKill, value);
+            add => MonoModHooks.Add(yharonOnKill, value);
+            remove { }
         }
 
         delegate void OnDoMiscDeathEffects(DoMiscDeathEffects orig, NPC npc, int mechType);
         static event OnDoMiscDeathEffects onAresBodyDoMiscDeathEffects
         {
-            add => HookEndpointManager.Add<OnDoMiscDeathEffects>(aresBodyDoMiscDeathEffects, value);
-            remove => HookEndpointManager.Remove<OnDoMiscDeathEffects>(aresBodyDoMiscDeathEffects, value);
+            add => MonoModHooks.Add(aresBodyDoMiscDeathEffects, value);
+            remove { }
         }
 
         static event OnOnKill onSupremeCalamitasOnKill
         {
-            add => HookEndpointManager.Add<OnOnKill>(supremeCalamitasOnKill, value);
-            remove => HookEndpointManager.Remove<OnOnKill>(supremeCalamitasOnKill, value);
+            add => MonoModHooks.Add(supremeCalamitasOnKill, value);
+            remove { }
         }
 
-        delegate void OnCalamityGlobalNpcSetNewBossJustDownedTy(CalamityGlobalNpcSetNewBossJustDowned orig, NPC self);
+        delegate void OnCalamityGlobalNpcSetNewBossJustDownedTy(CalamityGlobalNpcSetNewBossJustDowned orig, NPC npc);
         static event OnCalamityGlobalNpcSetNewBossJustDownedTy onCalamityGlobalNpcSetNewBossJustDowned
         {
-            add => HookEndpointManager.Add<OnCalamityGlobalNpcSetNewBossJustDownedTy>(calamityGlobalNpcSetNewBossJustDowned, value);
-            remove => HookEndpointManager.Remove<OnCalamityGlobalNpcSetNewBossJustDownedTy>(calamityGlobalNpcSetNewBossJustDowned, value);
+            add => MonoModHooks.Add(calamityGlobalNpcSetNewBossJustDowned, value);
+            remove { }
         }
     }
 }

@@ -1,0 +1,30 @@
+Configs: {
+	Config: {
+		DisplayName: Config
+
+		Headers: {
+			Common: Common Header
+			Advanced: Advanced Header
+		}
+
+		name: {
+			Label: Name
+			Tooltip: ""
+		}
+
+		port: {
+			Label: Port
+			Tooltip: ""
+		}
+
+		address: {
+			Label: Server Address
+			Tooltip: ""
+		}
+
+		password: {
+			Label: Password
+			Tooltip: ""
+		}
+	}
+}

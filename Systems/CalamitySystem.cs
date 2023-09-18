@@ -16,10 +16,9 @@ namespace SeldomArchipelago.Systems
         public void GiveCrimsonFlask() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.CrimsonFlask>();
         public void GiveCrawCarapace() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.CrawCarapace>();
         public void GiveGiantShell() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.GiantShell>();
-        public void GiveFungalCarapace() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.FungalCarapace>();
         public void GiveLifeJelly() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.LifeJelly>();
         public void GiveVitalJelly() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.VitalJelly>();
-        public void GiveManaJelly() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.ManaJelly>();
+        public void GiveCleansingJelly() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.CleansingJelly>();
         public void GiveGiantTortoiseShell() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.GiantTortoiseShell>();
         public void GiveCoinOfDeceit() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.CoinofDeceit>();
         public void GiveInkBomb() => ModContent.GetInstance<ArchipelagoSystem>().GiveItem<CalamityMod.Items.Accessories.InkBomb>();
@@ -90,7 +89,7 @@ namespace SeldomArchipelago.Systems
             "Post-Yharon, Dragon of Rebirth" => CalamityMod.DownedBossSystem.downedYharon,
             "Post-Exo Mechs" => CalamityMod.DownedBossSystem.downedExoMechs,
             "Post-Supreme Witch, Calamitas" => CalamityMod.DownedBossSystem.downedCalamitas,
-            "Post-Adult Eidolon Wyrm" => CalamityMod.DownedBossSystem.downedAdultEidolonWyrm,
+            "Post-Primordial Wyrm" => CalamityMod.DownedBossSystem.downedPrimordialWyrm,
             "Post-Boss Rush" => CalamityMod.DownedBossSystem.downedBossRush,
             _ => ((Func<bool>)(() =>
             {
@@ -101,8 +100,7 @@ namespace SeldomArchipelago.Systems
 
         public void CalamityStartHardmode()
         {
-            CalamityMod.NPCs.CalamityGlobalNPC.SetNewShopVariable(
-            [
+            CalamityMod.NPCs.CalamityGlobalNPC.SetNewShopVariable(new[] {
                 17,
                 19,
                 20,
@@ -116,7 +114,7 @@ namespace SeldomArchipelago.Systems
                 453,
                 633,
                 0
-            ], false);
+            }, false);
 
             if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
 
@@ -160,7 +158,7 @@ namespace SeldomArchipelago.Systems
         public void CalamityAcidRainTier1Downed() => CalamityMod.DownedBossSystem.downedEoCAcidRain = true;
         public void CalamityDreadnautilusDowned() => CalamityMod.DownedBossSystem.downedDreadnautilus = true;
         public void CalamityAcidRainTier2Downed() => CalamityMod.DownedBossSystem.downedAquaticScourgeAcidRain = true;
-        public void CalamityAdultEidolonWyrmDowned() => CalamityMod.DownedBossSystem.downedAdultEidolonWyrm = true;
+        public void CalamityPrimordialWyrmDowned() => CalamityMod.DownedBossSystem.downedPrimordialWyrm = true;
         public void CalamityBossRushDowned() => CalamityMod.DownedBossSystem.downedBossRush = true;
 
         public void CalamityOnKillDesertScourge() => CalamityOnKill(new CalamityMod.NPCs.DesertScourge.DesertScourgeHead(), SeldomArchipelago.desertScourgeHeadOnKill);

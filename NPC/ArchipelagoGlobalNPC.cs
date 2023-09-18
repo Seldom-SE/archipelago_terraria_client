@@ -14,7 +14,7 @@ namespace SeldomArchipelago
 
         void CalamityOnKill(int npc)
         {
-            if (npc == ModContent.NPCType<CalamityMod.NPCs.AdultEidolonWyrm.AdultEidolonWyrmHead>()) ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Adult Eidolon Wyrm");
+            if (npc == ModContent.NPCType<CalamityMod.NPCs.PrimordialWyrm.PrimordialWyrmHead>()) ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Primordial Wyrm");
         }
     }
 }

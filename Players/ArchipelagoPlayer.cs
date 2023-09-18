@@ -15,7 +15,7 @@ namespace SeldomArchipelago.Players
     {
         TagCompound achievements = new();
 
-        public override void OnEnterWorld(Player player)
+        public override void OnEnterWorld()
         {
             Main.Achievements.ClearAll();
             var achievements = (Dictionary<string, Achievement>)typeof(AchievementManager).GetField("_achievements", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Main.Achievements);
@@ -48,7 +48,7 @@ namespace SeldomArchipelago.Players
             }
 
             var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
-            archipelagoSystem.Chat(archipelagoSystem.Status(), player.whoAmI);
+            archipelagoSystem.Chat(archipelagoSystem.Status(), Player.whoAmI);
         }
 
         public override void SaveData(TagCompound tag)
