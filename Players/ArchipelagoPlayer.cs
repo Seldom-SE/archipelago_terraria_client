@@ -17,11 +17,12 @@ namespace SeldomArchipelago.Players
 
         public override void OnEnterWorld()
         {
-            Main.Achievements.ClearAll();
             var achievements = (Dictionary<string, Achievement>)typeof(AchievementManager).GetField("_achievements", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Main.Achievements);
 
             foreach (var achievement in achievements)
             {
+                achievement.Value.ClearProgress();
+
                 var conditions = (Dictionary<string, AchievementCondition>)typeof(Achievement).GetField("_conditions", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(achievement.Value);
                 var serConditions = this.achievements.Get<TagCompound>(achievement.Key);
 

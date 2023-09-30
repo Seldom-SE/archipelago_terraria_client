@@ -119,7 +119,7 @@ namespace SeldomArchipelago
                         GameEventClearedID.DefeatedSkeletronPrime => "Skeletron Prime",
                         GameEventClearedID.DefeatedPlantera => "Plantera",
                         GameEventClearedID.DefeatedGolem => "Golem",
-                        GameEventClearedID.DefeatedMartians => "Martian Invasion",
+                        GameEventClearedID.DefeatedMartians => "Martian Madness",
                         GameEventClearedID.DefeatedFishron => "Duke Fishron",
                         GameEventClearedID.DefeatedHalloweenTree => "Mourning Wood",
                         GameEventClearedID.DefeatedHalloweenKing => "Pumpking",
