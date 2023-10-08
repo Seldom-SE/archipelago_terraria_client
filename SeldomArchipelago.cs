@@ -247,6 +247,7 @@ namespace SeldomArchipelago
                 "SLAYER_OF_WORLDS" => "Slayer of Worlds",
                 "SICK_THROW" => "Sick Throw",
                 "YOU_AND_WHAT_ARMY" => "You and What Army?",
+                "GET_ZENITH" => "Zenith",
                 _ => null,
             };
 
