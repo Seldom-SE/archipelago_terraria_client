@@ -138,6 +138,13 @@ namespace SeldomArchipelago
                 cursor.EmitDelegate<Action>(() => Main.hardMode = temp);
             };
 
+            // Stop loading achievements from disk
+            IL.Terraria.Achievements.AchievementManager.Load += il =>
+            {
+                var cursor = new ILCursor(il);
+                cursor.Emit(OpCodes.Ret);
+            };
+
             if (Main.netMode != NetmodeID.Server) Main.Achievements.OnAchievementCompleted += OnAchievementCompleted;
         }
 

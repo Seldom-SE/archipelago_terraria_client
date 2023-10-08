@@ -14,9 +14,17 @@ namespace SeldomArchipelago.Players
     public class ArchipelagoPlayer : ModPlayer
     {
         TagCompound achievements = new();
+        bool inWorld = false;
 
         public override void OnEnterWorld(Player player)
         {
+            inWorld = true;
+
+            foreach (var temp in this.achievements)
+            {
+                Mod.Logger.Info(temp.Key);
+            }
+
             var achievements = (Dictionary<string, Achievement>)typeof(AchievementManager).GetField("_achievements", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Main.Achievements);
 
             foreach (var achievement in achievements)
@@ -61,6 +69,8 @@ namespace SeldomArchipelago.Players
 
             foreach (var achievement in achievements)
             {
+                if (!inWorld) achievement.Value.ClearProgress();
+
                 var conditions = (Dictionary<string, AchievementCondition>)typeof(Achievement).GetField("_conditions", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(achievement.Value);
                 var serConditions = new TagCompound();
 
