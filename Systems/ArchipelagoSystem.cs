@@ -301,8 +301,10 @@ namespace SeldomArchipelago.Systems
 
             foreach (var goal in goals) if (!collectedLocations.Contains(goal)) return;
 
-            var victoryPacket = new StatusUpdatePacket();
-            victoryPacket.Status = ArchipelagoClientState.ClientGoal;
+            var victoryPacket = new StatusUpdatePacket()
+            {
+                Status = ArchipelagoClientState.ClientGoal,
+            };
             session.Socket.SendPacket(victoryPacket);
 
             victory = true;
@@ -339,13 +341,13 @@ namespace SeldomArchipelago.Systems
 
         public string[] Status() => Tuple.Create(session != null, enabled) switch
         {
-            (false, _) => new string[] {
+            (false, _) => new[] {
                 @"The world is not connected to Archipelago! Reload the world or run ""/apconnect"".",
                 "If you are the host, check your config in the main menu at Workshop > Manage Mods > Config",
                 "Or in-game at Settings > Mod Configuration",
             },
-            (true, false) => new string[] { @"Archipelago is connected but not enabled. Once everyone's joined, run ""/apstart"" to start it." },
-            (true, true) => new string[] { "Archipelago is active!" },
+            (true, false) => new[] { @"Archipelago is connected but not enabled. Once everyone's joined, run ""/apstart"" to start it." },
+            (true, true) => new[] { "Archipelago is active!" },
         };
 
         public bool Enable()
@@ -364,8 +366,10 @@ namespace SeldomArchipelago.Systems
         {
             if (session == null) return false;
 
-            var packet = new SayPacket();
-            packet.Text = command;
+            var packet = new SayPacket()
+            {
+                Text = command,
+            };
             session.Socket.SendPacket(packet);
 
             return true;
@@ -403,11 +407,11 @@ namespace SeldomArchipelago.Systems
 
             if (!collectedLocations.Contains(locationName))
             {
-                locationQueue.Add(session.Locations.ScoutLocationsAsync(new long[] { location }));
+                locationQueue.Add(session.Locations.ScoutLocationsAsync(new[] { location }));
                 collectedLocations.Add(locationName);
             }
 
-            session.Locations.CompleteLocationChecks(new long[] { location });
+            session.Locations.CompleteLocationChecks(new[] { location });
         }
 
         public void QueueLocationClient(string locationName)
@@ -433,7 +437,7 @@ namespace SeldomArchipelago.Systems
                     if (item == ItemID.SilverCoin)
                     {
                         var platinum = count / 10000;
-                        var gold = (count % 10000) / 100;
+                        var gold = count % 10000 / 100;
                         var silver = count % 100;
                         if (platinum > 0) player.QuickSpawnItem(player.GetSource_GiftOrReward(), ItemID.PlatinumCoin, platinum);
                         if (gold > 0) player.QuickSpawnItem(player.GetSource_GiftOrReward(), ItemID.GoldCoin, gold);

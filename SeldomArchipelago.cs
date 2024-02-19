@@ -9,6 +9,7 @@ using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
 using System.IO;
+using System.Reflection;
 
 namespace SeldomArchipelago
 {
@@ -29,7 +30,7 @@ namespace SeldomArchipelago
                 var cursor = new ILCursor(il);
 
                 cursor.GotoNext(i => i.MatchLdsfld(typeof(Main).GetField(nameof(Main.netMode))));
-                cursor.EmitDelegate<Action>(() => archipelagoSystem.QueueLocationClient("Torch God"));
+                cursor.EmitDelegate(() => archipelagoSystem.QueueLocationClient("Torch God"));
                 cursor.Emit(OpCodes.Ret);
             };
 
@@ -54,7 +55,7 @@ namespace SeldomArchipelago
                 var cursor = new ILCursor(il);
 
                 cursor.Emit(OpCodes.Ldarg_1);
-                cursor.EmitDelegate<Action<int>>((int id) =>
+                cursor.EmitDelegate((int id) =>
                 {
                     var location = id switch
                     {
@@ -107,7 +108,7 @@ namespace SeldomArchipelago
                     cursor.GotoNext(i => i.MatchStsfld(flag));
                     cursor.EmitDelegate<Action>(() => temp = (bool)flag.GetValue(null));
                     cursor.Index++;
-                    cursor.EmitDelegate<Action>(() =>
+                    cursor.EmitDelegate(() =>
                     {
                         flag.SetValue(null, temp);
                         archipelagoSystem.QueueLocation($"Old One's Army Tier {tier}");
@@ -119,6 +120,17 @@ namespace SeldomArchipelago
             {
                 var cursor = new ILCursor(il);
 
+                // Prevent NPC.downedTower* from being set
+                foreach (var flag in new string[] { nameof(NPC.downedTowerSolar), nameof(NPC.downedTowerVortex), nameof(NPC.downedTowerNebula), nameof(NPC.downedTowerStardust) })
+                {
+                    var field = typeof(NPC).GetField(flag, BindingFlags.Static | BindingFlags.Public);
+                    cursor.GotoNext(i => i.MatchStsfld(field));
+                    // Crimes
+                    cursor.EmitDelegate<Action>(() => temp = (bool)field.GetValue(null));
+                    cursor.Index++;
+                    cursor.EmitDelegate(() => field.SetValue(null, temp));
+                }
+
                 // Prevent NPC.downedMechBossAny from being set
                 while (cursor.TryGotoNext(i => i.MatchStsfld(typeof(NPC).GetField(nameof(NPC.downedMechBossAny)))))
                 {
@@ -129,13 +141,22 @@ namespace SeldomArchipelago
 
                 // Prevent Hardmode generation Terraria.NPC:69104
                 cursor.GotoNext(i => i.MatchCall(typeof(WorldGen).GetMethod(nameof(WorldGen.StartHardmode))));
-                cursor.EmitDelegate<Action>(() =>
+                cursor.EmitDelegate(() =>
                 {
                     temp = Main.hardMode;
                     Main.hardMode = true;
                 });
                 cursor.Index++;
                 cursor.EmitDelegate<Action>(() => Main.hardMode = temp);
+            };
+
+            IL.Terraria.WorldGen.UpdateLunarApocalypse += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                cursor.GotoNext(i => i.MatchCall(typeof(WorldGen).GetMethod(nameof(WorldGen.StartImpendingDoom))));
+                cursor.Index--;
+                cursor.EmitDelegate(() => archipelagoSystem.QueueLocation("Lunar Events"));
             };
 
             // Stop loading achievements from disk
