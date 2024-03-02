@@ -381,6 +381,62 @@ namespace SeldomArchipelago.Systems
             return true;
         }
 
+        public string[] DebugInfo()
+        {
+            var info = new List<string>();
+
+            if (locationBacklog.Count > 0)
+            {
+                info.Add("You have locations in the backlog, which should only be the case if Archipelago is inactive");
+                info.Add($"Location backlog: [{string.Join("; ", locationBacklog)}]");
+            }
+            else
+            {
+                info.Add("No locations in the backlog, which is usually normal");
+            }
+
+            if (locationQueue.Count > 0)
+            {
+                info.Add($"You have locations queued for sending. In normal circumstances, these locations will be sent ASAP.");
+
+                var statuses = new List<string>();
+                foreach (var location in locationQueue) statuses.Add(location.Status switch
+                {
+                    TaskStatus.Created => "Created",
+                    TaskStatus.WaitingForActivation => "Waiting for activation",
+                    TaskStatus.WaitingToRun => "Waiting to run",
+                    TaskStatus.Running => "Running",
+                    TaskStatus.WaitingForChildrenToComplete => "Waiting for children to complete",
+                    TaskStatus.RanToCompletion => "Completed",
+                    TaskStatus.Canceled => "Canceled",
+                    TaskStatus.Faulted => "Faulted",
+                    _ => "Has a status that was added to C# after this code was written",
+                });
+
+                info.Add($"Location queue statuses: [{string.Join("; ", statuses)}]");
+            }
+            else
+            {
+                info.Add("No locations in the queue, which is usually normal");
+            }
+
+            info.Add($"You're {(session == null ? "not " : "")}connected to Archipelago");
+            if (session != null && !session.Socket.Connected)
+            {
+                info.Add("Actually, the socket is disconnected and mod is in a weird state");
+            }
+
+            info.Add($"DeathLink is {(deathlink == null ? "dis" : "en")}abled");
+            info.Add($"Archipelago is {(enabled ? "en" : "dis")}abled");
+            info.Add($"You've collected {collectedItems} items, of which {currentItem} have been applied");
+            info.Add($"Collected locations: [{string.Join("; ", collectedLocations)}]");
+            info.Add($"Goals: [{string.Join("; ", goals)}]");
+            info.Add($"Victory has {(victory ? "been achieved! Hooray!" : "not been achieved. Alas.")}");
+            info.Add($"You are slot {slot}");
+
+            return info.ToArray();
+        }
+
         public void Chat(string message, int player = -1)
         {
             if (player == -1)
