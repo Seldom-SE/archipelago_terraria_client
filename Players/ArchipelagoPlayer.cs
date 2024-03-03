@@ -16,7 +16,7 @@ namespace SeldomArchipelago.Players
         TagCompound achievements = new();
         bool inWorld = false;
 
-        public override void OnEnterWorld(Player player)
+        public override void OnEnterWorld()
         {
             inWorld = true;
 
@@ -57,7 +57,7 @@ namespace SeldomArchipelago.Players
             }
 
             var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
-            archipelagoSystem.Chat(archipelagoSystem.Status(), player.whoAmI);
+            archipelagoSystem.Chat(archipelagoSystem.Status(), this.Player.whoAmI);
         }
 
         public override void SaveData(TagCompound tag)

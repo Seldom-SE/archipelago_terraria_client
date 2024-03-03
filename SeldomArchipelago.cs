@@ -25,7 +25,7 @@ namespace SeldomArchipelago
             // Begin cursed IL editing
 
             // Torch God reward Terraria.Player:13794
-            IL.Terraria.Player.TorchAttack += il =>
+            Terraria.IL_Player.TorchAttack += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -35,7 +35,7 @@ namespace SeldomArchipelago
             };
 
             // Allow Torch God even if you have `unlockedBiomeTorches`
-            IL.Terraria.Player.UpdateTorchLuck_ConsumeCountersAndCalculate += il =>
+            Terraria.IL_Player.UpdateTorchLuck_ConsumeCountersAndCalculate += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -50,7 +50,7 @@ namespace SeldomArchipelago
             };
 
             // General event clear locations
-            IL.Terraria.NPC.SetEventFlagCleared += il =>
+            Terraria.IL_NPC.SetEventFlagCleared += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -94,7 +94,7 @@ namespace SeldomArchipelago
             };
 
             // Old One's Army locations
-            IL.Terraria.GameContent.Events.DD2Event.WinInvasionInternal += il =>
+            Terraria.GameContent.Events.IL_DD2Event.WinInvasionInternal += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -116,7 +116,7 @@ namespace SeldomArchipelago
                 }
             };
 
-            IL.Terraria.NPC.DoDeathEvents += il =>
+            Terraria.IL_NPC.DoDeathEvents += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -150,7 +150,7 @@ namespace SeldomArchipelago
                 cursor.EmitDelegate<Action>(() => Main.hardMode = temp);
             };
 
-            IL.Terraria.WorldGen.UpdateLunarApocalypse += il =>
+            Terraria.IL_WorldGen.UpdateLunarApocalypse += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -159,8 +159,8 @@ namespace SeldomArchipelago
                 cursor.EmitDelegate(() => archipelagoSystem.QueueLocation("Lunar Events"));
             };
 
-            // Stop loading achievements from disk
-            IL.Terraria.Achievements.AchievementManager.Load += il =>
+            // Stop loading achievements from disk\
+            Terraria.Achievements.IL_AchievementManager.Load += il =>
             {
                 var cursor = new ILCursor(il);
                 cursor.Emit(OpCodes.Ret);

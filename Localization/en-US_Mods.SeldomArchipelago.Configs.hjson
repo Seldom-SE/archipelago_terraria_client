@@ -1,0 +1,14 @@
+ModConfig: {
+	DisplayName: Slot Name
+	Port: Port
+	Host: Server Address
+	Password: Password
+}
+
+Config: {
+	name.Tooltip: The name in the Archipelago yaml configuration generated for this game
+	port.Tooltip: Port for the connection. This can be found on the Game Room on archipelago.gg
+	DisplayName: Config
+	address.Tooltip: ""
+	password.Tooltip: ""
+}
