@@ -7,7 +7,7 @@ namespace SeldomArchipelago.Command
     {
         public override string Command => "apflags";
         public override CommandType Type => CommandType.World;
-        public override string Description => "Sends a command to Archipelago";
+        public override string Description => "Lists the set boss/event flags";
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {

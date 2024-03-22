@@ -10,6 +10,8 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
+using System.IO;
+using System.Reflection;
 
 namespace SeldomArchipelago
 {
@@ -165,6 +167,17 @@ namespace SeldomArchipelago
             {
                 var cursor = new ILCursor(il);
 
+                // Prevent NPC.downedTower* from being set
+                foreach (var flag in new string[] { nameof(NPC.downedTowerSolar), nameof(NPC.downedTowerVortex), nameof(NPC.downedTowerNebula), nameof(NPC.downedTowerStardust) })
+                {
+                    var field = typeof(NPC).GetField(flag, BindingFlags.Static | BindingFlags.Public);
+                    cursor.GotoNext(i => i.MatchStsfld(field));
+                    // Crimes
+                    cursor.EmitDelegate<Action>(() => temp = (bool)field.GetValue(null));
+                    cursor.Index++;
+                    cursor.EmitDelegate(() => field.SetValue(null, temp));
+                }
+
                 // Prevent NPC.downedMechBossAny from being set
                 while (cursor.TryGotoNext(i => i.MatchStsfld(typeof(NPC).GetField(nameof(NPC.downedMechBossAny)))))
                 {
@@ -182,6 +195,22 @@ namespace SeldomArchipelago
                 });
                 cursor.Index++;
                 cursor.EmitDelegate<Action>(() => Main.hardMode = temp);
+            };
+
+            IL.Terraria.WorldGen.UpdateLunarApocalypse += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                cursor.GotoNext(i => i.MatchCall(typeof(WorldGen).GetMethod(nameof(WorldGen.StartImpendingDoom))));
+                cursor.Index--;
+                cursor.EmitDelegate(() => archipelagoSystem.QueueLocation("Lunar Events"));
+            };
+
+            // Stop loading achievements from disk
+            IL.Terraria.Achievements.AchievementManager.Load += il =>
+            {
+                var cursor = new ILCursor(il);
+                cursor.Emit(OpCodes.Ret);
             };
 
             if (Main.netMode != NetmodeID.Server) Main.Achievements.OnAchievementCompleted += OnAchievementCompleted;
@@ -413,6 +442,7 @@ namespace SeldomArchipelago
                 "SLAYER_OF_WORLDS" => "Slayer of Worlds",
                 "SICK_THROW" => "Sick Throw",
                 "YOU_AND_WHAT_ARMY" => "You and What Army?",
+                "GET_ZENITH" => "Zenith",
                 _ => null,
             };
 
