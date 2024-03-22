@@ -10,8 +10,6 @@ using Terraria.DataStructures;
 using Terraria.GameContent.Events;
 using Terraria.ID;
 using Terraria.ModLoader;
-using System.IO;
-using System.Reflection;
 
 namespace SeldomArchipelago
 {
@@ -197,7 +195,7 @@ namespace SeldomArchipelago
                 cursor.EmitDelegate<Action>(() => Main.hardMode = temp);
             };
 
-            IL.Terraria.WorldGen.UpdateLunarApocalypse += il =>
+            IL_WorldGen.UpdateLunarApocalypse += il =>
             {
                 var cursor = new ILCursor(il);
 
@@ -207,7 +205,7 @@ namespace SeldomArchipelago
             };
 
             // Stop loading achievements from disk
-            IL.Terraria.Achievements.AchievementManager.Load += il =>
+            IL_AchievementManager.Load += il =>
             {
                 var cursor = new ILCursor(il);
                 cursor.Emit(OpCodes.Ret);
