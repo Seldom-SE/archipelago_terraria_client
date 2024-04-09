@@ -12,11 +12,13 @@ using Terraria;
 using Terraria.Chat;
 using Terraria.DataStructures;
 using Terraria.GameContent.Events;
+using Terraria.GameContent.Generation;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.Social;
+using Terraria.WorldBuilding;
 
 namespace SeldomArchipelago.Systems
 {
@@ -143,48 +145,52 @@ namespace SeldomArchipelago.Systems
             switch (item)
             {
                 case "Reward: Torch God's Favor": GiveItem(ItemID.TorchGodsFavor); break;
-                case "Post-King Slime": NPC.downedSlimeKing = true; break;
-                case "Post-Eye of Cthulhu": NPC.downedBoss1 = true; break;
-                case "Post-Evil Boss": NPC.downedBoss2 = true; break;
+                case "Post-King Slime": BossFlag(ref NPC.downedSlimeKing, NPCID.KingSlime); break;
+                case "Post-Eye of Cthulhu": BossFlag(ref NPC.downedBoss1, NPCID.EyeofCthulhu); break;
+                case "Post-Evil Boss": BossFlag(ref NPC.downedBoss2, NPCID.EaterofWorldsHead); break;
                 case "Post-Old One's Army Tier 1": DD2Event.DownedInvasionT1 = true; break;
                 case "Post-Goblin Army": NPC.downedGoblins = true; break;
-                case "Post-Queen Bee": NPC.downedQueenBee = true; break;
-                case "Post-Skeletron": NPC.downedBoss3 = true; break;
-                case "Post-Deerclops": NPC.downedDeerclops = true; break;
+                case "Post-Queen Bee": BossFlag(ref NPC.downedQueenBee, NPCID.QueenBee); break;
+                case "Post-Skeletron": BossFlag(ref NPC.downedBoss3, NPCID.SkeletronHead); break;
+                case "Post-Deerclops": BossFlag(ref NPC.downedDeerclops, NPCID.Deerclops); break;
                 case "Hardmode":
-                    if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().SpawnHardOres();
-                    StartHardmode();
+                    BossFlag(NPCID.WallofFlesh);
+                    WorldGen.StartHardmode();
                     break;
                 case "Post-Pirate Invasion": NPC.downedPirates = true; break;
-                case "Post-Queen Slime": NPC.downedQueenSlime = true; break;
+                case "Post-Queen Slime": BossFlag(ref NPC.downedQueenSlime, NPCID.QueenSlimeBoss); break;
                 case "Post-The Twins":
-                    if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().SpawnMechOres();
-                    NPC.downedMechBoss2 = NPC.downedMechBossAny = true;
+                    Action set = () => NPC.downedMechBoss2 = NPC.downedMechBossAny = true;
+                    if (NPC.AnyNPCs(NPCID.Retinazer))
+                    {
+                        if (NPC.AnyNPCs(NPCID.Spazmatism))
+                        {
+                            // If the player is fighting The Twins, it would mess with the `CalamityGlobalNPC.OnKill` logic, so we have a fallback
+                            if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().SpawnMechOres();
+                            NPC.downedMechBoss2 = NPC.downedMechBossAny = true;
+                        }
+                        else BossFlag(set, NPCID.Retinazer);
+                    }
+                    else BossFlag(set, NPCID.Spazmatism);
                     break;
                 case "Post-Old One's Army Tier 2": DD2Event.DownedInvasionT2 = true; break;
-                case "Post-The Destroyer":
-                    if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().SpawnMechOres();
-                    NPC.downedMechBoss1 = NPC.downedMechBossAny = true;
-                    break;
-                case "Post-Skeletron Prime":
-                    if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().SpawnMechOres();
-                    NPC.downedMechBoss3 = NPC.downedMechBossAny = true;
-                    break;
-                case "Post-Plantera": NPC.downedPlantBoss = true; break;
-                case "Post-Golem": NPC.downedGolemBoss = true; break;
+                case "Post-The Destroyer": BossFlag(() => NPC.downedMechBoss1 = NPC.downedMechBossAny = true, NPCID.TheDestroyer); break;
+                case "Post-Skeletron Prime": BossFlag(() => NPC.downedMechBoss3 = NPC.downedMechBossAny = true, NPCID.SkeletronPrime); break;
+                case "Post-Plantera": BossFlag(ref NPC.downedPlantBoss, NPCID.Plantera); break;
+                case "Post-Golem": BossFlag(ref NPC.downedGolemBoss, NPCID.Golem); break;
                 case "Post-Old One's Army Tier 3": DD2Event.DownedInvasionT3 = true; break;
                 case "Post-Martian Madness": NPC.downedMartians = true; break;
-                case "Post-Duke Fishron": NPC.downedFishron = true; break;
-                case "Post-Mourning Wood": NPC.downedHalloweenTree = true; break;
-                case "Post-Pumpking": NPC.downedHalloweenKing = true; break;
-                case "Post-Everscream": NPC.downedChristmasTree = true; break;
-                case "Post-Santa-NK1": NPC.downedChristmasSantank = true; break;
-                case "Post-Ice Queen": NPC.downedChristmasIceQueen = true; break;
+                case "Post-Duke Fishron": BossFlag(ref NPC.downedFishron, NPCID.DukeFishron); break;
+                case "Post-Mourning Wood": BossFlag(ref NPC.downedHalloweenTree, NPCID.MourningWood); break;
+                case "Post-Pumpking": BossFlag(ref NPC.downedHalloweenKing, NPCID.Pumpking); break;
+                case "Post-Everscream": BossFlag(ref NPC.downedChristmasTree, NPCID.Everscream); break;
+                case "Post-Santa-NK1": BossFlag(ref NPC.downedChristmasSantank, NPCID.SantaNK1); break;
+                case "Post-Ice Queen": BossFlag(ref NPC.downedChristmasIceQueen, NPCID.IceQueen); break;
                 case "Post-Frost Legion": NPC.downedFrost = true; break;
-                case "Post-Empress of Light": NPC.downedEmpressOfLight = true; break;
-                case "Post-Lunatic Cultist": NPC.downedAncientCultist = true; break;
+                case "Post-Empress of Light": BossFlag(ref NPC.downedEmpressOfLight, NPCID.HallowBoss); break;
+                case "Post-Lunatic Cultist": BossFlag(ref NPC.downedAncientCultist, NPCID.CultistBoss); break;
                 case "Post-Lunar Events": NPC.downedTowerNebula = NPC.downedTowerSolar = NPC.downedTowerStardust = NPC.downedTowerVortex = true; break;
-                case "Post-Moon Lord": NPC.downedMoonlord = true; break;
+                case "Post-Moon Lord": BossFlag(ref NPC.downedMoonlord, NPCID.MoonLordCore); break;
                 case "Post-Desert Scourge": ModContent.GetInstance<CalamitySystem>().CalamityOnKillDesertScourge(); break;
                 case "Post-Giant Clam": ModContent.GetInstance<CalamitySystem>().CalamityOnKillGiantClam(false); break;
                 case "Post-Acid Rain Tier 1": ModContent.GetInstance<CalamitySystem>().CalamityAcidRainTier1Downed(); break;
@@ -603,6 +609,23 @@ namespace SeldomArchipelago.Systems
             packet.Send();
         }
 
+        void BossFlag(ref bool flag, int boss)
+        {
+            BossFlag(boss);
+            flag = true;
+        }
+
+        void BossFlag(Action set, int boss)
+        {
+            BossFlag(boss);
+            set();
+        }
+
+        void BossFlag(int boss)
+        {
+            if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().VanillaBossKilled(boss);
+        }
+
         void GiveItem(Action<Player> giveItem)
         {
             for (var i = 0; i < Main.maxPlayers; i++)
@@ -634,11 +657,13 @@ namespace SeldomArchipelago.Systems
             });
         }
 
-        void StartHardmode()
+        public override void ModifyHardmodeTasks(List<GenPass> list)
         {
-            WorldGen.StartHardmode();
-
-            if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().CalamityStartHardmode();
+            // If all mech boss flags are collected, but not Hardmode, there was no Hallow when hallowed ore was generated, so no ore was generated. So, we generate new ore if this is the case.
+            list.Add(new PassLegacy("Hallowed Ore", (progress, config) =>
+            {
+                if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().CalamityStartHardmode();
+            }));
         }
     }
 }

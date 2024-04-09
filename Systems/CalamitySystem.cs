@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using CalamityMod;
+using CalamityMod.NPCs;
+using CalamityMod.Tiles.Ores;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace SeldomArchipelago.Systems
@@ -100,35 +105,37 @@ namespace SeldomArchipelago.Systems
 
         public void CalamityStartHardmode()
         {
-            CalamityMod.NPCs.CalamityGlobalNPC.SetNewShopVariable(new[] {
-                17,
-                19,
-                20,
-                227,
-                228,
-                353,
-                207,
-                38,
-                208,
-                54,
-                453,
-                633,
-                0
-            }, false);
-
-            if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
-
-            WorldGen.altarCount++;
-            CalamityMod.CalamityUtils.SpawnOre(107, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
-            CalamityMod.CalamityUtils.SpawnOre(221, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
+            if (CalamityConfig.Instance.EarlyHardmodeProgressionRework && NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3) SpawnMechOres();
         }
 
-        public void CalamityOnKill(ModNPC npc, MethodInfo method)
+        public void VanillaBossKilled(int boss)
         {
+            var npc = new NPC { type = boss };
+            var calamityNpc = new CalamityGlobalNPC();
+            typeof(NPC).GetField("_globals", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(npc, new GlobalNPC[] { calamityNpc });
+            var seldomArchipelago = ModContent.GetInstance<SeldomArchipelago>();
+            seldomArchipelago.temp = true;
+            calamityNpc.OnKill(npc);
+            seldomArchipelago.temp = false;
+        }
+
+        public void CalamityOnKill<T>(MethodInfo method) where T : ModNPC, new() => CalamityOnKill<T>(method, new float[] { 0, 0, 0, 0 });
+
+        public void CalamityOnKill<T>(MethodInfo method, float[] newAi) where T: ModNPC, new()
+        {
+            var npc = new T();
             var entity = new NPC
             {
+                type = ModContent.NPCType<T>(),
                 target = 0
             };
+            var calamityNpc = new CalamityGlobalNPC();
+            calamityNpc.newAI = newAi;
+            var globalNpcs = new List<GlobalNPC>();
+            var index = ModContent.GetInstance<CalamityGlobalNPC>().PerEntityIndex;
+            for (int i = 0; i < index; i++) globalNpcs.Add(null);
+            globalNpcs.Add(calamityNpc);
+            typeof(NPC).GetField("_globals", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(entity, globalNpcs.ToArray());
             typeof(ModType<NPC>).GetProperty("Entity").SetValue(npc, entity);
             var seldomArchipelago = ModContent.GetInstance<SeldomArchipelago>();
             seldomArchipelago.temp = true;
@@ -141,7 +148,7 @@ namespace SeldomArchipelago.Systems
             var downed = hardmode ? CalamityMod.DownedBossSystem.downedCLAM : CalamityMod.DownedBossSystem.downedCLAMHardMode;
             var isHardmode = Main.hardMode;
             Main.hardMode = hardmode;
-            CalamityOnKill(new CalamityMod.NPCs.SunkenSea.GiantClam(), SeldomArchipelago.giantClamOnKill);
+            CalamityOnKill<CalamityMod.NPCs.SunkenSea.GiantClam>(SeldomArchipelago.giantClamOnKill);
             if (hardmode) CalamityMod.DownedBossSystem.downedCLAM = downed;
             else CalamityMod.DownedBossSystem.downedCLAMHardMode = downed;
             Main.hardMode = isHardmode;
@@ -155,53 +162,57 @@ namespace SeldomArchipelago.Systems
             seldomArchipelago.temp = false;
         }
 
+        public void CalamityOnKillCryogen()
+        {
+            CalamityOnKill<CalamityMod.NPCs.Cryogen.Cryogen>(SeldomArchipelago.cryogenOnKill);
+            if (Main.netMode == NetmodeID.SinglePlayer) CalamityUtils.SpawnOre(ModContent.TileType<CryonicOre>(), 0.00015, 0.45f, 0.7f, 3, 8, new int[] {
+                147,
+                161,
+                163,
+                200,
+                164,
+                0,
+                0,
+            });
+        }
+        public void CalamityOnKillExoMechs()
+        {
+            CalamityMod.DownedBossSystem.downedExoMechs = CalamityMod.DownedBossSystem.downedAres = CalamityMod.DownedBossSystem.downedArtemisAndApollo = CalamityMod.DownedBossSystem.downedThanatos = true;
+        }
+
         public void CalamityAcidRainTier1Downed() => CalamityMod.DownedBossSystem.downedEoCAcidRain = true;
         public void CalamityDreadnautilusDowned() => CalamityMod.DownedBossSystem.downedDreadnautilus = true;
         public void CalamityAcidRainTier2Downed() => CalamityMod.DownedBossSystem.downedAquaticScourgeAcidRain = true;
         public void CalamityPrimordialWyrmDowned() => CalamityMod.DownedBossSystem.downedPrimordialWyrm = true;
         public void CalamityBossRushDowned() => CalamityMod.DownedBossSystem.downedBossRush = true;
 
-        public void CalamityOnKillDesertScourge() => CalamityOnKill(new CalamityMod.NPCs.DesertScourge.DesertScourgeHead(), SeldomArchipelago.desertScourgeHeadOnKill);
-        public void CalamityOnKillCrabulon() => CalamityOnKill(new CalamityMod.NPCs.Crabulon.Crabulon(), SeldomArchipelago.crabulonOnKill);
-        public void CalamityOnKillTheHiveMind() => CalamityOnKill(new CalamityMod.NPCs.HiveMind.HiveMind(), SeldomArchipelago.hiveMindOnKill);
-        public void CalamityOnKillThePerforators() => CalamityOnKill(new CalamityMod.NPCs.Perforator.PerforatorHive(), SeldomArchipelago.perforatorHiveOnKill);
-        public void CalamityOnKillTheSlimeGod() => CalamityOnKill(new CalamityMod.NPCs.SlimeGod.SlimeGodCore(), SeldomArchipelago.slimeGodCoreOnKill);
-        public void CalamityOnKillAquaticScourge() => CalamityOnKill(new CalamityMod.NPCs.AquaticScourge.AquaticScourgeHead(), SeldomArchipelago.aquaticScourgeHeadOnKill);
-        public void CalamityOnKillCragmawMire() => CalamityOnKill(new CalamityMod.NPCs.AcidRain.CragmawMire(), SeldomArchipelago.cragmawMireOnKill);
-        public void CalamityOnKillBrimstoneElemental() => CalamityOnKill(new CalamityMod.NPCs.BrimstoneElemental.BrimstoneElemental(), SeldomArchipelago.brimstoneElementalOnKill);
-        public void CalamityOnKillCryogen() => CalamityOnKill(new CalamityMod.NPCs.Cryogen.Cryogen(), SeldomArchipelago.cryogenOnKill);
-        public void CalamityOnKillCalamitasClone() => CalamityOnKill(new CalamityMod.NPCs.CalClone.CalamitasClone(), SeldomArchipelago.calamitasCloneOnKill);
-        public void CalamityOnKillGreatSandShark() => CalamityOnKill(new CalamityMod.NPCs.GreatSandShark.GreatSandShark(), SeldomArchipelago.greatSandSharkOnKill);
-        public void CalamityOnKillAstrumAureus() => CalamityOnKill(new CalamityMod.NPCs.AstrumAureus.AstrumAureus(), SeldomArchipelago.astrumAureusOnKill);
-        public void CalamityOnKillThePlaguebringerGoliath() => CalamityOnKill(new CalamityMod.NPCs.PlaguebringerGoliath.PlaguebringerGoliath(), SeldomArchipelago.plaguebringerGoliathOnKill);
-        public void CalamityOnKillRavager() => CalamityOnKill(new CalamityMod.NPCs.Ravager.RavagerBody(), SeldomArchipelago.ravagerBodyOnKill);
-        public void CalamityOnKillAstrumDeus() => CalamityOnKill(new CalamityMod.NPCs.AstrumDeus.AstrumDeusHead(), SeldomArchipelago.astrumDeusHeadOnKill);
-        public void CalamityOnKillProfanedGuardians() => CalamityOnKill(new CalamityMod.NPCs.ProfanedGuardians.ProfanedGuardianCommander(), SeldomArchipelago.profanedGuardianCommanderOnKill);
-        public void CalamityOnKillTheDragonfolly() => CalamityOnKill(new CalamityMod.NPCs.Bumblebirb.Bumblefuck(), SeldomArchipelago.bumblefuckOnKill);
-        public void CalamityOnKillProvidenceTheProfanedGoddess() => CalamityOnKill(new CalamityMod.NPCs.Providence.Providence(), SeldomArchipelago.providenceOnKill);
-        public void CalamityOnKillStormWeaver() => CalamityOnKill(new CalamityMod.NPCs.StormWeaver.StormWeaverHead(), SeldomArchipelago.stormWeaverHeadOnKill);
-        public void CalamityOnKillCeaselessVoid() => CalamityOnKill(new CalamityMod.NPCs.CeaselessVoid.CeaselessVoid(), SeldomArchipelago.ceaselessVoidOnKill);
-        public void CalamityOnKillSignusEnvoyOfTheDevourer() => CalamityOnKill(new CalamityMod.NPCs.Signus.Signus(), SeldomArchipelago.signusOnKill);
-        public void CalamityOnKillPolterghast() => CalamityOnKill(new CalamityMod.NPCs.Polterghast.Polterghast(), SeldomArchipelago.polterghastOnKill);
-        public void CalamityOnKillMauler() => CalamityOnKill(new CalamityMod.NPCs.AcidRain.Mauler(), SeldomArchipelago.maulerOnKill);
-        public void CalamityOnKillNuclearTerror() => CalamityOnKill(new CalamityMod.NPCs.AcidRain.NuclearTerror(), SeldomArchipelago.nuclearTerrorOnKill);
-        public void CalamityOnKillTheOldDuke() => CalamityOnKill(new CalamityMod.NPCs.OldDuke.OldDuke(), SeldomArchipelago.oldDukeOnKill);
-        public void CalamityOnKillTheDevourerOfGods() => CalamityOnKill(new CalamityMod.NPCs.DevourerofGods.DevourerofGodsHead(), SeldomArchipelago.devourerofGodsHeadOnKill);
-        public void CalamityOnKillYharonDragonOfRebirth() => CalamityOnKill(new CalamityMod.NPCs.Yharon.Yharon(), SeldomArchipelago.yharonOnKill);
-        public void CalamityOnKillExoMechs() => CalamityOnKill(new CalamityMod.NPCs.ExoMechs.Ares.AresBody(), SeldomArchipelago.aresBodyDoMiscDeathEffects);
-        public void CalamityOnKillSupremeWitchCalamitas() => CalamityOnKill(new CalamityMod.NPCs.SupremeCalamitas.SupremeCalamitas(), SeldomArchipelago.supremeCalamitasOnKill);
-
-        public bool GetAndUnsetRework()
-        {
-            var rework = CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework;
-            CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework = false;
-            return rework;
-        }
-
-        public void SetRework(bool rework)
-        {
-            CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework = rework;
-        }
+        public void CalamityOnKillDesertScourge() => CalamityOnKill<CalamityMod.NPCs.DesertScourge.DesertScourgeHead>(SeldomArchipelago.desertScourgeHeadOnKill);
+        public void CalamityOnKillCrabulon() => CalamityOnKill<CalamityMod.NPCs.Crabulon.Crabulon>(SeldomArchipelago.crabulonOnKill);
+        public void CalamityOnKillTheHiveMind() => CalamityOnKill<CalamityMod.NPCs.HiveMind.HiveMind>(SeldomArchipelago.hiveMindOnKill);
+        public void CalamityOnKillThePerforators() => CalamityOnKill<CalamityMod.NPCs.Perforator.PerforatorHive>(SeldomArchipelago.perforatorHiveOnKill);
+        public void CalamityOnKillTheSlimeGod() => CalamityOnKill<CalamityMod.NPCs.SlimeGod.SlimeGodCore>(SeldomArchipelago.slimeGodCoreOnKill);
+        public void CalamityOnKillAquaticScourge() => CalamityOnKill<CalamityMod.NPCs.AquaticScourge.AquaticScourgeHead>(SeldomArchipelago.aquaticScourgeHeadOnKill);
+        public void CalamityOnKillCragmawMire() => CalamityOnKill<CalamityMod.NPCs.AcidRain.CragmawMire>(SeldomArchipelago.cragmawMireOnKill);
+        public void CalamityOnKillBrimstoneElemental() => CalamityOnKill<CalamityMod.NPCs.BrimstoneElemental.BrimstoneElemental>(SeldomArchipelago.brimstoneElementalOnKill);
+        public void CalamityOnKillCalamitasClone() => CalamityOnKill<CalamityMod.NPCs.CalClone.CalamitasClone>(SeldomArchipelago.calamitasCloneOnKill);
+        public void CalamityOnKillGreatSandShark() => CalamityOnKill<CalamityMod.NPCs.GreatSandShark.GreatSandShark>(SeldomArchipelago.greatSandSharkOnKill);
+        public void CalamityOnKillAstrumAureus() => CalamityOnKill<CalamityMod.NPCs.AstrumAureus.AstrumAureus>(SeldomArchipelago.astrumAureusOnKill);
+        public void CalamityOnKillThePlaguebringerGoliath() => CalamityOnKill<CalamityMod.NPCs.PlaguebringerGoliath.PlaguebringerGoliath>(SeldomArchipelago.plaguebringerGoliathOnKill);
+        public void CalamityOnKillRavager() => CalamityOnKill<CalamityMod.NPCs.Ravager.RavagerBody>(SeldomArchipelago.ravagerBodyOnKill);
+        public void CalamityOnKillAstrumDeus() => CalamityOnKill<CalamityMod.NPCs.AstrumDeus.AstrumDeusHead>(SeldomArchipelago.astrumDeusHeadOnKill, new float[] { 3, 0, 0, 0 });
+        public void CalamityOnKillProfanedGuardians() => CalamityOnKill<CalamityMod.NPCs.ProfanedGuardians.ProfanedGuardianCommander>(SeldomArchipelago.profanedGuardianCommanderOnKill);
+        public void CalamityOnKillTheDragonfolly() => CalamityOnKill<CalamityMod.NPCs.Bumblebirb.Bumblefuck>(SeldomArchipelago.bumblefuckOnKill);
+        public void CalamityOnKillProvidenceTheProfanedGoddess() => CalamityOnKill<CalamityMod.NPCs.Providence.Providence>(SeldomArchipelago.providenceOnKill);
+        public void CalamityOnKillStormWeaver() => CalamityOnKill<CalamityMod.NPCs.StormWeaver.StormWeaverHead>(SeldomArchipelago.stormWeaverHeadOnKill);
+        public void CalamityOnKillCeaselessVoid() => CalamityOnKill<CalamityMod.NPCs.CeaselessVoid.CeaselessVoid>(SeldomArchipelago.ceaselessVoidOnKill);
+        public void CalamityOnKillSignusEnvoyOfTheDevourer() => CalamityOnKill<CalamityMod.NPCs.Signus.Signus>(SeldomArchipelago.signusOnKill);
+        public void CalamityOnKillPolterghast() => CalamityOnKill<CalamityMod.NPCs.Polterghast.Polterghast>(SeldomArchipelago.polterghastOnKill);
+        public void CalamityOnKillMauler() => CalamityOnKill<CalamityMod.NPCs.AcidRain.Mauler>(SeldomArchipelago.maulerOnKill);
+        public void CalamityOnKillNuclearTerror() => CalamityOnKill<CalamityMod.NPCs.AcidRain.NuclearTerror>(SeldomArchipelago.nuclearTerrorOnKill);
+        public void CalamityOnKillTheOldDuke() => CalamityOnKill<CalamityMod.NPCs.OldDuke.OldDuke>(SeldomArchipelago.oldDukeOnKill);
+        public void CalamityOnKillTheDevourerOfGods() => CalamityOnKill<CalamityMod.NPCs.DevourerofGods.DevourerofGodsHead>(SeldomArchipelago.devourerofGodsHeadOnKill);
+        public void CalamityOnKillYharonDragonOfRebirth() => CalamityOnKill<CalamityMod.NPCs.Yharon.Yharon>(SeldomArchipelago.yharonOnKill);
+        public void CalamityOnKillSupremeWitchCalamitas() => CalamityOnKill<CalamityMod.NPCs.SupremeCalamitas.SupremeCalamitas>(SeldomArchipelago.supremeCalamitasOnKill);
 
         public void SpawnHardOres()
         {
@@ -214,6 +225,12 @@ namespace SeldomArchipelago.Systems
         {
             if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
             typeof(CalamityMod.NPCs.CalamityGlobalNPC).GetMethod("SpawnMechBossHardmodeOres", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(new CalamityMod.NPCs.CalamityGlobalNPC(), null);
+        }
+
+        // I'm using an int because I'm a hater
+        public bool AreExosDead(int thisExoIsDead)
+        {
+            return (thisExoIsDead == 0 || !(CalamityGlobalNPC.draedonExoMechPrime != -1 && Main.npc[CalamityGlobalNPC.draedonExoMechPrime].active)) && (thisExoIsDead == 1 || !(CalamityGlobalNPC.draedonExoMechTwinGreen != -1 && Main.npc[CalamityGlobalNPC.draedonExoMechTwinGreen].active)) && (thisExoIsDead == 2 || !(CalamityGlobalNPC.draedonExoMechWorm != -1 && Main.npc[CalamityGlobalNPC.draedonExoMechWorm].active));
         }
     }
 }

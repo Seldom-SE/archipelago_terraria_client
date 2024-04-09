@@ -2,7 +2,9 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using SeldomArchipelago.Systems;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.Achievements;
@@ -52,7 +54,9 @@ namespace SeldomArchipelago
         public static MethodInfo oldDukeOnKill = null;
         public static MethodInfo devourerofGodsHeadOnKill = null;
         public static MethodInfo yharonOnKill = null;
-        public static MethodInfo aresBodyDoMiscDeathEffects = null;
+        public static MethodInfo aresBodyOnKill = null;
+        public static MethodInfo apolloOnKill = null;
+        public static MethodInfo thanatosHeadOnKill = null;
         public static MethodInfo supremeCalamitasOnKill = null;
         public static MethodInfo calamityGlobalNpcSetNewBossJustDowned = null;
 
@@ -255,7 +259,9 @@ namespace SeldomArchipelago
                     case "OldDuke": oldDukeOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                     case "DevourerofGodsHead": devourerofGodsHeadOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                     case "Yharon": yharonOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
-                    case "AresBody": aresBodyDoMiscDeathEffects = type.GetMethod("DoMiscDeathEffects", BindingFlags.Static | BindingFlags.Public); break;
+                    case "AresBody": aresBodyOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
+                    case "Apollo": apolloOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
+                    case "ThanatosHead": thanatosHeadOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                     case "SupremeCalamitas": supremeCalamitasOnKill = type.GetMethod("OnKill", BindingFlags.Instance | BindingFlags.Public); break;
                 }
 
@@ -291,7 +297,9 @@ namespace SeldomArchipelago
             onOldDukeOnKill += OnOldDukeOnKill;
             onDevourerofGodsHeadOnKill += OnDevourerofGodsHeadOnKill;
             onYharonOnKill += OnYharonOnKill;
-            onAresBodyDoMiscDeathEffects += OnAresBodyDoMiscDeathEffects;
+            onAresBodyOnKill += OnAresBodyOnKill;
+            onApolloOnKill += OnApolloOnKill;
+            onThanatosHeadOnKill += OnThanatosHeadOnKill;
             onSupremeCalamitasOnKill += OnSupremeCalamitasOnKill;
             onCalamityGlobalNpcSetNewBossJustDowned += OnCalamityGlobalNpcSetNewBossJustDowned;
         }
@@ -349,7 +357,9 @@ namespace SeldomArchipelago
             onOldDukeOnKill -= OnOldDukeOnKill;
             onDevourerofGodsHeadOnKill -= OnDevourerofGodsHeadOnKill;
             onYharonOnKill -= OnYharonOnKill;
-            onAresBodyDoMiscDeathEffects -= OnAresBodyDoMiscDeathEffects;
+            onAresBodyOnKill -= OnAresBodyOnKill;
+            onApolloOnKill -= OnApolloOnKill;
+            onThanatosHeadOnKill -= OnThanatosHeadOnKill;
             onSupremeCalamitasOnKill -= OnSupremeCalamitasOnKill;
             onCalamityGlobalNpcSetNewBossJustDowned -= OnCalamityGlobalNpcSetNewBossJustDowned;
         }
@@ -521,12 +531,12 @@ namespace SeldomArchipelago
             else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("The Slime God");
         }
 
+        int[] vanillaBosses = { NPCID.KingSlime, NPCID.EyeofCthulhu, NPCID.EaterofWorldsHead, NPCID.EaterofWorldsBody, NPCID.EaterofWorldsTail, NPCID.BrainofCthulhu, NPCID.QueenBee, NPCID.SkeletronHead, NPCID.Deerclops, NPCID.WallofFlesh, NPCID.BloodNautilus, NPCID.QueenSlimeBoss, NPCID.Retinazer, NPCID.Spazmatism, NPCID.TheDestroyer, NPCID.SkeletronPrime, NPCID.Plantera, NPCID.Golem, NPCID.DukeFishron, NPCID.MourningWood, NPCID.Pumpking, NPCID.Everscream, NPCID.SantaNK1, NPCID.IceQueen, NPCID.HallowBoss, NPCID.CultistBoss, NPCID.MoonLordCore };
+
         delegate void CalamityGlobalNpcOnKill(object self, NPC npc);
         void OnCalamityGlobalNpcOnKill(CalamityGlobalNpcOnKill orig, object self, NPC npc)
         {
-            var rework = ModContent.GetInstance<CalamitySystem>().GetAndUnsetRework();
-            orig(self, npc);
-            ModContent.GetInstance<CalamitySystem>().SetRework(rework);
+            if (temp || !vanillaBosses.Contains(npc.type)) orig(self, npc);
         }
 
         void EditCalamityGlobalNPCOnKill(ILContext il)
@@ -680,11 +690,22 @@ namespace SeldomArchipelago
             else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Yharon, Dragon of Rebirth");
         }
 
-        delegate void DoMiscDeathEffects(NPC npc, int mechType);
-        void OnAresBodyDoMiscDeathEffects(DoMiscDeathEffects orig, NPC npc, int mechType)
+        void OnAresBodyOnKill(OnKill orig, ModNPC self)
         {
-            if (temp) orig(npc, mechType);
-            else ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Exo Mechs");
+            if (temp) orig(self);
+            else if (ModContent.GetInstance<CalamitySystem>().AreExosDead(0)) ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Exo Mechs");
+        }
+
+        void OnApolloOnKill(OnKill orig, ModNPC self)
+        {
+            if (temp) orig(self);
+            else if (ModContent.GetInstance<CalamitySystem>().AreExosDead(1)) ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Exo Mechs");
+        }
+
+        void OnThanatosHeadOnKill(OnKill orig, ModNPC self)
+        {
+            if (temp) orig(self);
+            else if (ModContent.GetInstance<CalamitySystem>().AreExosDead(2)) ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Exo Mechs");
         }
 
         void OnSupremeCalamitasOnKill(OnKill orig, ModNPC self)
@@ -892,10 +913,21 @@ namespace SeldomArchipelago
             remove { }
         }
 
-        delegate void OnDoMiscDeathEffects(DoMiscDeathEffects orig, NPC npc, int mechType);
-        static event OnDoMiscDeathEffects onAresBodyDoMiscDeathEffects
+        static event OnOnKill onAresBodyOnKill
         {
-            add => MonoModHooks.Add(aresBodyDoMiscDeathEffects, value);
+            add => MonoModHooks.Add(aresBodyOnKill, value);
+            remove { }
+        }
+
+        static event OnOnKill onApolloOnKill
+        {
+            add => MonoModHooks.Add(apolloOnKill, value);
+            remove { }
+        }
+
+        static event OnOnKill onThanatosHeadOnKill
+        {
+            add => MonoModHooks.Add(thanatosHeadOnKill, value);
             remove { }
         }
 
