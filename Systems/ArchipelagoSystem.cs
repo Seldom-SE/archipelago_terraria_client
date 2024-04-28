@@ -25,6 +25,13 @@ namespace SeldomArchipelago.Systems
     // TODO Use a separate class for data and logic
     public class ArchipelagoSystem : ModSystem
     {
+        // Achievements can be completed while loading into the world, but those complete before
+        // `ArchipelagoPlayer::OnEnterWorld`, where achievements are reset, is run. So, I keep track
+        // of which achievements have been completed since `OnWorldLoad` was run, so
+        // `ArchipelagoPlayer` knows not to clear them.
+        List<string> achieved = new List<string>();
+        // I store locations that were collected before `/apstart` is run so they can be queued once
+        // it's run
         List<string> locationBacklog = new List<string>();
         List<Task<LocationInfoPacket>> locationQueue;
         ArchipelagoSession session;
@@ -421,6 +428,7 @@ namespace SeldomArchipelago.Systems
         {
             typeof(SocialAPI).GetField("_mode", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, SocialMode.Steam);
 
+            achieved.Clear();
             locationBacklog.Clear();
             locationQueue = null;
             deathlink = null;
@@ -582,6 +590,16 @@ namespace SeldomArchipelago.Systems
             var packet = ModContent.GetInstance<SeldomArchipelago>().GetPacket();
             packet.Write(locationName);
             packet.Send();
+        }
+
+        public void Achieved(string achievement)
+        {
+            achieved.Add(achievement);
+        }
+
+        public List<string> GetAchieved()
+        {
+            return achieved;
         }
 
         public void TriggerDeathlink(string message, int player)

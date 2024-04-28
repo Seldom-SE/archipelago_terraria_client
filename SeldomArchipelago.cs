@@ -462,6 +462,7 @@ namespace SeldomArchipelago
             };
 
             if (name != null) ModContent.GetInstance<ArchipelagoSystem>().QueueLocationClient(name);
+            ModContent.GetInstance<ArchipelagoSystem>().Achieved(achievement.Name);
         }
 
         delegate void OnKill(ModNPC self);

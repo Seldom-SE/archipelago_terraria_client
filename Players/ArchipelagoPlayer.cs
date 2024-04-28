@@ -18,12 +18,16 @@ namespace SeldomArchipelago.Players
 
         public override void OnEnterWorld()
         {
+            var achievedWhileLoading = ModContent.GetInstance<ArchipelagoSystem>().GetAchieved();
+
             inWorld = true;
 
             var achievements = (Dictionary<string, Achievement>)typeof(AchievementManager).GetField("_achievements", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(Main.Achievements);
 
             foreach (var achievement in achievements)
             {
+                if (achievedWhileLoading.Contains(achievement.Value.Name)) continue;
+
                 achievement.Value.ClearProgress();
 
                 var conditions = (Dictionary<string, AchievementCondition>)typeof(Achievement).GetField("_conditions", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(achievement.Value);
