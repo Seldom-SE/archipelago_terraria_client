@@ -51,11 +51,12 @@ namespace SeldomArchipelago.Systems
             if (Main.netMode == NetmodeID.MultiplayerClient) return;
 
             var config = ModContent.GetInstance<Config.Config>();
-            session = ArchipelagoSessionFactory.CreateSession(config.address, config.port);
 
             LoginResult result;
             try
             {
+                session = ArchipelagoSessionFactory.CreateSession(config.address, config.port);
+
                 result = session.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.AllItems, null, null, null, config.password == "" ? null : config.password);
                 if (result is LoginFailure)
                 {
@@ -137,7 +138,7 @@ namespace SeldomArchipelago.Systems
             "Post-Lunatic Cultist" => NPC.downedAncientCultist,
             "Post-Lunar Events" => NPC.downedTowerNebula,
             "Post-Moon Lord" => NPC.downedMoonlord,
-            _ => ModContent.GetInstance<CalamitySystem>().CheckCalamityFlag(flag),
+            _ => ModContent.GetInstance<CalamitySystem>()?.CheckCalamityFlag(flag) ?? false,
         };
 
         public void Collect(string item)
