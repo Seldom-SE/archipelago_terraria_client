@@ -4,6 +4,7 @@ using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Packets;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json.Linq;
+using SeldomArchipelago.Players;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -22,7 +23,6 @@ using Terraria.WorldBuilding;
 
 namespace SeldomArchipelago.Systems
 {
-    // TODO Use a separate class for data and logic
     public class ArchipelagoSystem : ModSystem
     {
         // Achievements can be completed while loading into the world, but those complete before
@@ -36,9 +36,9 @@ namespace SeldomArchipelago.Systems
         List<Task<LocationInfoPacket>> locationQueue;
         ArchipelagoSession session;
         DeathLinkService deathlink;
-        bool enabled;
         int collectedItems;
         int currentItem;
+        List<int> receivedRewards = new List<int>();
         List<string> collectedLocations = new List<string>();
         List<string> goals = new List<string>();
         bool victory = false;
@@ -47,6 +47,7 @@ namespace SeldomArchipelago.Systems
         public override void LoadWorldData(TagCompound tag)
         {
             collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
+            receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
         }
 
         public override void OnWorldLoad()
@@ -107,11 +108,12 @@ namespace SeldomArchipelago.Systems
             }
 
             slot = success.Slot;
+
+            foreach (var location in locationBacklog) QueueLocation(location);
+            locationBacklog.Clear();
         }
 
         public string[] flags = { "Post-King Slime", "Post-Desert Scourge", "Post-Giant Clam", "Post-Eye of Cthulhu", "Post-Acid Rain Tier 1", "Post-Crabulon", "Post-Evil Boss", "Post-Old One's Army Tier 1", "Post-Goblin Army", "Post-Queen Bee", "Post-The Hive Mind", "Post-The Perforators", "Post-Skeletron", "Post-Deerclops", "Post-The Slime God", "Hardmode", "Post-Dreadnautilus", "Post-Hardmode Giant Clam", "Post-Pirate Invasion", "Post-Queen Slime", "Post-Aquatic Scourge", "Post-Cragmaw Mire", "Post-Acid Rain Tier 2", "Post-The Twins", "Post-Old One's Army Tier 2", "Post-Brimstone Elemental", "Post-The Destroyer", "Post-Cryogen", "Post-Skeletron Prime", "Post-Calamitas Clone", "Post-Plantera", "Post-Great Sand Shark", "Post-Leviathan and Anahita", "Post-Astrum Aureus", "Post-Golem", "Post-Old One's Army Tier 3", "Post-Martian Madness", "Post-The Plaguebringer Goliath", "Post-Duke Fishron", "Post-Mourning Wood", "Post-Pumpking", "Post-Everscream", "Post-Santa-NK1", "Post-Ice Queen", "Post-Frost Legion", "Post-Ravager", "Post-Empress of Light", "Post-Lunatic Cultist", "Post-Astrum Deus", "Post-Lunar Events", "Post-Moon Lord", "Post-Profaned Guardians", "Post-The Dragonfolly", "Post-Providence, the Profaned Goddess", "Post-Storm Weaver", "Post-Ceaseless Void", "Post-Signus, Envoy of the Devourer", "Post-Polterghast", "Post-Mauler", "Post-Nuclear Terror", "Post-The Old Duke", "Post-The Devourer of Gods", "Post-Yharon, Dragon of Rebirth", "Post-Exo Mechs", "Post-Supreme Witch, Calamitas", "Post-Primordial Wyrm", "Post-Boss Rush" };
-
-        // static readonly Func<bool>[] flags = new[] { () => NPC.downedSlimeKing, () => NPC.downedBoss1, () => NPC.downedBoss2, () => DD2Event.DownedInvasionT1, () => NPC.downedGoblins, () => NPC.downedQueenBee, () => NPC.downedBoss3, () => NPC.downedDeerclops, () => Main.hardMode, () => NPC.downedPirates, () => NPC.downedQueenSlime, () => NPC.downedMechBoss1, () => NPC.downedMechBoss2, () => NPC.downedMechBoss3, () => NPC.downedPlantBoss, () => NPC.downedGolemBoss, () => DD2Event.DownedInvasionT2, () => NPC.downedMartians, () => NPC.downedFishron, () => NPC.downedHalloweenTree, () => NPC.downedHalloweenKing, () => NPC.downedChristmasTree, () => NPC.downedChristmasSantank, () => NPC.downedChristmasIceQueen, () => NPC.downedFrost, () => NPC.downedEmpressOfLight, () => NPC.downedAncientCultist, () => NPC.downedTowerNebula, () => NPC.downedMoonlord };
 
         public bool CheckFlag(string flag) => flag switch
         {
@@ -351,6 +353,7 @@ namespace SeldomArchipelago.Systems
                 case "Reward: Iron Boots": ModContent.GetInstance<CalamitySystem>().GiveIronBoots(); break;
                 case "Reward: Sprit Glyph": ModContent.GetInstance<CalamitySystem>().GiveSpritGlyph(); break;
                 case "Reward: Abyssal Amulet": ModContent.GetInstance<CalamitySystem>().GiveAbyssalAmulet(); break;
+                case null: break;
                 default: Chat($"Received unknown item: {item}"); break;
             }
         }
@@ -364,11 +367,8 @@ namespace SeldomArchipelago.Systems
                 Chat("Disconnected from Archipelago. Reload the world to reconnect.");
                 session = null;
                 deathlink = null;
-                enabled = false;
                 return;
             }
-
-            if (!enabled) return;
 
             var unqueue = new List<int>();
             for (var i = 0; i < locationQueue.Count; i++)
@@ -421,7 +421,8 @@ namespace SeldomArchipelago.Systems
         public override void SaveWorldData(TagCompound tag)
         {
             tag["ApCollectedItems"] = collectedItems;
-            if (enabled) session.DataStorage[Scope.Slot, "CollectedLocations"] = collectedLocations.ToArray();
+            if (session != null) session.DataStorage[Scope.Slot, "CollectedLocations"] = collectedLocations.ToArray();
+            tag["ApReceivedRewards"] = receivedRewards;
         }
 
         public void Reset()
@@ -432,8 +433,8 @@ namespace SeldomArchipelago.Systems
             locationBacklog.Clear();
             locationQueue = null;
             deathlink = null;
-            enabled = false;
             currentItem = 0;
+            receivedRewards = new List<int>();
             collectedLocations = new List<string>();
             goals = new List<string>();
             victory = false;
@@ -448,28 +449,15 @@ namespace SeldomArchipelago.Systems
             Reset();
         }
 
-        public string[] Status() => Tuple.Create(session != null, enabled) switch
+        public string[] Status() => (session == null) switch
         {
-            (false, _) => new[] {
+            true => new[] {
                 @"The world is not connected to Archipelago! Reload the world or run ""/apconnect"".",
                 "If you are the host, check your config in the main menu at Workshop > Manage Mods > Config",
                 "Or in-game at Settings > Mod Configuration",
             },
-            (true, false) => new[] { @"Archipelago is connected but not enabled. Once everyone's joined, run ""/apstart"" to start it." },
-            (true, true) => new[] { "Archipelago is active!" },
+            false => new[] { "Archipelago is active!" },
         };
-
-        public bool Enable()
-        {
-            if (session == null) return false;
-
-            enabled = true;
-
-            foreach (var location in locationBacklog) QueueLocation(location);
-            locationBacklog.Clear();
-
-            return true;
-        }
 
         public bool SendCommand(string command)
         {
@@ -530,7 +518,6 @@ namespace SeldomArchipelago.Systems
             }
 
             info.Add($"DeathLink is {(deathlink == null ? "dis" : "en")}abled");
-            info.Add($"Archipelago is {(enabled ? "en" : "dis")}abled");
             info.Add($"You've collected {collectedItems} items, of which {currentItem} have been applied");
             info.Add($"Collected locations: [{string.Join("; ", collectedLocations)}]");
             info.Add($"Goals: [{string.Join("; ", goals)}]");
@@ -561,7 +548,7 @@ namespace SeldomArchipelago.Systems
 
         public void QueueLocation(string locationName)
         {
-            if (!enabled)
+            if (session == null)
             {
                 locationBacklog.Add(locationName);
                 return;
@@ -645,16 +632,32 @@ namespace SeldomArchipelago.Systems
             if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().VanillaBossKilled(boss);
         }
 
-        void GiveItem(Action<Player> giveItem)
+        void GiveItem(int? item, Action<Player> giveItem)
         {
+            if (item != null) receivedRewards.Add(item.Value);
+
             for (var i = 0; i < Main.maxPlayers; i++)
             {
                 var player = Main.player[i];
-                if (player.active) giveItem(player);
+                if (player.active)
+                {
+                    giveItem(player);
+                    if (item != null)
+                    {
+                        if (Main.netMode == NetmodeID.Server)
+                        {
+                            var packet = ModContent.GetInstance<SeldomArchipelago>().GetPacket();
+                            packet.Write("YouGotAnItem");
+                            packet.Write(item.Value);
+                            packet.Send(i);
+                        }
+                        else player.GetModPlayer<ArchipelagoPlayer>().ReceivedReward(item.Value);
+                    }
+                }
             }
         }
 
-        void GiveItem(int item) => GiveItem(player => player.QuickSpawnItem(player.GetSource_GiftOrReward(), item, 1));
+        void GiveItem(int item) => GiveItem(item, player => player.QuickSpawnItem(player.GetSource_GiftOrReward(), item, 1));
         public void GiveItem<T>() where T : ModItem => GiveItem(ModContent.ItemType<T>());
 
         int[] baseCoins = { 15, 20, 25, 30, 40, 50, 70, 100 };
@@ -668,7 +671,7 @@ namespace SeldomArchipelago.Systems
             var platinum = count / 10000;
             var gold = count % 10000 / 100;
             var silver = count % 100;
-            GiveItem(player =>
+            GiveItem(null, player =>
             {
                 if (platinum > 0) player.QuickSpawnItem(player.GetSource_GiftOrReward(), ItemID.PlatinumCoin, platinum);
                 if (gold > 0) player.QuickSpawnItem(player.GetSource_GiftOrReward(), ItemID.GoldCoin, gold);
@@ -676,9 +679,13 @@ namespace SeldomArchipelago.Systems
             });
         }
 
+        public List<int> ReceivedRewards() => receivedRewards;
+
         public override void ModifyHardmodeTasks(List<GenPass> list)
         {
-            // If all mech boss flags are collected, but not Hardmode, there was no Hallow when hallowed ore was generated, so no ore was generated. So, we generate new ore if this is the case.
+            // If all mech boss flags are collected, but not Hardmode, there was no Hallow when
+            // hallowed ore was generated, so no ore was generated. So, we generate new ore if this
+            // is the case.
             list.Add(new PassLegacy("Hallowed Ore", (progress, config) =>
             {
                 if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().CalamityStartHardmode();

@@ -1,3 +1,4 @@
+using SeldomArchipelago.NPCs;
 using SeldomArchipelago.Systems;
 using System.Collections.Generic;
 using System.Reflection;
@@ -15,6 +16,7 @@ namespace SeldomArchipelago.Players
     {
         TagCompound achievements = new();
         bool inWorld = false;
+        List<int> receivedRewards = new();
 
         public override void OnEnterWorld()
         {
@@ -87,16 +89,15 @@ namespace SeldomArchipelago.Players
             }
 
             tag["apachievements"] = serAchievements;
+            tag["apreceivedRewards"] = receivedRewards;
         }
 
         public override void LoadData(TagCompound tag)
         {
             if (Main.netMode == NetmodeID.Server) return;
 
-            achievements = new();
-            if (!tag.ContainsKey("apachievements")) return;
-
-            achievements = tag.Get<TagCompound>("apachievements");
+            achievements = tag.ContainsKey("apachievements") ? tag.Get<TagCompound>("apachievements") : new();
+            receivedRewards = tag.ContainsKey("apreceivedRewards") ? tag.Get<List<int>>("apreceivedRewards") : new();
         }
 
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
@@ -113,5 +114,13 @@ namespace SeldomArchipelago.Players
             packet.Write($"deathlink{damageSource.GetDeathText(Player.name)}");
             packet.Send();
         }
+
+        public override void PostBuyItem(NPC vendor, Item[] shopInventory, Item item)
+        {
+            if (vendor.type == ModContent.NPCType<CollectionNPC>() && !receivedRewards.Contains(item.type)) receivedRewards.Add(item.type);
+        }
+
+        public void ReceivedReward(int item) => receivedRewards.Add(item);
+        public bool HasReceivedReward(int item) => receivedRewards.Contains(item);
     }
 }

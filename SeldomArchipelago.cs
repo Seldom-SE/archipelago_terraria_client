@@ -1,6 +1,9 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using SeldomArchipelago.NPCs;
+using SeldomArchipelago.Players;
 using SeldomArchipelago.Systems;
+using SeldomArchipelago.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,9 +18,7 @@ using Terraria.ModLoader;
 
 namespace SeldomArchipelago
 {
-    // TODO
-    // Make a new class that holds all of `ArchipelagoSystem`'s state to avoid having to manually reset
-    // Use a data-oriented approach to get rid of all this repetition
+    // TODO Use a data-oriented approach to get rid of all this repetition
     public class SeldomArchipelago : Mod
     {
         // Terraria is single-threaded so this *should* be fine
@@ -315,6 +316,35 @@ namespace SeldomArchipelago
             {
                 var player = Main.player[Main.myPlayer];
                 if (player.active && !player.dead) player.Hurt(PlayerDeathReason.ByCustomReason(message), 999999, 1);
+            }
+            else if (message == "YouGotAnItem") Main.LocalPlayer.GetModPlayer<ArchipelagoPlayer>().ReceivedReward(reader.ReadInt32());
+            else if (message == "RecievedRewardsForSetupShop")
+            {
+                var rewards = archipelagoSystem.ReceivedRewards();
+
+                var packet = GetPacket();
+                packet.Write("SetupShop");
+                foreach (var reward in rewards) packet.Write(reward);
+                packet.Write(-1);
+                var player = Main.player[whoAmI];
+                var position = player.position;
+                var npc = NPC.NewNPC(new EntitySource_Misc("Open collection"), (int)position.X, (int)position.Y, ModContent.NPCType<CollectionNPC>(), 0, whoAmI, reader.ReadInt32());
+                player.SetTalkNPC(npc);
+                packet.Write(npc);
+                packet.Send(whoAmI);
+            }
+            else if (message == "SetupShop")
+            {
+                var items = new List<int>();
+
+                while (true)
+                {
+                    var item = reader.ReadInt32();
+                    if (item == -1) break;
+                    items.Add(item);
+                }
+
+                CollectionButton.SetupShop(items, reader.ReadInt32());
             }
             else archipelagoSystem.QueueLocation(message);
         }
