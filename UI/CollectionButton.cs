@@ -83,6 +83,9 @@ namespace SeldomArchipelago.UI
 
         public static void SetupShop(List<int> items, int npc)
         {
+            var itemsReversed = new List<int>(items);
+            itemsReversed.Reverse();
+
             typeof(Main).GetMethod("OpenShop", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(Main.instance, new object[] { 1 });
             var player = Main.LocalPlayer;
 
@@ -106,9 +109,9 @@ namespace SeldomArchipelago.UI
                 shop.item[slot] = new Item();
                 Item item = shop.item[slot];
 
-                if (slot < items.Count)
+                if (slot < itemsReversed.Count)
                 {
-                    var type = items[slot];
+                    var type = itemsReversed[slot];
                     item.SetDefaults(type);
                     item.isAShopItem = true;
 

@@ -25,71 +25,79 @@ namespace SeldomArchipelago.Systems
 {
     public class ArchipelagoSystem : ModSystem
     {
-        // Achievements can be completed while loading into the world, but those complete before
-        // `ArchipelagoPlayer::OnEnterWorld`, where achievements are reset, is run. So, I keep track
-        // of which achievements have been completed since `OnWorldLoad` was run, so
-        // `ArchipelagoPlayer` knows not to clear them.
-        List<string> achieved = new List<string>();
-        // I store locations that were collected before `/apstart` is run so they can be queued once
-        // it's run
-        List<string> locationBacklog = new List<string>();
-        List<Task<LocationInfoPacket>> locationQueue;
-        ArchipelagoSession session;
-        DeathLinkService deathlink;
-        int collectedItems;
-        int currentItem;
-        List<int> receivedRewards = new List<int>();
-        List<string> collectedLocations = new List<string>();
-        List<string> goals = new List<string>();
-        bool victory = false;
-        int slot = 0;
+        class WorldState
+        {
+            // Achievements can be completed while loading into the world, but those complete before
+            // `ArchipelagoPlayer::OnEnterWorld`, where achievements are reset, is run. So, I keep track
+            // of which achievements have been completed since `OnWorldLoad` was run, so
+            // `ArchipelagoPlayer` knows not to clear them.
+            public List<string> achieved = new List<string>();
+            // I store locations that were collected before `/apstart` is run so they can be queued once
+            // it's run
+            public List<string> locationBacklog = new List<string>();
+            public int collectedItems;
+            public List<int> receivedRewards = new List<int>();
+        }
+
+        class SessionState
+        {
+            public List<Task<LocationInfoPacket>> locationQueue = new List<Task<LocationInfoPacket>>();
+            public ArchipelagoSession session;
+            public DeathLinkService deathlink;
+            public int currentItem;
+            public List<string> collectedLocations = new List<string>();
+            public List<string> goals = new List<string>();
+            public bool victory;
+            public int slot;
+        }
+
+        WorldState world = new();
+        SessionState session;
 
         public override void LoadWorldData(TagCompound tag)
         {
-            collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
-            receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
+            world.collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
+            world.receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
         }
 
         public override void OnWorldLoad()
         {
             typeof(SocialAPI).GetField("_mode", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, SocialMode.None);
 
-            locationQueue = new List<Task<LocationInfoPacket>>();
-
             if (Main.netMode == NetmodeID.MultiplayerClient) return;
 
             var config = ModContent.GetInstance<Config.Config>();
 
             LoginResult result;
+            ArchipelagoSession newSession;
             try
             {
-                session = ArchipelagoSessionFactory.CreateSession(config.address, config.port);
+                newSession = ArchipelagoSessionFactory.CreateSession(config.address, config.port);
 
-                result = session.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.AllItems, null, null, null, config.password == "" ? null : config.password);
+                result = newSession.TryConnectAndLogin("Terraria", config.name, ItemsHandlingFlags.AllItems, null, null, null, config.password == "" ? null : config.password);
                 if (result is LoginFailure)
                 {
-                    session = null;
                     return;
                 }
             }
             catch
             {
-                session = null;
                 return;
             }
 
-            var locations = session.DataStorage[Scope.Slot, "CollectedLocations"].To<String[]>();
+            session = new();
+            session.session = newSession;
+
+            var locations = session.session.DataStorage[Scope.Slot, "CollectedLocations"].To<String[]>();
             if (locations != null)
             {
-                collectedLocations = new List<string>(locations);
+                session.collectedLocations = new List<string>(locations);
             }
 
             var success = (LoginSuccessful)result;
-            goals = new List<string>(((JArray)success.SlotData["goal"]).ToObject<string[]>());
+            session.goals = new List<string>(((JArray)success.SlotData["goal"]).ToObject<string[]>());
 
-            victory = false;
-
-            session.MessageLog.OnMessageReceived += (message) =>
+            session.session.MessageLog.OnMessageReceived += (message) =>
             {
                 var text = "";
                 foreach (var part in message.Parts)
@@ -101,16 +109,16 @@ namespace SeldomArchipelago.Systems
 
             if ((bool)success.SlotData["deathlink"])
             {
-                deathlink = session.CreateDeathLinkService();
-                deathlink.EnableDeathLink();
+                session.deathlink = session.session.CreateDeathLinkService();
+                session.deathlink.EnableDeathLink();
 
-                deathlink.OnDeathLinkReceived += ReceiveDeathlink;
+                session.deathlink.OnDeathLinkReceived += ReceiveDeathlink;
             }
 
-            slot = success.Slot;
+            session.slot = success.Slot;
 
-            foreach (var location in locationBacklog) QueueLocation(location);
-            locationBacklog.Clear();
+            foreach (var location in world.locationBacklog) QueueLocation(location);
+            world.locationBacklog.Clear();
         }
 
         public string[] flags = { "Post-King Slime", "Post-Desert Scourge", "Post-Giant Clam", "Post-Eye of Cthulhu", "Post-Acid Rain Tier 1", "Post-Crabulon", "Post-Evil Boss", "Post-Old One's Army Tier 1", "Post-Goblin Army", "Post-Queen Bee", "Post-The Hive Mind", "Post-The Perforators", "Post-Skeletron", "Post-Deerclops", "Post-The Slime God", "Hardmode", "Post-Dreadnautilus", "Post-Hardmode Giant Clam", "Post-Pirate Invasion", "Post-Queen Slime", "Post-Aquatic Scourge", "Post-Cragmaw Mire", "Post-Acid Rain Tier 2", "Post-The Twins", "Post-Old One's Army Tier 2", "Post-Brimstone Elemental", "Post-The Destroyer", "Post-Cryogen", "Post-Skeletron Prime", "Post-Calamitas Clone", "Post-Plantera", "Post-Great Sand Shark", "Post-Leviathan and Anahita", "Post-Astrum Aureus", "Post-Golem", "Post-Old One's Army Tier 3", "Post-Martian Madness", "Post-The Plaguebringer Goliath", "Post-Duke Fishron", "Post-Mourning Wood", "Post-Pumpking", "Post-Everscream", "Post-Santa-NK1", "Post-Ice Queen", "Post-Frost Legion", "Post-Ravager", "Post-Empress of Light", "Post-Lunatic Cultist", "Post-Astrum Deus", "Post-Lunar Events", "Post-Moon Lord", "Post-Profaned Guardians", "Post-The Dragonfolly", "Post-Providence, the Profaned Goddess", "Post-Storm Weaver", "Post-Ceaseless Void", "Post-Signus, Envoy of the Devourer", "Post-Polterghast", "Post-Mauler", "Post-Nuclear Terror", "Post-The Old Duke", "Post-The Devourer of Gods", "Post-Yharon, Dragon of Rebirth", "Post-Exo Mechs", "Post-Supreme Witch, Calamitas", "Post-Primordial Wyrm", "Post-Boss Rush" };
@@ -362,18 +370,17 @@ namespace SeldomArchipelago.Systems
         {
             if (session == null) return;
 
-            if (!session.Socket.Connected)
+            if (!session.session.Socket.Connected)
             {
                 Chat("Disconnected from Archipelago. Reload the world to reconnect.");
                 session = null;
-                deathlink = null;
                 return;
             }
 
             var unqueue = new List<int>();
-            for (var i = 0; i < locationQueue.Count; i++)
+            for (var i = 0; i < session.locationQueue.Count; i++)
             {
-                var status = locationQueue[i].Status;
+                var status = session.locationQueue[i].Status;
 
                 if (status switch
                 {
@@ -381,7 +388,7 @@ namespace SeldomArchipelago.Systems
                     _ => false,
                 })
                 {
-                    if (status == TaskStatus.RanToCompletion) foreach (var item in locationQueue[i].Result.Locations) Chat($"Sent {session.Items.GetItemName(item.Item)} to {session.Players.GetPlayerAlias(item.Player)}!");
+                    if (status == TaskStatus.RanToCompletion) foreach (var item in session.locationQueue[i].Result.Locations) Chat($"Sent {session.session.Items.GetItemName(item.Item)} to {session.session.Players.GetPlayerAlias(item.Player)}!");
                     else Chat("Sent an item to a player...but failed to get info about it!");
 
                     unqueue.Add(i);
@@ -389,63 +396,53 @@ namespace SeldomArchipelago.Systems
             }
 
             unqueue.Reverse();
-            foreach (var i in unqueue) locationQueue.RemoveAt(i);
+            foreach (var i in unqueue) session.locationQueue.RemoveAt(i);
 
-            while (session.Items.Any())
+            while (session.session.Items.Any())
             {
-                var item = session.Items.DequeueItem();
-                var itemName = session.Items.GetItemName(item.Item);
+                var item = session.session.Items.DequeueItem();
+                var itemName = session.session.Items.GetItemName(item.Item);
 
-                if (currentItem++ < collectedItems) continue;
+                if (session.currentItem++ < world.collectedItems) continue;
 
                 Collect(itemName);
 
-                collectedItems++;
+                world.collectedItems++;
             }
 
             if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().CalamityPostUpdateWorld();
 
-            if (victory) return;
+            if (session.victory) return;
 
-            foreach (var goal in goals) if (!collectedLocations.Contains(goal)) return;
+            foreach (var goal in session.goals) if (!session.collectedLocations.Contains(goal)) return;
 
             var victoryPacket = new StatusUpdatePacket()
             {
                 Status = ArchipelagoClientState.ClientGoal,
             };
-            session.Socket.SendPacket(victoryPacket);
+            session.session.Socket.SendPacket(victoryPacket);
 
-            victory = true;
+            session.victory = true;
         }
 
         public override void SaveWorldData(TagCompound tag)
         {
-            tag["ApCollectedItems"] = collectedItems;
-            if (session != null) session.DataStorage[Scope.Slot, "CollectedLocations"] = collectedLocations.ToArray();
-            tag["ApReceivedRewards"] = receivedRewards;
+            tag["ApCollectedItems"] = world.collectedItems;
+            if (session != null) session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
+            tag["ApReceivedRewards"] = world.receivedRewards;
         }
 
         public void Reset()
         {
             typeof(SocialAPI).GetField("_mode", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, SocialMode.Steam);
 
-            achieved.Clear();
-            locationBacklog.Clear();
-            locationQueue = null;
-            deathlink = null;
-            currentItem = 0;
-            receivedRewards = new List<int>();
-            collectedLocations = new List<string>();
-            goals = new List<string>();
-            victory = false;
-
-            if (session != null) session.Socket.DisconnectAsync();
+            if (session != null) session.session.Socket.DisconnectAsync();
             session = null;
         }
 
         public override void OnWorldUnload()
         {
-            collectedItems = 0;
+            world = new();
             Reset();
         }
 
@@ -467,7 +464,7 @@ namespace SeldomArchipelago.Systems
             {
                 Text = command,
             };
-            session.Socket.SendPacket(packet);
+            session.session.Socket.SendPacket(packet);
 
             return true;
         }
@@ -476,53 +473,73 @@ namespace SeldomArchipelago.Systems
         {
             var info = new List<string>();
 
-            if (locationBacklog.Count > 0)
+            if (world == null)
             {
-                info.Add("You have locations in the backlog, which should only be the case if Archipelago is inactive");
-                info.Add($"Location backlog: [{string.Join("; ", locationBacklog)}]");
+                info.Add("The mod thinks you're not in a world, which should never happen");
             }
             else
             {
-                info.Add("No locations in the backlog, which is usually normal");
-            }
-
-            if (locationQueue.Count > 0)
-            {
-                info.Add($"You have locations queued for sending. In normal circumstances, these locations will be sent ASAP.");
-
-                var statuses = new List<string>();
-                foreach (var location in locationQueue) statuses.Add(location.Status switch
+                info.Add("You are in a world");
+                if (world.locationBacklog.Count > 0)
                 {
-                    TaskStatus.Created => "Created",
-                    TaskStatus.WaitingForActivation => "Waiting for activation",
-                    TaskStatus.WaitingToRun => "Waiting to run",
-                    TaskStatus.Running => "Running",
-                    TaskStatus.WaitingForChildrenToComplete => "Waiting for children to complete",
-                    TaskStatus.RanToCompletion => "Completed",
-                    TaskStatus.Canceled => "Canceled",
-                    TaskStatus.Faulted => "Faulted",
-                    _ => "Has a status that was added to C# after this code was written",
-                });
+                    info.Add("You have locations in the backlog, which should only be the case if Archipelago is inactive");
+                    info.Add($"Location backlog: [{string.Join("; ", world.locationBacklog)}]");
+                }
+                else
+                {
+                    info.Add("No locations in the backlog, which is usually normal");
+                }
 
-                info.Add($"Location queue statuses: [{string.Join("; ", statuses)}]");
+                info.Add($"You've collected {world.collectedItems} items");
+            }
+
+            if (session == null)
+            {
+                info.Add("You're not connected to Archipelago");
             }
             else
             {
-                info.Add("No locations in the queue, which is usually normal");
-            }
+                if (session.session.Socket.Connected)
+                {
+                    info.Add("You're connected to Archipelago");
+                }
+                else
+                {
+                    info.Add("You're not connected to Archipelago, but the mod thinks you are");
+                }
 
-            info.Add($"You're {(session == null ? "not " : "")}connected to Archipelago");
-            if (session != null && !session.Socket.Connected)
-            {
-                info.Add("Actually, the socket is disconnected and mod is in a weird state");
-            }
+                if (session.locationQueue.Count > 0)
+                {
+                    info.Add($"You have locations queued for sending. In normal circumstances, these locations will be sent ASAP.");
 
-            info.Add($"DeathLink is {(deathlink == null ? "dis" : "en")}abled");
-            info.Add($"You've collected {collectedItems} items, of which {currentItem} have been applied");
-            info.Add($"Collected locations: [{string.Join("; ", collectedLocations)}]");
-            info.Add($"Goals: [{string.Join("; ", goals)}]");
-            info.Add($"Victory has {(victory ? "been achieved! Hooray!" : "not been achieved. Alas.")}");
-            info.Add($"You are slot {slot}");
+                    var statuses = new List<string>();
+                    foreach (var location in session.locationQueue) statuses.Add(location.Status switch
+                    {
+                        TaskStatus.Created => "Created",
+                        TaskStatus.WaitingForActivation => "Waiting for activation",
+                        TaskStatus.WaitingToRun => "Waiting to run",
+                        TaskStatus.Running => "Running",
+                        TaskStatus.WaitingForChildrenToComplete => "Waiting for children to complete",
+                        TaskStatus.RanToCompletion => "Completed",
+                        TaskStatus.Canceled => "Canceled",
+                        TaskStatus.Faulted => "Faulted",
+                        _ => "Has a status that was added to C# after this code was written",
+                    });
+
+                    info.Add($"Location queue statuses: [{string.Join("; ", statuses)}]");
+                }
+                else
+                {
+                    info.Add("No locations in the queue, which is usually normal");
+                }
+
+                info.Add($"DeathLink is {(session.deathlink == null ? "dis" : "en")}abled");
+                info.Add($"{session.currentItem} items have been applied");
+                info.Add($"Collected locations: [{string.Join("; ", session.collectedLocations)}]");
+                info.Add($"Goals: [{string.Join("; ", session.goals)}]");
+                info.Add($"Victory has {(session.victory ? "been achieved! Hooray!" : "not been achieved. Alas.")}");
+                info.Add($"You are slot {session.slot}");
+            }
 
             return info.ToArray();
         }
@@ -550,20 +567,20 @@ namespace SeldomArchipelago.Systems
         {
             if (session == null)
             {
-                locationBacklog.Add(locationName);
+                world.locationBacklog.Add(locationName);
                 return;
             }
 
-            var location = session.Locations.GetLocationIdFromName("Terraria", locationName);
-            if (location == -1 || !session.Locations.AllMissingLocations.Contains(location)) return;
+            var location = session.session.Locations.GetLocationIdFromName("Terraria", locationName);
+            if (location == -1 || !session.session.Locations.AllMissingLocations.Contains(location)) return;
 
-            if (!collectedLocations.Contains(locationName))
+            if (!session.collectedLocations.Contains(locationName))
             {
-                locationQueue.Add(session.Locations.ScoutLocationsAsync(new[] { location }));
-                collectedLocations.Add(locationName);
+                session.locationQueue.Add(session.session.Locations.ScoutLocationsAsync(new[] { location }));
+                session.collectedLocations.Add(locationName);
             }
 
-            session.Locations.CompleteLocationChecks(new[] { location });
+            session.session.Locations.CompleteLocationChecks(new[] { location });
         }
 
         public void QueueLocationClient(string locationName)
@@ -581,20 +598,20 @@ namespace SeldomArchipelago.Systems
 
         public void Achieved(string achievement)
         {
-            achieved.Add(achievement);
+            world.achieved.Add(achievement);
         }
 
         public List<string> GetAchieved()
         {
-            return achieved;
+            return world.achieved;
         }
 
         public void TriggerDeathlink(string message, int player)
         {
-            if (deathlink == null) return;
+            if (session?.deathlink == null) return;
 
-            var death = new DeathLink(session.Players.GetPlayerAlias(slot), message);
-            deathlink.SendDeathLink(death);
+            var death = new DeathLink(session.session.Players.GetPlayerAlias(session.slot), message);
+            session.deathlink.SendDeathLink(death);
             ReceiveDeathlink(death);
         }
 
@@ -634,7 +651,7 @@ namespace SeldomArchipelago.Systems
 
         void GiveItem(int? item, Action<Player> giveItem)
         {
-            if (item != null) receivedRewards.Add(item.Value);
+            if (item != null) world.receivedRewards.Add(item.Value);
 
             for (var i = 0; i < Main.maxPlayers; i++)
             {
@@ -679,7 +696,7 @@ namespace SeldomArchipelago.Systems
             });
         }
 
-        public List<int> ReceivedRewards() => receivedRewards;
+        public List<int> ReceivedRewards() => world.receivedRewards;
 
         public override void ModifyHardmodeTasks(List<GenPass> list)
         {
