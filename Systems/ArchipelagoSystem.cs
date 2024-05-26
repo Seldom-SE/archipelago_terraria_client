@@ -25,25 +25,37 @@ namespace SeldomArchipelago.Systems
 {
     public class ArchipelagoSystem : ModSystem
     {
+        // Data that's reset between worlds
         class WorldState
         {
             // Achievements can be completed while loading into the world, but those complete before
-            // `ArchipelagoPlayer::OnEnterWorld`, where achievements are reset, is run. So, I keep track
-            // of which achievements have been completed since `OnWorldLoad` was run, so
+            // `ArchipelagoPlayer::OnEnterWorld`, where achievements are reset, is run. So, this
+            // keeps track of which achievements have been completed since `OnWorldLoad` was run, so
             // `ArchipelagoPlayer` knows not to clear them.
             public List<string> achieved = new List<string>();
-            // I store locations that were collected before `/apstart` is run so they can be queued once
-            // it's run
+            // Stores locations that were collected before Archipelago is started so they can be
+            // queued once it's started
             public List<string> locationBacklog = new List<string>();
+            // Number of items the player has collected in this world
             public int collectedItems;
+            // List of rewards received in this world, so they don't get reapplied. Saved in the
+            // Terraria world instead of Archipelago data in case the player is, for example,
+            // playing Hardcore and wants to receive all the rewards again when making a new player/
+            // world.
             public List<int> receivedRewards = new List<int>();
         }
 
+        // Data that's reset between Archipelago sessions
         class SessionState
         {
+            // List of locations that are currently being sent
             public List<Task<LocationInfoPacket>> locationQueue = new List<Task<LocationInfoPacket>>();
             public ArchipelagoSession session;
             public DeathLinkService deathlink;
+            // Like `collectedItems`, but unique to this Archipelago session, and doesn't save, so
+            // it starts at 0 each session. While less than `collectedItems`, it discards items
+            // instead of collecting them. This is needed bc AP just gives us a list of items that
+            // we have, and it's up to us to keep track of which ones we've already applied.
             public int currentItem;
             public List<string> collectedLocations = new List<string>();
             public List<string> goals = new List<string>();
@@ -62,6 +74,7 @@ namespace SeldomArchipelago.Systems
 
         public override void OnWorldLoad()
         {
+            // Needed for achievements to work right
             typeof(SocialAPI).GetField("_mode", BindingFlags.Static | BindingFlags.NonPublic).SetValue(null, SocialMode.None);
 
             if (Main.netMode == NetmodeID.MultiplayerClient) return;

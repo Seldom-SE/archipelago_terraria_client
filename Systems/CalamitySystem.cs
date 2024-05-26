@@ -10,6 +10,7 @@ using Terraria.ModLoader;
 
 namespace SeldomArchipelago.Systems
 {
+    // Direct usage of Calamity must happen in here, else the mod won't compile without Calamity
     [ExtendsFromMod("CalamityMod")]
     public class CalamitySystem : ModSystem
     {
@@ -121,7 +122,7 @@ namespace SeldomArchipelago.Systems
 
         public void CalamityOnKill<T>(MethodInfo method) where T : ModNPC, new() => CalamityOnKill<T>(method, new float[] { 0, 0, 0, 0 });
 
-        public void CalamityOnKill<T>(MethodInfo method, float[] newAi) where T: ModNPC, new()
+        public void CalamityOnKill<T>(MethodInfo method, float[] newAi) where T : ModNPC, new()
         {
             var npc = new T();
             var entity = new NPC

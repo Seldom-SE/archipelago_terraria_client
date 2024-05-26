@@ -21,7 +21,12 @@ namespace SeldomArchipelago
     // TODO Use a data-oriented approach to get rid of all this repetition
     public class SeldomArchipelago : Mod
     {
-        // Terraria is single-threaded so this *should* be fine
+        // We reuse some parts of Terraria's code for multiple purposes in this mod. For example,
+        // when you kill a boss, we have to prevent that code from making permanent world changes
+        // and instead send a location, but we reuse that same code when making permanent changes
+        // after receiving a boss flag as an item, so we have to not prevent the code from making
+        // such changes in that case. So, we use this flag to determine whether the code is run by
+        // the game naturally (false) or run by us (true). Terraria is single-threaded, don't worry.
         public bool temp;
 
         public static MethodInfo desertScourgeHeadOnKill = null;
@@ -310,6 +315,8 @@ namespace SeldomArchipelago
             var message = reader.ReadString();
             var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
 
+            // The way we handle packets kind of sucks. It's using string IDs with some special
+            // cases.
             if (message == "") archipelagoSystem.Chat(archipelagoSystem.Status(), whoAmI);
             else if (message.StartsWith("deathlink")) archipelagoSystem.TriggerDeathlink(message.Substring(9), whoAmI);
             else if (message.StartsWith("[DeathLink]"))

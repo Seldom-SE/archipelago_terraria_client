@@ -83,6 +83,7 @@ namespace SeldomArchipelago.UI
 
         public static void SetupShop(List<int> items, int npc)
         {
+            // Reverse the items so the newer ones show up earlier in the shop
             var itemsReversed = new List<int>(items);
             itemsReversed.Reverse();
 

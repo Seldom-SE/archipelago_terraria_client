@@ -14,8 +14,13 @@ namespace SeldomArchipelago.Players
 {
     public class ArchipelagoPlayer : ModPlayer
     {
+        // We save and load achievement data to the player. This means achievement progress is
+        // tracked per-player.
         TagCompound achievements = new();
         bool inWorld = false;
+        // List of rewards the player has received. If the player hasn't received a reward that has
+        // been sent out (because they weren't in-game at the time), it's free in the collection
+        // shop.
         List<int> receivedRewards = new();
 
         public override void OnEnterWorld()
