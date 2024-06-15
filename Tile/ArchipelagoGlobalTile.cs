@@ -1,4 +1,5 @@
-﻿using Terraria.GameContent.Achievements;
+﻿using Terraria;
+using Terraria.GameContent.Achievements;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -11,7 +12,7 @@ namespace SeldomArchipelago.Tile
             base.KillTile(i, j, type, ref fail, ref effectOnly, ref noItem);
 
             // Calamity's ore progression rework prevents the code that completes the "Begone, Evil!" achievement from running, so we complete it manually
-            if (type == TileID.DemonAltar && !fail) AchievementsHelper.NotifyProgressionEvent(6);
+            if (Main.LocalPlayer != null && type == TileID.DemonAltar && !fail) AchievementsHelper.NotifyProgressionEvent(6);
         }
     }
 }
