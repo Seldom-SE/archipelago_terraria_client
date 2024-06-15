@@ -1,5 +1,6 @@
 using SeldomArchipelago.Systems;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace SeldomArchipelago.NPCs
@@ -14,7 +15,10 @@ namespace SeldomArchipelago.NPCs
 
         void CalamityOnKill(int npc)
         {
-            if (npc == ModContent.NPCType<CalamityMod.NPCs.PrimordialWyrm.PrimordialWyrmHead>()) ModContent.GetInstance<ArchipelagoSystem>().QueueLocation("Primordial Wyrm");
+            var seldomArchipelago = ModContent.GetInstance<ArchipelagoSystem>();
+
+            if (npc == NPCID.BloodNautilus) seldomArchipelago.QueueLocation("Dreadnautilus");
+            else if (npc == ModContent.NPCType<CalamityMod.NPCs.PrimordialWyrm.PrimordialWyrmHead>()) seldomArchipelago.QueueLocation("Primordial Wyrm");
         }
     }
 }

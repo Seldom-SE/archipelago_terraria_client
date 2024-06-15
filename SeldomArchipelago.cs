@@ -585,14 +585,6 @@ namespace SeldomArchipelago
             cursor.GotoNext(i => i.MatchLdcI4(NPCID.WallofFlesh));
             cursor.Emit(OpCodes.Pop);
             cursor.Emit(OpCodes.Ldc_I4_0);
-
-            cursor.GotoNext(i => i.MatchLdcI4(NPCID.BloodNautilus));
-            cursor.GotoNext(i => i.MatchLdcI4(NPCID.BloodNautilus));
-            cursor.EmitDelegate<Action<int>>(npc =>
-            {
-                if (npc == NPCID.BloodNautilus) seldomArchipelago.QueueLocation("Dreadnautilus");
-            });
-            cursor.Emit(OpCodes.Ldc_I4_M1);
         }
 
         void OnAquaticScourgeHeadOnKill(OnKill orig, ModNPC self)
