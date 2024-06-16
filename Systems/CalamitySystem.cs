@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using CalamityMod;
+using CalamityMod.Events;
 using CalamityMod.NPCs;
 using CalamityMod.Tiles.Ores;
 using Terraria;
@@ -232,6 +233,11 @@ namespace SeldomArchipelago.Systems
         public bool AreExosDead(int thisExoIsDead)
         {
             return (thisExoIsDead == 0 || !(CalamityGlobalNPC.draedonExoMechPrime != -1 && Main.npc[CalamityGlobalNPC.draedonExoMechPrime].active)) && (thisExoIsDead == 1 || !(CalamityGlobalNPC.draedonExoMechTwinGreen != -1 && Main.npc[CalamityGlobalNPC.draedonExoMechTwinGreen].active)) && (thisExoIsDead == 2 || !(CalamityGlobalNPC.draedonExoMechWorm != -1 && Main.npc[CalamityGlobalNPC.draedonExoMechWorm].active));
+        }
+
+        public void HandleBossRush(NPC npc)
+        {
+            if (BossRushEvent.BossRushActive) typeof(BossRushEvent).GetMethod("OnBossKill", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { npc, ModContent.GetInstance<CalamityMod.CalamityMod>() });
         }
     }
 }

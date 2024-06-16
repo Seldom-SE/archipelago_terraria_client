@@ -576,6 +576,7 @@ namespace SeldomArchipelago
         void OnCalamityGlobalNpcOnKill(CalamityGlobalNpcOnKill orig, object self, NPC npc)
         {
             if (temp || !vanillaBosses.Contains(npc.type)) orig(self, npc);
+            else ModContent.GetInstance<CalamitySystem>().HandleBossRush(npc);
         }
 
         void EditCalamityGlobalNPCOnKill(ILContext il)
