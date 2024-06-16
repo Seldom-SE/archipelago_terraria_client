@@ -414,6 +414,7 @@ namespace SeldomArchipelago
                 "NO_HOBO" => "No Hobo",
                 "HEAVY_METAL" => "Heavy Metal",
                 "FREQUENT_FLYER" => "The Frequent Flyer",
+                "GET_GOLDEN_DELIGHT" => "Feast of Midas",
                 "DYE_HARD" => "Dye Hard",
                 "LUCKY_BREAK" => "Lucky Break",
                 "STAR_POWER" => "Star Power",
