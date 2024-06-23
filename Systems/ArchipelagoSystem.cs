@@ -374,8 +374,10 @@ namespace SeldomArchipelago.Systems
                 case "Reward: Iron Boots": ModContent.GetInstance<CalamitySystem>().GiveIronBoots(); break;
                 case "Reward: Sprit Glyph": ModContent.GetInstance<CalamitySystem>().GiveSpritGlyph(); break;
                 case "Reward: Abyssal Amulet": ModContent.GetInstance<CalamitySystem>().GiveAbyssalAmulet(); break;
+                case "Reward: Life Crystal": GiveItem(ItemID.LifeCrystal); break;
                 case "Reward: Enchanted Sword": GiveItem(ItemID.EnchantedSword); break;
                 case "Reward: Starfury": GiveItem(ItemID.Starfury); break;
+                case "Reward: Defender Medal": GiveItem(ItemID.DefenderMedal); break;
                 case null: break;
                 default: Chat($"Received unknown item: {item}"); break;
             }
