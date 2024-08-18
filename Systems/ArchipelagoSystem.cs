@@ -466,9 +466,8 @@ namespace SeldomArchipelago.Systems
         public string[] Status() => (session == null) switch
         {
             true => new[] {
-                @"The world is not connected to Archipelago! Reload the world or run ""/apconnect"".",
+                @"The world is not connected to Archipelago! Reload the world to try again.",
                 "If you are the host, check your config in the main menu at Workshop > Manage Mods > Config",
-                "Or in-game at Settings > Mod Configuration",
             },
             false => new[] { "Archipelago is active!" },
         };
