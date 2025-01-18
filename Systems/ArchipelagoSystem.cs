@@ -1,8 +1,10 @@
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Models;
 using Archipelago.MultiClient.Net.Packets;
 using Microsoft.Xna.Framework;
+using Color = Microsoft.Xna.Framework.Color;
 using Newtonsoft.Json.Linq;
 using SeldomArchipelago.Players;
 using System;
@@ -49,7 +51,7 @@ namespace SeldomArchipelago.Systems
         class SessionState
         {
             // List of locations that are currently being sent
-            public List<Task<LocationInfoPacket>> locationQueue = new List<Task<LocationInfoPacket>>();
+            public List<Task<Dictionary<long, ScoutedItemInfo>>> locationQueue = new List<Task<Dictionary<long, ScoutedItemInfo>>>();
             public ArchipelagoSession session;
             public DeathLinkService deathlink;
             // Like `collectedItems`, but unique to this Archipelago session, and doesn't save, so
@@ -405,7 +407,7 @@ namespace SeldomArchipelago.Systems
                     _ => false,
                 })
                 {
-                    if (status == TaskStatus.RanToCompletion) foreach (var item in session.locationQueue[i].Result.Locations) Chat($"Sent {session.session.Items.GetItemName(item.Item)} to {session.session.Players.GetPlayerAlias(item.Player)}!");
+                    if (status == TaskStatus.RanToCompletion) foreach (var item in session.locationQueue[i].Result.Values) Chat($"Sent {item.ItemName} to {session.session.Players.GetPlayerAlias(item.Player)}!");
                     else Chat("Sent an item to a player...but failed to get info about it!");
 
                     unqueue.Add(i);
@@ -417,8 +419,7 @@ namespace SeldomArchipelago.Systems
 
             while (session.session.Items.Any())
             {
-                var item = session.session.Items.DequeueItem();
-                var itemName = session.session.Items.GetItemName(item.Item);
+                var itemName = session.session.Items.DequeueItem().ItemName;
 
                 if (session.currentItem++ < world.collectedItems) continue;
 
