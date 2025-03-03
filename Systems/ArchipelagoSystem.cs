@@ -470,7 +470,14 @@ namespace SeldomArchipelago.Systems
                 @"The world is not connected to Archipelago! Reload the world to try again.",
                 "If you are the host, check your config in the main menu at Workshop > Manage Mods > Config",
             },
-            false => new[] { "Archipelago is active!" },
+            false => (ModContent.GetInstance<CalamitySystem>()) switch
+            {
+                null => new[] { "Archipelago is active!" },
+                _ => new[] {
+                    "Archipelago is active!",
+                    "Calamity Archipelago detected. If you beat a Calamity boss and it doesn't give you a check, restart your game and beat it again. It is a rare, unsolved bug."
+                }
+            },
         };
 
         public bool SendCommand(string command)
