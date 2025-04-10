@@ -30,3 +30,10 @@ Configs: {
 }
 
 NPCs.CollectionNPC.DisplayName: Collection N P C
+
+Items: {
+	HardmodeStarter: {
+		DisplayName: Hardmode Starter
+		Tooltip: ""
+	}
+}

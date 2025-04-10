@@ -113,7 +113,7 @@ namespace SeldomArchipelago.Systems
 
             var success = (LoginSuccessful)result;
             session.goals = new List<string>(((JArray)success.SlotData["goal"]).ToObject<string[]>());
-            session.hardmodeAsItem = (bool)success.SlotData["receive_hardmode_as_item"];
+            session.hardmodeAsItem = 0 != (long)success.SlotData["receive_hardmode_as_item"];
 
             session.session.MessageLog.OnMessageReceived += (message) =>
             {
@@ -666,7 +666,7 @@ namespace SeldomArchipelago.Systems
         }
         public static void ActivateHardmode()
         {
-            ModContent.GetInstance<ArchipelagoSystem>().BossFlag(NPCID.WallofFlesh);
+            ArchipelagoSystem.BossFlag(NPCID.WallofFlesh);
             WorldGen.StartHardmode();
         }
         void BossFlag(ref bool flag, int boss)
