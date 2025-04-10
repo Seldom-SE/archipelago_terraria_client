@@ -5,3 +5,4 @@
 /Backup
 /UpgradeLog.htm
 lib/CalamityMod.dll
+*.csproj
