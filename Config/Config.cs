@@ -27,5 +27,11 @@ namespace SeldomArchipelago.Config
         [Label("Password")]
         [DefaultValue("")]
         public string password;
+
+        [Header("Miscellaneous")]
+
+        [Label("Receive Hardmode As Item")]
+        [DefaultValue(true)]
+        public bool hardmodeAsItem;
     }
 }

@@ -5,6 +5,7 @@ Configs: {
 		Headers: {
 			Common: Common Header
 			Advanced: Advanced Header
+			Miscellaneous: Miscellaneous Header
 		}
 
 		name: {
@@ -24,6 +25,11 @@ Configs: {
 
 		password: {
 			Label: Password
+			Tooltip: ""
+		}
+
+		hardmodeAsItem: {
+			Label: Receive Hardmode As Item
 			Tooltip: ""
 		}
 	}

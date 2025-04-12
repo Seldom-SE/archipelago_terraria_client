@@ -104,6 +104,7 @@ namespace SeldomArchipelago.Systems
 
             session = new();
             session.session = newSession;
+            session.hardmodeAsItem = config.hardmodeAsItem;
 
             var locations = session.session.DataStorage[Scope.Slot, "CollectedLocations"].To<String[]>();
             if (locations != null)
@@ -113,7 +114,6 @@ namespace SeldomArchipelago.Systems
 
             var success = (LoginSuccessful)result;
             session.goals = new List<string>(((JArray)success.SlotData["goal"]).ToObject<string[]>());
-            session.hardmodeAsItem = 0 != (long)success.SlotData["receive_hardmode_as_item"];
 
             session.session.MessageLog.OnMessageReceived += (message) =>
             {
