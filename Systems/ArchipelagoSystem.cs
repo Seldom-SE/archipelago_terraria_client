@@ -62,7 +62,7 @@ namespace SeldomArchipelago.Systems
             public int currentItem;
             public List<string> collectedLocations = new List<string>();
             public List<string> goals = new List<string>();
-            public bool hardmodeAsItem;
+
             public bool victory;
             public int slot;
         }
@@ -104,7 +104,6 @@ namespace SeldomArchipelago.Systems
 
             session = new();
             session.session = newSession;
-            session.hardmodeAsItem = config.hardmodeAsItem;
 
             var locations = session.session.DataStorage[Scope.Slot, "CollectedLocations"].To<String[]>();
             if (locations != null)
@@ -190,7 +189,7 @@ namespace SeldomArchipelago.Systems
                 case "Post-Skeletron": BossFlag(ref NPC.downedBoss3, NPCID.SkeletronHead); break;
                 case "Post-Deerclops": BossFlag(ref NPC.downedDeerclops, NPCID.Deerclops); break;
                 case "Hardmode":
-                    if (session.hardmodeAsItem)
+                    if (ModContent.GetInstance<Config.Config>().hardmodeAsItem)
                     {
                         GiveItem(ModContent.ItemType<HardmodeStarter>());
                     }
