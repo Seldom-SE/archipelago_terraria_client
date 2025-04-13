@@ -22,6 +22,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.Social;
 using Terraria.WorldBuilding;
+using SeldomArchipelago.HardmodeItem;
 
 namespace SeldomArchipelago.Systems
 {
@@ -61,6 +62,7 @@ namespace SeldomArchipelago.Systems
             public int currentItem;
             public List<string> collectedLocations = new List<string>();
             public List<string> goals = new List<string>();
+
             public bool victory;
             public int slot;
         }
@@ -187,8 +189,14 @@ namespace SeldomArchipelago.Systems
                 case "Post-Skeletron": BossFlag(ref NPC.downedBoss3, NPCID.SkeletronHead); break;
                 case "Post-Deerclops": BossFlag(ref NPC.downedDeerclops, NPCID.Deerclops); break;
                 case "Hardmode":
-                    BossFlag(NPCID.WallofFlesh);
-                    WorldGen.StartHardmode();
+                    if (ModContent.GetInstance<Config.Config>().hardmodeAsItem)
+                    {
+                        GiveItem(ModContent.ItemType<HardmodeStarter>());
+                    }
+                    else
+                    {
+                        ActivateHardmode();
+                    }
                     break;
                 case "Post-Pirate Invasion": NPC.downedPirates = true; break;
                 case "Post-Queen Slime": BossFlag(ref NPC.downedQueenSlime, NPCID.QueenSlimeBoss); break;
@@ -655,7 +663,11 @@ namespace SeldomArchipelago.Systems
             packet.Write(message);
             packet.Send();
         }
-
+        public static void ActivateHardmode()
+        {
+            ArchipelagoSystem.BossFlag(NPCID.WallofFlesh);
+            WorldGen.StartHardmode();
+        }
         void BossFlag(ref bool flag, int boss)
         {
             BossFlag(boss);
@@ -668,7 +680,7 @@ namespace SeldomArchipelago.Systems
             set();
         }
 
-        void BossFlag(int boss)
+        static void BossFlag(int boss)
         {
             if (ModLoader.HasMod("CalamityMod")) ModContent.GetInstance<CalamitySystem>().VanillaBossKilled(boss);
         }
