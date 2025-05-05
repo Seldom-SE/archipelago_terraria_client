@@ -282,6 +282,127 @@
             <see cref="E:Archipelago.MultiClient.Net.BounceFeatures.DeathLink.DeathLinkService.OnDeathLinkReceived"/> events
             </summary>
         </member>
+        <member name="T:Archipelago.MultiClient.Net.Colors.BuiltInPalettes">
+            <summary>
+            Contains built-in palettes for color handling
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Colors.BuiltInPalettes.Dark">
+            <summary>
+            Default dark palette based on terminal colors
+            </summary>
+        </member>
+        <member name="T:Archipelago.MultiClient.Net.Colors.ColorUtils">
+            <summary>
+            Static utilities for getting the appropriate palette color from various protocol-provided information
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Colors.ColorUtils.ActivePlayerColor">
+            <summary>
+            The color to be used to represent the currently connected player
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Colors.ColorUtils.NonActivePlayerColor">
+            <summary>
+            The color to be used to represent any player other the currently connected player
+            </summary>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.ColorUtils.GetColor(Archipelago.MultiClient.Net.Enums.JsonMessagePartColor)">
+            <summary>
+            Gets the palette color corresponding to a JsonMessagePartColor.
+            </summary>
+            <returns>The corresponding palette color, or null if not specified</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.ColorUtils.GetColor(Archipelago.MultiClient.Net.Enums.HintStatus)">
+            <summary>
+            Gets the palette color corresponding to a HintStatus.
+            </summary>
+            <returns>The corresponding palette color, or null if not specified</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.ColorUtils.GetColor(Archipelago.MultiClient.Net.Models.Hint)">
+            <summary>
+            Gets the palette color corresponding to a Hint's status.
+            </summary>
+            <returns>The corresponding palette color, or null if not specified</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.ColorUtils.GetColor(Archipelago.MultiClient.Net.Enums.ItemFlags)">
+            <summary>
+            Gets the palette color corresponding to an ItemFlags.
+            </summary>
+            <returns>The corresponding palette color, or null if not specified</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.ColorUtils.GetColor(Archipelago.MultiClient.Net.Models.ItemInfo)">
+            <summary>
+            Gets the palette color corresponding to an ItemInfo's flags.
+            </summary>
+            <returns>The corresponding palette color, or null if not specified</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.ColorUtils.GetColor(Archipelago.MultiClient.Net.Helpers.PlayerInfo,Archipelago.MultiClient.Net.Helpers.IConnectionInfoProvider)">
+            <summary>
+            Gets the palette color corresponding to a PlayerInfo.
+            </summary>
+            <returns>The corresponding palette color, or null if not specified</returns>
+        </member>
+        <member name="T:Archipelago.MultiClient.Net.Colors.Palette`1">
+            <summary>
+            Palette/theme support for client colors
+            </summary>
+            <typeparam name="T">
+            The type of actual color in the palette, typically an engine- or framework-specific Color struct
+            </typeparam>
+        </member>
+        <member name="P:Archipelago.MultiClient.Net.Colors.Palette`1.DefaultColor">
+            <summary>
+            The default color to use in the palette when color is not specified, or the requested color is not
+            in the palette
+            </summary>
+        </member>
+        <member name="P:Archipelago.MultiClient.Net.Colors.Palette`1.Item(System.Nullable{Archipelago.MultiClient.Net.Colors.PaletteColor})">
+            <summary>
+            Retrieves a color from the palette
+            </summary>
+            <param name="color">The palette color to look up</param>
+            <returns>
+            The requested color. Returns the default color if the requested color was null or
+            not defined in this palette.
+            </returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.Palette`1.#ctor(`0,System.Collections.Generic.Dictionary{Archipelago.MultiClient.Net.Colors.PaletteColor,`0})">
+            <summary>
+            Creates a custom palette
+            </summary>
+            <param name="defaultColor">The default color for the palette</param>
+            <param name="palette">
+            The colors in the palette. Note that this does not need to define a mapping for every
+            PaletteColor if it is not desired.
+            </param>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.Palette`1.Transform``1(System.Func{`0,``0})">
+            <summary>
+            Creates a copy of this palette with all values transformed to another type
+            </summary>
+            <typeparam name="U">The desired color type for the new palette</typeparam>
+            <param name="transform">A transformation function to convert to the new type</param>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.Palette`1.Edit(`0,System.Collections.Generic.Dictionary{Archipelago.MultiClient.Net.Colors.PaletteColor,`0})">
+            <summary>
+            Creates a copy of this palette with the specified colors replaced
+            </summary>
+            <param name="newDefault">The new default color</param>
+            <param name="paletteEdits">A mapping specifying colors to replace</param>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Colors.Palette`1.Edit(System.Collections.Generic.Dictionary{Archipelago.MultiClient.Net.Colors.PaletteColor,`0})">
+            <summary>
+            Creates a copy of this palette with the specified colors replaced. The default color
+            is preserved.
+            </summary>
+            <param name="paletteEdits">A mapping specifying colors to replace</param>
+        </member>
+        <member name="T:Archipelago.MultiClient.Net.Colors.PaletteColor">
+            <summary>
+            Colors used in client palettes; some by protocol and some by convention.
+            </summary>
+        </member>
         <member name="T:Archipelago.MultiClient.Net.Converters.ArchipelagoPacketConverter">
             <summary>
             Json Converter for archipelago packets
@@ -493,6 +614,36 @@
         <member name="F:Archipelago.MultiClient.Net.Enums.HintCreationPolicy.CreateAndAnnounceOnce">
             <summary>
             Create a hint and announce it player that the item belongs to but only once announce if the hint didnt exist yet
+            </summary>
+        </member>
+        <member name="T:Archipelago.MultiClient.Net.Enums.HintStatus">
+            <summary>
+            The state of a player
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Enums.HintStatus.Found">
+            <summary>
+            The location has been collected. Status cannot be changed once found.
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Enums.HintStatus.Unspecified">
+            <summary>
+            The receiving player has not specified any status
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Enums.HintStatus.NoPriority">
+            <summary>
+            The receiving player has specified that the item is unneeded
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Enums.HintStatus.Avoid">
+            <summary>
+            The receiving player has specified that the item is detrimental
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Enums.HintStatus.Priority">
+            <summary>
+            The receiving player has specified that the item is needed
             </summary>
         </member>
         <member name="T:Archipelago.MultiClient.Net.Enums.InvalidPacketErrorType">
@@ -711,6 +862,11 @@
         <member name="F:Archipelago.MultiClient.Net.Enums.JsonMessagePartType.Color">
             <summary>
             Regular text that should be colored. Only type that will contain color data.
+            </summary>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.Enums.JsonMessagePartType.HintStatus">
+            <summary>
+            The HintStatus of the hint
             </summary>
         </member>
         <member name="T:Archipelago.MultiClient.Net.Enums.OperationType">
@@ -1075,6 +1231,12 @@
         <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.TrackClientStatus(System.Action{Archipelago.MultiClient.Net.Enums.ArchipelagoClientState},System.Boolean,System.Nullable{System.Int32},System.Nullable{System.Int32})">
             <inheritdoc />
         </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.GetRaceMode">
+            <inheritdoc />
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.DataStorageHelper.GetRaceModeAsync">
+            <inheritdoc />
+        </member>
         <member name="T:Archipelago.MultiClient.Net.Helpers.IDataStorageWrapper">
             <summary>
             Methods for working with read-only data storage sets
@@ -1187,6 +1349,18 @@
             <param name="retrieveCurrentClientStatus">should the current status be retrieved or just the updates</param>
             <param name="slot">the slot id of the player to request the status for, defaults to the current player's slot if left empty</param>
             <param name="team">the team id of the player to request the status for, defaults to the current player's team if left empty</param>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.IDataStorageWrapper.GetRaceMode">
+            <summary>
+            Retrieves the server's race mode setting. false for disabled or unavailable, true for enabled
+            </summary>
+            <returns>The race mode setting. false for disabled or unavailable, true for enabled</returns>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.Helpers.IDataStorageWrapper.GetRaceModeAsync">
+            <summary>
+            Retrieves the server's race mode setting. false for disabled or unavailable, true for enabled
+            </summary>
+            <returns>The race mode setting. false for disabled or unavailable, true for enabled</returns>
         </member>
         <member name="T:Archipelago.MultiClient.Net.Helpers.ArchipelagoSocketHelperDelagates">
             <summary>
@@ -1587,6 +1761,11 @@
             </summary>
             <returns>returns the players info's of members from a group slot, or null if this slot is not a group</returns>
         </member>
+        <member name="P:Archipelago.MultiClient.Net.Helpers.PlayerInfo.IsGroup">
+            <summary>
+            Is true if the player is a group.
+            </summary>
+        </member>
         <member name="M:Archipelago.MultiClient.Net.Helpers.PlayerInfo.IsRelatedTo(Archipelago.MultiClient.Net.Helpers.PlayerInfo)">
             <summary>
             True if this player is the same player, or if either player is a group (e.g. itemlinks) that contains the other player
@@ -1611,7 +1790,7 @@
         </member>
         <member name="M:Archipelago.MultiClient.Net.Helpers.PlayerInfo.#ctor(System.Int32,System.Int32,System.String,System.String,System.String,Archipelago.MultiClient.Net.Models.NetworkSlot[],System.Int32[])">
             <summary>
-            Creates and PlayerInfo object, used by json deserialization
+            Creates an PlayerInfo object, used by json deserialization
             </summary>
             <param name="team">The team of this player</param>
             <param name="slot">The slot of this player</param>
@@ -2064,6 +2243,12 @@
             </summary>
             <seealso cref="T:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePart"/>
         </member>
+        <member name="T:Archipelago.MultiClient.Net.MessageLog.Parts.HintStatusMessagePart">
+            <summary>
+            Part of a LogMessage that contains information about the entrance
+            </summary>
+            <seealso cref="T:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePart"/>
+        </member>
         <member name="T:Archipelago.MultiClient.Net.MessageLog.Parts.ItemMessagePart">
             <summary>
             Part of a LogMessage that contains information about an item
@@ -2118,13 +2303,24 @@
         </member>
         <member name="P:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePart.Color">
             <summary>
-            The specified or default color for this message part
+            The color corresponding to <see cref="P:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePart.PaletteColor"/> in the built-in dark palette.
+            </summary>
+        </member>
+        <member name="P:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePart.PaletteColor">
+            <summary>
+            The specified color for this message part, or null if not specified.
             </summary>
         </member>
         <member name="P:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePart.IsBackgroundColor">
             <summary>
-            The specified background color for this message part
+            Whether this message part's color is intended to represent a background color
             </summary>
+        </member>
+        <member name="M:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePart.GetColor``1(Archipelago.MultiClient.Net.Colors.Palette{``0})">
+            <summary>
+            Gets the color corresponding to <see cref="P:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePart.PaletteColor"/> in the specified palette.
+            </summary>
+            <param name="palette">The palette to retrieve the color from</param>
         </member>
         <member name="M:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePart.ToString">
             <summary>
@@ -2150,6 +2346,9 @@
         </member>
         <member name="F:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePartType.Entrance">
             <inheritdoc cref="T:Archipelago.MultiClient.Net.MessageLog.Parts.EntranceMessagePart"/>
+        </member>
+        <member name="F:Archipelago.MultiClient.Net.MessageLog.Parts.MessagePartType.HintStatus">
+            <inheritdoc cref="T:Archipelago.MultiClient.Net.MessageLog.Parts.HintStatusMessagePart"/>
         </member>
         <member name="T:Archipelago.MultiClient.Net.MessageLog.Parts.PlayerMessagePart">
             <summary>
