@@ -23,13 +23,14 @@ using Terraria.ModLoader.IO;
 using Terraria.Social;
 using Terraria.WorldBuilding;
 using SeldomArchipelago.HardmodeItem;
+using System.Linq;
 
 namespace SeldomArchipelago.Systems
 {
-    public class ArchipelagoSystem : ModSystem
+    class ArchipelagoSystem : ModSystem
     {
         // Data that's reset between worlds
-        class WorldState
+        public class WorldState
         {
             // Achievements can be completed while loading into the world, but those complete before
             // `ArchipelagoPlayer::OnEnterWorld`, where achievements are reset, is run. So, this
@@ -46,10 +47,16 @@ namespace SeldomArchipelago.Systems
             // playing Hardcore and wants to receive all the rewards again when making a new player/
             // world.
             public List<int> receivedRewards = new List<int>();
+            // Set of town NPCs received in this world.
+            public HashSet<int> receivedNPCs = null;
+            // Dict of bound npc ids to item npc ids, if a player's npc item happens to be placed in their bound npcs location.
+            // If this is the case, we can transform the bound npc into the item npc.
+            // Almost entirely for cute purposes.
+            public Dictionary<int, int> npcLocTypeToNpcItemType = null;
         }
 
         // Data that's reset between Archipelago sessions
-        class SessionState
+        public class SessionState
         {
             // List of locations that are currently being sent
             public List<Task<Dictionary<long, ScoutedItemInfo>>> locationQueue = new List<Task<Dictionary<long, ScoutedItemInfo>>>();
@@ -67,13 +74,15 @@ namespace SeldomArchipelago.Systems
             public int slot;
         }
 
-        WorldState world = new();
-        SessionState session;
+        public WorldState world = new();
+        public SessionState session;
 
         public override void LoadWorldData(TagCompound tag)
         {
             world.collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
             world.receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
+            if (world.receivedNPCs is null)
+                world.receivedNPCs = tag.ContainsKey("ApReceivedNPCs") ? tag.Get<List<int>>("ApReceivedNPCs").ToHashSet() : null;
         }
 
         public override void OnWorldLoad()
@@ -132,6 +141,47 @@ namespace SeldomArchipelago.Systems
                 session.deathlink.OnDeathLinkReceived += ReceiveDeathlink;
             }
 
+            if ((bool)success.SlotData["randomize_npcs"])
+            {
+                world.receivedNPCs = new();
+                string[] boundNPClocs = [
+                    "Golfer",
+                    "Angler",
+                    "Stylist",
+                    "Tavernkeep",
+                    "Goblin Tinkerer",
+                    "Mechanic",
+                    "Wizard",
+                    "Tax Collector"
+                ];
+                var locIDtoNPCname = new Dictionary<long, string>();
+                foreach (string loc in boundNPClocs)
+                {
+                    locIDtoNPCname[session.session.Locations.GetLocationIdFromName("Terraria", loc)] = loc;
+                }
+                if (locIDtoNPCname.ContainsKey(-1))
+                {
+                    throw new Exception($"Some retrieved NPC locations turned up -1 ids.");
+                }
+                var task = session.session.Locations.ScoutLocationsAsync(locIDtoNPCname.Keys.ToArray());
+                if (task.Wait(1000));
+                {
+                    world.npcLocTypeToNpcItemType = new();
+                    int playerID = success.Slot;
+                    var npcLocDict = task.Result;
+                    foreach(long key in npcLocDict.Keys)
+                        {
+                            ItemInfo itemInfo = npcLocDict[key];
+                            if (itemInfo.Player.Slot == playerID && boundNPClocs.Contains(itemInfo.ItemName))
+                            {
+                                int npcType = npcNameToID[locIDtoNPCname[key]];
+                                world.npcLocTypeToNpcItemType[npcType] = npcNameToID[itemInfo.ItemName];
+                            }
+                        }
+                }
+                
+            }
+
             session.slot = success.Slot;
 
             foreach (var location in world.locationBacklog) QueueLocation(location);
@@ -174,9 +224,42 @@ namespace SeldomArchipelago.Systems
             "Post-Moon Lord" => NPC.downedMoonlord,
             _ => ModContent.GetInstance<CalamitySystem>()?.CheckCalamityFlag(flag) ?? false,
         };
-
+        Dictionary<string, int> npcNameToID = new()
+            {
+                {"Guide", NPCID.Guide },
+                {"Merchant", NPCID.Merchant },
+                {"Nurse", NPCID.Nurse },
+                {"Demolitionist", NPCID.Demolitionist },
+                {"Dye Trader", NPCID.DyeTrader },
+                {"Angler", NPCID.Angler },
+                {"Zoologist", NPCID.BestiaryGirl },
+                {"Dryad", NPCID.Dryad },
+                {"Painter", NPCID.Painter },
+                {"Golfer", NPCID.Golfer },
+                {"Arms Dealer", NPCID.ArmsDealer },
+                {"Tavernkeep", NPCID.DD2Bartender },
+                {"Stylist", NPCID.Stylist },
+                {"Goblin Tinkerer", NPCID.GoblinTinkerer },
+                {"Witch Doctor", NPCID.WitchDoctor },
+                {"Clothier", NPCID.Clothier },
+                {"Mechanic", NPCID.Mechanic },
+                {"Party Girl", NPCID.PartyGirl },
+                {"Wizard", NPCID.Wizard },
+                {"Tax Collector", NPCID.TaxCollector },
+                {"Truffle", NPCID.Truffle },
+                {"Pirate", NPCID.Pirate },
+                {"Steampunker", NPCID.Steampunker },
+                {"Cyborg", NPCID.Cyborg },
+                {"Santa Claus", NPCID.SantaClaus },
+                {"Princess", NPCID.Princess },
+            };
         public void Collect(string item)
         {
+            if (npcNameToID.ContainsKey(item))
+            {
+                world.receivedNPCs.Add(npcNameToID[item]);
+                return;
+            }
             switch (item)
             {
                 case "Reward: Torch God's Favor": GiveItem(ItemID.TorchGodsFavor); break;
@@ -456,6 +539,7 @@ namespace SeldomArchipelago.Systems
             tag["ApCollectedItems"] = world.collectedItems;
             if (session != null) session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
             tag["ApReceivedRewards"] = world.receivedRewards;
+            if (world.receivedNPCs is not null) tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
         }
 
         public void Reset()

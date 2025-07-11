@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis.Operations;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using SeldomArchipelago.NPCs;
@@ -71,6 +72,183 @@ namespace SeldomArchipelago
             var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
 
             // Begin cursed IL editing
+
+            // Change Town NPCs' Spawn Conditions
+            IL_Main.UpdateTime_SpawnTownNPCs += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                // Old Man
+                cursor.GotoNext(i => i.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3))));
+                cursor.Index++;
+                cursor.EmitPop();
+                cursor.EmitDelegate(() =>
+                {
+                    if (archipelagoSystem.session is null) return NPC.downedBoss3;
+                    return archipelagoSystem.session.collectedLocations.Contains("Skeletron");
+                });
+
+                // Town NPCs
+                var skipVanillaLabel = il.DefineLabel();
+                var skipRandoLabel = il.DefineLabel();
+
+                cursor.GotoNext(i => i.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.unlockedSlimeGreenSpawn))));
+                cursor.Index++;
+                cursor.EmitPop();
+                cursor.EmitDelegate(() =>
+                {
+                    return archipelagoSystem.world.receivedNPCs is not null;
+                });
+                cursor.EmitLdcI4(1);
+                cursor.EmitBlt(skipRandoLabel);
+                cursor.EmitDelegate(() =>
+                {
+                    foreach (int npc in archipelagoSystem.world.receivedNPCs)
+                    {
+                        Main.townNPCCanSpawn[npc] = !NPC.AnyNPCs(npc);
+                    }
+                });
+                cursor.EmitBr(skipVanillaLabel);
+                cursor.Index++;
+                cursor.EmitLdsfld(typeof(NPC).GetField(nameof(NPC.unlockedSlimeGreenSpawn)));
+                cursor.MarkLabel(skipRandoLabel);
+                cursor.GotoNext(i => i.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.boughtCat))));
+                cursor.MarkLabel(skipVanillaLabel);
+                cursor.GotoNext(i => i.MatchLdsfld(typeof(WorldGen).GetField(nameof(WorldGen.prioritizedTownNPCType))));
+                cursor.Index++;
+                cursor.EmitDelegate<Func<int, int>>((priorityNPC) =>
+                {
+                    if (archipelagoSystem.world.receivedNPCs is null) return priorityNPC;
+                    foreach (int npc in archipelagoSystem.world.receivedNPCs)
+                    {
+                        if (!NPC.AnyNPCs(npc)) return npc;
+                    }
+                    return priorityNPC;
+                });
+            };
+
+            // Allow Bound NPCs/Old Man to spawn until checked
+            Terraria.IL_NPC.AI_007_TownEntities += il =>
+            {
+                var cursor = new ILCursor(il);
+
+                void SkipInstruction(string varName)
+                {
+                    var label = il.DefineLabel();
+                    cursor.GotoNext(i => i.MatchStsfld(typeof(NPC).GetField(varName)));
+                    cursor.EmitPop();
+                    cursor.EmitBr(label);
+                    cursor.GotoNext(i => i.MatchBr(out var _));
+                    cursor.MarkLabel(label);
+                }
+
+                SkipInstruction(nameof(NPC.savedGolfer));
+                SkipInstruction(nameof(NPC.savedTaxCollector));
+                SkipInstruction(nameof(NPC.savedGoblin));
+                SkipInstruction(nameof(NPC.savedWizard));
+                SkipInstruction(nameof(NPC.savedMech));
+                SkipInstruction(nameof(NPC.savedStylist));
+                SkipInstruction(nameof(NPC.savedAngler));
+                SkipInstruction(nameof(NPC.savedBartender));
+
+                cursor.GotoNext(i => i.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3))));
+                cursor.Index++;
+                cursor.EmitPop();
+                cursor.EmitDelegate<Func<bool>>(() => archipelagoSystem.session is null ? NPC.downedBoss3 : archipelagoSystem.session.collectedLocations.Contains("Skeletron"));
+            };
+
+            // Add Checks To Bound NPCs
+
+            Terraria.IL_NPC.AI_000_TransformBoundNPC += il =>
+            {
+                var cursor = new ILCursor(il);
+                var skipRando = il.DefineLabel();
+
+                cursor.EmitDelegate(() =>
+                {
+                    return archipelagoSystem.world.receivedNPCs is not null;
+                });
+                cursor.EmitLdcI4(1);
+                cursor.EmitBlt(skipRando);
+
+                cursor.EmitLdarg(2);
+                cursor.EmitDelegate((int npcType) =>
+                {
+                    int boundNPCtype;
+                    string locName;
+                    switch (npcType)
+                    {
+                        case NPCID.Angler: boundNPCtype = NPCID.SleepingAngler; locName = "Angler"; NPC.savedAngler = true; break;
+                        case NPCID.Golfer: boundNPCtype = NPCID.GolferRescue; locName = "Golfer"; NPC.savedGolfer = true; break;
+                        case NPCID.DD2Bartender: boundNPCtype = NPCID.BartenderUnconscious; locName = "Tavernkeep"; NPC.savedBartender = true; break;
+                        case NPCID.Stylist: boundNPCtype = NPCID.WebbedStylist; locName = "Stylist"; NPC.savedStylist = true; break;
+                        case NPCID.GoblinTinkerer: boundNPCtype = NPCID.BoundGoblin; locName = "Goblin Tinkerer"; NPC.savedGoblin = true; break;
+                        case NPCID.Mechanic: boundNPCtype = NPCID.BoundMechanic; locName = "Mechanic"; NPC.savedMech = true; break;
+                        case NPCID.Wizard: boundNPCtype = NPCID.BoundWizard; locName = "Wizard"; NPC.savedWizard = true; break;
+                        default: throw new Exception($"NPC type {npcType} unaccounted for in TransformBoundNPC");
+                    }
+                    archipelagoSystem.QueueLocationClient(locName);
+                    if (archipelagoSystem.world.npcLocTypeToNpcItemType is not null && archipelagoSystem.world.npcLocTypeToNpcItemType.TryGetValue(npcType, out int newNpcType))
+                        return newNpcType;
+                    NPC npc = Main.npc[NPC.FindFirstNPC(boundNPCtype)];
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        NetMessage.SendStrikeNPC(npc, new NPC.HitInfo() { InstantKill = true });
+                    }
+                    else
+                    {
+                        npc.StrikeInstantKill();
+                    }
+                    return 0;
+                });
+                cursor.EmitStarg(2);
+                cursor.EmitLdarg(2);
+                cursor.EmitLdcI4(1);
+                cursor.EmitBge(skipRando);
+                cursor.EmitRet();
+                cursor.MarkLabel(skipRando);
+                ;
+            };
+
+            // Add Check to Purifying Tax Collector
+            // The method we edit for this is suspiciously large yet not identified as one that gets affected by garbage collection. If this randomly stops working in gameplay, find a different way to do this.
+
+            Terraria.IL_Projectile.Damage += il =>
+            {
+                var cursor = new ILCursor(il);
+                var label = il.DefineLabel();
+
+                cursor.GotoNext(i => i.MatchCallvirt(typeof(NPC).GetMethod(nameof(NPC.Transform))));
+                cursor.Index += 2;
+                cursor.MarkLabel(label);
+                cursor.Index -= 3;
+                cursor.EmitDelegate<Func<NPC, bool>>((NPC npc) =>
+                {
+                    NPC.savedTaxCollector = true;
+                    if (archipelagoSystem.world.receivedNPCs is null) return false;
+                    archipelagoSystem.QueueLocationClient("Tax Collector");
+
+                    if (archipelagoSystem.world.npcLocTypeToNpcItemType.TryGetValue(NPCID.TaxCollector, out int type))
+                    {
+                        npc.Transform(type);
+                        return true;
+                    }
+
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        NetMessage.SendStrikeNPC(npc, new NPC.HitInfo() { InstantKill = true });
+                    }
+                    else
+                    {
+                        npc.StrikeInstantKill();
+                    }
+                    return true;
+                });
+                cursor.EmitLdcI4(1);
+                cursor.EmitBge(label);
+                cursor.EmitDelegate<Func<NPC>>(() => Main.npc[NPC.FindFirstNPC(NPCID.DemonTaxCollector)]);
+            };
+
 
             // Torch God reward Terraria.Player:13794
             IL_Player.TorchAttack += il =>
