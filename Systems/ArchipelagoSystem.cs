@@ -654,7 +654,7 @@ namespace SeldomArchipelago.Systems
             for (var i = 0; i < Main.maxPlayers; i++)
             {
                 var player = Main.player[i];
-                if (player.active && !player.dead) player.Hurt(PlayerDeathReason.ByCustomReason(message), 999999, 1);
+                if (player.active && !player.dead) player.Hurt(PlayerDeathReason.ByCustomReason(message), 999999, 1, dodgeable: false);
             }
 
             if (Main.netMode == NetmodeID.SinglePlayer) return;
