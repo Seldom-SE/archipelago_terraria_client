@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis.Operations;
+using Microsoft.Xna.Framework;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using SeldomArchipelago.NPCs;
@@ -12,9 +13,12 @@ using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.Achievements;
+using Terraria.Chat;
 using Terraria.DataStructures;
+using Terraria.Enums;
 using Terraria.GameContent.Events;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace SeldomArchipelago
@@ -72,6 +76,110 @@ namespace SeldomArchipelago
             var archipelagoSystem = ModContent.GetInstance<ArchipelagoSystem>();
 
             // Begin cursed IL editing
+
+            // Manage Ghost Spawning
+            IL_WorldGen.SpawnTownNPC += il =>
+            {
+                var cursor = new ILCursor(il);
+                var label = il.DefineLabel();
+
+                cursor.GotoNext(i => i.MatchCall(out var mref) && mref.Name == "NewNPC");
+                cursor.Remove();
+                cursor.EmitDelegate((IEntitySource source, int x, int y, int type, int mysteryNumber, float _, float _, float _, float _, int target) => // whatever floats ur boat, dude
+                {
+                    bool spawnGhost = Main.rand.NextBool();
+                    if (spawnGhost)
+                    {
+                        int ghostIndex = NPC.NewNPC(source, WorldGen.bestX * 16, WorldGen.bestY * 16, ModContent.NPCType<CheckNPC>(), mysteryNumber, 0f, 0f, 0f, 0f, target);
+                        //CheckNPC ghost = Main.npc[ghostIndex].ModNPC as CheckNPC;
+                        //ghost.home = new(WorldGen.bestX, WorldGen.bestY);
+                        NPC ghost = Main.npc[ghostIndex];
+                        ghost.homeTileX = WorldGen.bestX;
+                        ghost.homeTileY = WorldGen.bestY;
+                        return ghostIndex;
+                    } else
+                    {
+                        return NPC.NewNPC(source, x, y, type, mysteryNumber, 0f, 0f, 0f, 0f, target);
+                    }
+                });
+                cursor.GotoNext(i => i.MatchCallvirt(out var mref) && mref.Name == "get_FullName");
+                cursor.EmitDelegate((NPC npc) =>
+                {
+                    if (npc.ModNPC is CheckNPC ghost)
+                    {
+                        if (Main.netMode == 0)
+                            Main.NewText("A strange NPC has arrived...?", 0, 255, 100);
+                        else if (Main.netMode == 2)
+                        {
+                            ChatHelper.BroadcastChatMessage(Terraria.Localization.NetworkText.FromLiteral("A strange NPC has arrived...?"), new Color(0, 255, 100));
+                        }
+                    }
+                    else
+                    {
+                        npc.netUpdate = true;
+                        string fullName = npc.FullName;
+                        if (Main.netMode == 0)
+                            Main.NewText(Language.GetTextValue("Announcement.HasArrived", fullName), 50, 125);
+                        else if (Main.netMode == 2)
+                            ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasArrived", npc.GetFullNetName()), new Color(50, 125, 255));
+                    }
+                });
+                cursor.EmitBr(label);
+                cursor.GotoNext(i => i.MatchCall(out var mref) && mref.Name == "NotifyProgressionEvent");
+                cursor.Index--;
+                cursor.MarkLabel(label);
+            };
+
+            // Manage Ghost Exploding
+            On_Player.SetTalkNPC += (On_Player.orig_SetTalkNPC orig, Player player, int index, bool fromNet) =>
+            {
+                if (-1 < index && index <= Main.npc.Length && Main.npc[index].ModNPC is CheckNPC ghost)
+                {
+                    ghost.NPC.StrikeInstantKill();
+                }
+                else
+                {
+                    orig(player, index, fromNet);
+                }
+            };
+
+            // Manage Ghost Occupying Rooms
+            On_WorldGen.IsRoomConsideredAlreadyOccupied += (On_WorldGen.orig_IsRoomConsideredAlreadyOccupied orig, int i, int j, int type) =>
+            {
+                CheckNPC[] existingGhosts = [.. (from npc in Main.npc where npc.ModNPC is CheckNPC select npc.ModNPC as CheckNPC)];
+                foreach (var ghost in existingGhosts)
+                {
+                    if (ghost.NPC.active && ghost.home.X == i && ghost.home.Y == j) return true;
+                }
+                bool result = orig(i, j, type);
+                return result;
+                /*
+                NPC[] existingGhosts = [.. (from npc in Main.npc where npc.ModNPC is CheckNPC select npc)];
+                foreach(var ghost in existingGhosts)
+                {
+                    if (ghost.active && ghost.homeTileX == i && ghost.homeTileY == j) return true;
+                }
+                
+                bool result = orig(i, j, type);
+                return result;
+                */
+            };
+
+            On_WorldGen.ScoreRoom_IsThisRoomOccupiedBySomeone += (On_WorldGen.orig_ScoreRoom_IsThisRoomOccupiedBySomeone orig, int ignoreNPC, int npcTypeAsking) =>
+            {
+                CheckNPC[] existingGhosts = [.. (from npc in Main.npc where npc.active && npc.ModNPC is CheckNPC select npc.ModNPC as CheckNPC)];
+                foreach (var ghost in existingGhosts)
+                {
+                    for (int i = 0; i < WorldGen.numRoomTiles; i++)
+                    {
+                        if (ghost.NPC.homeTileX == WorldGen.roomX[i] && ghost.NPC.homeTileY - 1 == WorldGen.roomY[i])
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return orig(ignoreNPC, npcTypeAsking);
+            };
 
             // Change Town NPCs' Spawn Conditions
             IL_Main.UpdateTime_SpawnTownNPCs += il =>

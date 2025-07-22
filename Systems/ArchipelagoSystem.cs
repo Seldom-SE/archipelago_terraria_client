@@ -475,7 +475,6 @@ namespace SeldomArchipelago.Systems
                 default: Chat($"Received unknown item: {item}"); break;
             }
         }
-
         public override void PostUpdateWorld()
         {
             if (session == null) return;
