@@ -25,20 +25,55 @@ namespace SeldomArchipelago.NPCs
     [AutoloadHead]
     public class CheckNPC : ModNPC
     {
-        static int funType = NPCID.BoundGoblin;
-        static Asset<Texture2D> texture;
-        public Point home;
-        static int rotationIndex = 0;
+        public int GhostType
+        {
+            get => ghostType;
+            set
+            {
+                if (allGhostTypes.Contains(value))
+                {
+                    ghostType = value;
+                }
+                else
+                {
+                    throw new Exception($"Attempted to set ghostType to value {value}.");
+                }
+            }
+        }
+        int ghostType;
+        static readonly int[] allGhostTypes =
+        {
+            NPCID.Guide,
+            NPCID.Merchant,
+            NPCID.Nurse,
+            NPCID.Demolitionist,
+            NPCID.DyeTrader,
+            NPCID.BestiaryGirl,
+            NPCID.Dryad,
+            NPCID.Painter,
+            NPCID.ArmsDealer,
+            NPCID.WitchDoctor,
+            NPCID.Clothier,
+            NPCID.PartyGirl,
+            NPCID.Truffle,
+            NPCID.Pirate,
+            NPCID.Steampunker,
+            NPCID.Cyborg,
+            NPCID.SantaClaus
+        };
+        static Dictionary<int, Asset<Texture2D>> typeToTexture = new();
+        Asset<Texture2D> GetTexture() => typeToTexture[ghostType];
         public override void SetStaticDefaults()
         {
-            texture = ModContent.Request<Texture2D>($"Terraria/Images/NPC_{funType}");
-
-            //NPCID.Sets.NoTownNPCHappiness[Type] = true;
+            foreach (var npcType in allGhostTypes)
+            {
+                typeToTexture[npcType] = ModContent.Request<Texture2D>($"Terraria/Images/NPC_{npcType}");
+            }
             NPC.townNPC = true;
         }
         public override void SetDefaults()
         {
-            NPC.CloneDefaults(funType);
+            NPC.CloneDefaults(NPCID.LostGirl);
         }
         public override Color? GetAlpha(Color drawColor)
         {
@@ -46,30 +81,26 @@ namespace SeldomArchipelago.NPCs
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            var texture = GetTexture();
             drawColor = NPC.GetNPCColorTintedByBuffs(drawColor);
             drawColor.A = 5;
             float num35 = 0f;
             float num36 = Main.NPCAddHeight(NPC);
-            Vector2 halfSize = new Vector2(texture.Width() / 2, texture.Height() / Main.npcFrameCount[funType] / 2);
+            Vector2 halfSize = new Vector2(texture.Width() / 2, texture.Height() / Main.npcFrameCount[ghostType] / 2);
             SpriteEffects spriteEffects = SpriteEffects.None;
-            Microsoft.Xna.Framework.Rectangle frame6 = texture.Frame();
+            Rectangle frame6 = texture.Frame();
             float x = NPC.position.X - screenPos.X + (float)(NPC.width / 2) - (float)texture.Width() * NPC.scale / 2f + halfSize.X * NPC.scale;
-            float y = NPC.position.Y - screenPos.Y + (float)NPC.height - (float)texture.Height() * NPC.scale / (float)Main.npcFrameCount[funType] + 4f + halfSize.Y * NPC.scale + num36 + num35 + NPC.gfxOffY;
+            float y = NPC.position.Y - screenPos.Y + (float)NPC.height - (float)texture.Height() * NPC.scale / (float)Main.npcFrameCount[ghostType] + 4f + halfSize.Y * NPC.scale + num36 + num35 + NPC.gfxOffY;
             spriteBatch.Draw(texture.Value, new Vector2(x, y), frame6, NPC.GetAlpha(drawColor), NPC.rotation, halfSize, NPC.scale, spriteEffects, 0f);
 
             return false;
         }
         public override void FindFrame(int frameHeight)
         {
-            NPC.frame = texture.Frame();
+            NPC.frame = GetTexture().Frame();
         }
         public override bool CanChat() => true;
-        public override string GetChat() => "...";
-        public override void SetChatButtons(ref string button, ref string button2) => button = "Redeem";
-        public override void OnChatButtonClicked(bool firstButton, ref string shopName)
-        {
-            if (firstButton) NPC.StrikeInstantKill();
-        }
         public override bool NeedSaving() => true;
+        public static bool AnyGhosts(int type) => Main.npc.Any(npc => npc.active && npc.ModNPC is CheckNPC checkNPC && checkNPC.ghostType == type);
     }
 }

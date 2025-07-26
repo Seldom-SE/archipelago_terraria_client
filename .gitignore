@@ -7,3 +7,4 @@
 lib/CalamityMod.dll
 *.csproj
 /lib/CalamityMod.dll
+/.idea

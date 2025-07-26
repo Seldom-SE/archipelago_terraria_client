@@ -87,8 +87,7 @@ namespace SeldomArchipelago
                 cursor.Remove();
                 cursor.EmitDelegate((IEntitySource source, int x, int y, int type, int mysteryNumber, float _, float _, float _, float _, int target) => // whatever floats ur boat, dude
                 {
-                    bool spawnGhost = Main.rand.NextBool();
-                    if (spawnGhost)
+                    if (archipelagoSystem.ghostNPCqueue.TryDequeue(out int ghostID))
                     {
                         int ghostIndex = NPC.NewNPC(source, WorldGen.bestX * 16, WorldGen.bestY * 16, ModContent.NPCType<CheckNPC>(), mysteryNumber, 0f, 0f, 0f, 0f, target);
                         //CheckNPC ghost = Main.npc[ghostIndex].ModNPC as CheckNPC;
@@ -96,6 +95,8 @@ namespace SeldomArchipelago
                         NPC ghost = Main.npc[ghostIndex];
                         ghost.homeTileX = WorldGen.bestX;
                         ghost.homeTileY = WorldGen.bestY;
+                        CheckNPC modGhost = ghost.ModNPC as CheckNPC;
+                        modGhost.GhostType = ghostID;
                         return ghostIndex;
                     } else
                     {
@@ -108,7 +109,7 @@ namespace SeldomArchipelago
                     if (npc.ModNPC is CheckNPC ghost)
                     {
                         if (Main.netMode == 0)
-                            Main.NewText("A strange NPC has arrived...?", 0, 255, 100);
+                            Main.NewText($"The {Lang.GetNPCName(ghost.GhostType)} has arrived...?", 0, 255, 100);
                         else if (Main.netMode == 2)
                         {
                             ChatHelper.BroadcastChatMessage(Terraria.Localization.NetworkText.FromLiteral("A strange NPC has arrived...?"), new Color(0, 255, 100));
@@ -135,7 +136,15 @@ namespace SeldomArchipelago
             {
                 if (-1 < index && index <= Main.npc.Length && Main.npc[index].ModNPC is CheckNPC ghost)
                 {
-                    ghost.NPC.StrikeInstantKill();
+                    archipelagoSystem.QueueLocationClient(ArchipelagoSystem.npcIDtoName[ghost.GhostType]);
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        NetMessage.SendStrikeNPC(ghost.NPC, new NPC.HitInfo() { InstantKill = true });
+                    }
+                    else
+                    {
+                        ghost.NPC.StrikeInstantKill();
+                    }
                 }
                 else
                 {
@@ -149,7 +158,7 @@ namespace SeldomArchipelago
                 CheckNPC[] existingGhosts = [.. (from npc in Main.npc where npc.ModNPC is CheckNPC select npc.ModNPC as CheckNPC)];
                 foreach (var ghost in existingGhosts)
                 {
-                    if (ghost.NPC.active && ghost.home.X == i && ghost.home.Y == j) return true;
+                    if (ghost.NPC.active && ghost.NPC.homeTileX == i && ghost.NPC.homeTileY == j) return true;
                 }
                 bool result = orig(i, j, type);
                 return result;
@@ -197,10 +206,10 @@ namespace SeldomArchipelago
                 });
 
                 // Town NPCs
-                var skipVanillaLabel = il.DefineLabel();
                 var skipRandoLabel = il.DefineLabel();
 
                 cursor.GotoNext(i => i.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.unlockedSlimeGreenSpawn))));
+                cursor.GotoNext(i => i.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.boughtCat))));
                 cursor.Index++;
                 cursor.EmitPop();
                 cursor.EmitDelegate(() =>
@@ -211,17 +220,16 @@ namespace SeldomArchipelago
                 cursor.EmitBlt(skipRandoLabel);
                 cursor.EmitDelegate(() =>
                 {
-                    foreach (int npc in archipelagoSystem.world.receivedNPCs)
+                    for (int i = 0; i < Main.townNPCCanSpawn.Length; i++)
                     {
-                        Main.townNPCCanSpawn[npc] = !NPC.AnyNPCs(npc);
+                        if (Main.townNPCCanSpawn[i] && !archipelagoSystem.ghostNPCqueue.Any(x => x == i) && !CheckNPC.AnyGhosts(i))
+                            archipelagoSystem.ghostNPCqueue.Enqueue(i);
+                        Main.townNPCCanSpawn[i] = archipelagoSystem.world.receivedNPCs.Contains(i) && !NPC.AnyNPCs(i);
                     }
                 });
-                cursor.EmitBr(skipVanillaLabel);
-                cursor.Index++;
-                cursor.EmitLdsfld(typeof(NPC).GetField(nameof(NPC.unlockedSlimeGreenSpawn)));
+                cursor.EmitLdsfld(typeof(NPC).GetField(nameof(NPC.boughtCat)));
+                cursor.Index--;
                 cursor.MarkLabel(skipRandoLabel);
-                cursor.GotoNext(i => i.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.boughtCat))));
-                cursor.MarkLabel(skipVanillaLabel);
                 cursor.GotoNext(i => i.MatchLdsfld(typeof(WorldGen).GetField(nameof(WorldGen.prioritizedTownNPCType))));
                 cursor.Index++;
                 cursor.EmitDelegate<Func<int, int>>((priorityNPC) =>

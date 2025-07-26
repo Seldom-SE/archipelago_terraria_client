@@ -47,10 +47,10 @@ namespace SeldomArchipelago.Systems
             // playing Hardcore and wants to receive all the rewards again when making a new player/
             // world.
             public List<int> receivedRewards = new List<int>();
-            // Set of town NPCs received in this world.
+            // Set of town NPC items received in this world.
             public HashSet<int> receivedNPCs = null;
-            // Dict of bound npc ids to item npc ids, if a player's npc item happens to be placed in their bound npcs location.
-            // If this is the case, we can transform the bound npc into the item npc.
+            // Dict of bound npc ids to item npc ids, if a player's npc item happens to be placed in one of their npc locations.
+            // If this is the case, we can transform the ghost/bound npc into the item npc as soon as it is activated.
             // Almost entirely for cute purposes.
             public Dictionary<int, int> npcLocTypeToNpcItemType = null;
         }
@@ -76,6 +76,8 @@ namespace SeldomArchipelago.Systems
 
         public WorldState world = new();
         public SessionState session;
+
+        public Queue<int> ghostNPCqueue = new();
 
         public override void LoadWorldData(TagCompound tag)
         {
@@ -182,11 +184,12 @@ namespace SeldomArchipelago.Systems
                 
             }
 
-            session.slot = success.Slot;
+                session.slot = success.Slot;
 
             foreach (var location in world.locationBacklog) QueueLocation(location);
             world.locationBacklog.Clear();
         }
+        public bool LocationCollected(string loc) => session.collectedLocations.Contains(loc) || world.locationBacklog.Contains(loc);
 
         public string[] flags = { "Post-King Slime", "Post-Desert Scourge", "Post-Giant Clam", "Post-Eye of Cthulhu", "Post-Acid Rain Tier 1", "Post-Crabulon", "Post-Evil Boss", "Post-Old One's Army Tier 1", "Post-Goblin Army", "Post-Queen Bee", "Post-The Hive Mind", "Post-The Perforators", "Post-Skeletron", "Post-Deerclops", "Post-The Slime God", "Hardmode", "Post-Dreadnautilus", "Post-Hardmode Giant Clam", "Post-Pirate Invasion", "Post-Queen Slime", "Post-Aquatic Scourge", "Post-Cragmaw Mire", "Post-Acid Rain Tier 2", "Post-The Twins", "Post-Old One's Army Tier 2", "Post-Brimstone Elemental", "Post-The Destroyer", "Post-Cryogen", "Post-Skeletron Prime", "Post-Calamitas Clone", "Post-Plantera", "Post-Great Sand Shark", "Post-Leviathan and Anahita", "Post-Astrum Aureus", "Post-Golem", "Post-Old One's Army Tier 3", "Post-Martian Madness", "Post-The Plaguebringer Goliath", "Post-Duke Fishron", "Post-Mourning Wood", "Post-Pumpking", "Post-Everscream", "Post-Santa-NK1", "Post-Ice Queen", "Post-Frost Legion", "Post-Ravager", "Post-Empress of Light", "Post-Lunatic Cultist", "Post-Astrum Deus", "Post-Lunar Events", "Post-Moon Lord", "Post-Profaned Guardians", "Post-The Dragonfolly", "Post-Providence, the Profaned Goddess", "Post-Storm Weaver", "Post-Ceaseless Void", "Post-Signus, Envoy of the Devourer", "Post-Polterghast", "Post-Mauler", "Post-Nuclear Terror", "Post-The Old Duke", "Post-The Devourer of Gods", "Post-Yharon, Dragon of Rebirth", "Post-Exo Mechs", "Post-Supreme Witch, Calamitas", "Post-Primordial Wyrm", "Post-Boss Rush" };
 
@@ -224,7 +227,7 @@ namespace SeldomArchipelago.Systems
             "Post-Moon Lord" => NPC.downedMoonlord,
             _ => ModContent.GetInstance<CalamitySystem>()?.CheckCalamityFlag(flag) ?? false,
         };
-        Dictionary<string, int> npcNameToID = new()
+        public static Dictionary<string, int> npcNameToID = new()
             {
                 {"Guide", NPCID.Guide },
                 {"Merchant", NPCID.Merchant },
@@ -253,6 +256,7 @@ namespace SeldomArchipelago.Systems
                 {"Santa Claus", NPCID.SantaClaus },
                 {"Princess", NPCID.Princess },
             };
+        public static Dictionary<int, string> npcIDtoName = npcNameToID.ToDictionary(x => x.Value, x => x.Key);
         public void Collect(string item)
         {
             if (npcNameToID.ContainsKey(item))
@@ -552,6 +556,7 @@ namespace SeldomArchipelago.Systems
         public override void OnWorldUnload()
         {
             world = new();
+            ghostNPCqueue = new();
             Reset();
         }
 
