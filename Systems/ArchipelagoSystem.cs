@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using SeldomArchipelago.Players;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Threading.Tasks;
 using Terraria;
@@ -47,12 +48,15 @@ namespace SeldomArchipelago.Systems
             // playing Hardcore and wants to receive all the rewards again when making a new player/
             // world.
             public List<int> receivedRewards = new List<int>();
+            // Set of town NPC locations checked in this world.
+            public HashSet<int> checkedNPCs = null;
             // Set of town NPC items received in this world.
             public HashSet<int> receivedNPCs = null;
-            // Dict of bound npc ids to item npc ids, if a player's npc item happens to be placed in one of their npc locations.
-            // If this is the case, we can transform the ghost/bound npc into the item npc as soon as it is activated.
-            // Almost entirely for cute purposes.
+            // Dict of loc npc ids to item npc ids, if a player's npc item happens to be placed in one of their npc locations.
+            // If this is the case, we can transform the ghost/bound npc into the item npc as soon as it is activated, for both expediency and cuteness.
             public Dictionary<int, int> npcLocTypeToNpcItemType = null;
+
+            public bool NPCRandoActive() => receivedNPCs is not null;
         }
 
         // Data that's reset between Archipelago sessions
@@ -77,14 +81,23 @@ namespace SeldomArchipelago.Systems
         public WorldState world = new();
         public SessionState session;
 
+        // Contains all ghosts that are available to spawn.
         public Queue<int> ghostNPCqueue = new();
+        // Contains ghosts that require special housing conditions to spawn.
+        public readonly static ImmutableHashSet<int> specialSpawnGhosts =
+        [
+            NPCID.Truffle
+        ];
 
         public override void LoadWorldData(TagCompound tag)
         {
             world.collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
             world.receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
-            if (world.receivedNPCs is null)
+            if (!world.NPCRandoActive())
+            {
+                world.checkedNPCs = tag.ContainsKey("ApCheckedNPCs") ? tag.Get<List<int>>("ApCheckedNPCs").ToHashSet() : null;
                 world.receivedNPCs = tag.ContainsKey("ApReceivedNPCs") ? tag.Get<List<int>>("ApReceivedNPCs").ToHashSet() : null;
+            }
         }
 
         public override void OnWorldLoad()
@@ -145,19 +158,12 @@ namespace SeldomArchipelago.Systems
 
             if ((bool)success.SlotData["randomize_npcs"])
             {
+                world.checkedNPCs = session.session.DataStorage[Scope.Slot, "CheckedNPCs"].To<HashSet<int>>();
+                if (world.checkedNPCs is null) world.checkedNPCs = new();
                 world.receivedNPCs = new();
-                string[] boundNPClocs = [
-                    "Golfer",
-                    "Angler",
-                    "Stylist",
-                    "Tavernkeep",
-                    "Goblin Tinkerer",
-                    "Mechanic",
-                    "Wizard",
-                    "Tax Collector"
-                ];
+                string[] allNPCnames = npcNameToID.Keys.ToArray();
                 var locIDtoNPCname = new Dictionary<long, string>();
-                foreach (string loc in boundNPClocs)
+                foreach (string loc in allNPCnames)
                 {
                     locIDtoNPCname[session.session.Locations.GetLocationIdFromName("Terraria", loc)] = loc;
                 }
@@ -174,7 +180,7 @@ namespace SeldomArchipelago.Systems
                     foreach(long key in npcLocDict.Keys)
                         {
                             ItemInfo itemInfo = npcLocDict[key];
-                            if (itemInfo.Player.Slot == playerID && boundNPClocs.Contains(itemInfo.ItemName))
+                            if (itemInfo.Player.Slot == playerID && allNPCnames.Contains(itemInfo.ItemName))
                             {
                                 int npcType = npcNameToID[locIDtoNPCname[key]];
                                 world.npcLocTypeToNpcItemType[npcType] = npcNameToID[itemInfo.ItemName];
@@ -540,9 +546,17 @@ namespace SeldomArchipelago.Systems
         public override void SaveWorldData(TagCompound tag)
         {
             tag["ApCollectedItems"] = world.collectedItems;
-            if (session != null) session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
+            if (session != null)
+            {
+                session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
+                if (world.NPCRandoActive()) session.session.DataStorage[Scope.Slot, "CheckedNPCs"] = world.checkedNPCs.ToArray();
+            }
             tag["ApReceivedRewards"] = world.receivedRewards;
-            if (world.receivedNPCs is not null) tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
+            if (world.NPCRandoActive())
+            {
+                tag["ApCheckedNPCs"] = world.checkedNPCs.ToList();
+                tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
+            }
         }
 
         public void Reset()
