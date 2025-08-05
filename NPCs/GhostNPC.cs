@@ -61,7 +61,8 @@ namespace SeldomArchipelago.NPCs
             NPCID.Pirate,
             NPCID.Steampunker,
             NPCID.Cyborg,
-            NPCID.SantaClaus
+            NPCID.SantaClaus,
+            NPCID.Princess
         ];
         public static bool GhostableType(int type) => allGhostTypes.Contains(type);
         static Dictionary<int, Asset<Texture2D>> typeToTexture = new();

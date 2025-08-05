@@ -269,11 +269,42 @@ namespace SeldomArchipelago
                             existingGhostTypes.Add(ghost.GhostType);
                         }
                     }
-                    // Nurse & Demolitionist Override (this is needed since we stuffed the local variable for the merchant's existence)
+                    // Nurse, Demolitionist, Princess Overrides
                     if (existingTownTypes.Contains(NPCID.Merchant))
                     {
                         Main.townNPCCanSpawn[NPCID.Nurse] = NPC.SpawnAllowed_Nurse();
                         Main.townNPCCanSpawn[NPCID.Demolitionist] = NPC.SpawnAllowed_Demolitionist();
+                        HashSet<int> princessNPCs =
+                        [
+                            NPCID.Guide,
+                            NPCID.Merchant,
+                            NPCID.Nurse,
+                            NPCID.Demolitionist,
+                            NPCID.DyeTrader,
+                            NPCID.Angler,
+                            NPCID.BestiaryGirl,
+                            NPCID.Dryad,
+                            NPCID.Painter,
+                            NPCID.Golfer,
+                            NPCID.ArmsDealer,
+                            NPCID.DD2Bartender,
+                            NPCID.Stylist,
+                            NPCID.GoblinTinkerer,
+                            NPCID.WitchDoctor,
+                            NPCID.Clothier,
+                            NPCID.Mechanic,
+                            NPCID.PartyGirl,
+                            NPCID.Wizard,
+                            NPCID.TaxCollector,
+                            NPCID.Truffle,
+                            NPCID.Pirate,
+                            NPCID.Steampunker,
+                            NPCID.Cyborg
+                        ];
+                        if (princessNPCs.IsSubsetOf(existingTownTypes))
+                        {
+                            Main.townNPCCanSpawn[NPCID.Princess] = true;
+                        }
                     }
                     if (archipelagoSystem.world.NPCRandoActive())
                     {
