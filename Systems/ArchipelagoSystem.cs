@@ -51,8 +51,6 @@ namespace SeldomArchipelago.Systems
             public List<int> receivedRewards = new List<int>();
             // All NPCs that have been randomized.
             public ImmutableHashSet<int> randomizedNPCs = null;
-            // Set of town NPC locations checked in this world.
-            public HashSet<int> checkedNPCs = null;
             // Set of town NPC items received in this world.
             public HashSet<int> receivedNPCs = null;
             // Dict of loc npc ids to item npc ids, if a player's npc item happens to be placed in one of their npc locations.
@@ -99,7 +97,6 @@ namespace SeldomArchipelago.Systems
             if (!world.NPCRandoActive())
             {
                 world.randomizedNPCs = tag.ContainsKey("ApRandomizedNPCs") ? tag.Get<List<int>>("ApRandomizedNPCs").ToImmutableHashSet() : null;
-                world.checkedNPCs = tag.ContainsKey("ApCheckedNPCs") ? tag.Get<List<int>>("ApCheckedNPCs").ToHashSet() : null;
                 world.receivedNPCs = tag.ContainsKey("ApReceivedNPCs") ? tag.Get<List<int>>("ApReceivedNPCs").ToHashSet() : null;
             }
         }
@@ -164,8 +161,6 @@ namespace SeldomArchipelago.Systems
             if (randomizedNPCnames.Length > 0)
             {
                 world.randomizedNPCs = (from name in randomizedNPCnames select npcNameToID[name]).ToImmutableHashSet();
-                world.checkedNPCs = session.session.DataStorage[Scope.Slot, "CheckedNPCs"].To<HashSet<int>>();
-                if (world.checkedNPCs is null) world.checkedNPCs = new();
                 world.receivedNPCs = new();
                 string[] allNPCnames = npcNameToID.Keys.ToArray();
                 var locIDtoNPCname = new Dictionary<long, string>();
@@ -178,7 +173,7 @@ namespace SeldomArchipelago.Systems
                     throw new Exception($"Some retrieved NPC locations turned up -1 ids.");
                 }
                 var task = session.session.Locations.ScoutLocationsAsync(locIDtoNPCname.Keys.ToArray());
-                if (task.Wait(1000));
+                if (task.Wait(1000))
                 {
                     world.npcLocTypeToNpcItemType = new();
                     int playerID = success.Slot;
@@ -566,13 +561,11 @@ namespace SeldomArchipelago.Systems
             if (session != null)
             {
                 session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
-                if (world.NPCRandoActive()) session.session.DataStorage[Scope.Slot, "CheckedNPCs"] = world.checkedNPCs.ToArray();
             }
             tag["ApReceivedRewards"] = world.receivedRewards;
             if (world.NPCRandoActive())
             {
-                tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
-                tag["ApCheckedNPCs"] = world.checkedNPCs.ToList();
+                tag["ApRandomizedNPCs"] = world.randomizedNPCs.ToList();
                 tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
             }
         }

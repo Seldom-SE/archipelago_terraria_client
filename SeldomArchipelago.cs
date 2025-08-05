@@ -115,20 +115,21 @@ namespace SeldomArchipelago
                 {
                     if (npc.ModNPC is GhostNPC ghost)
                     {
-                        if (Main.netMode == 0)
-                            Main.NewText($"The {Lang.GetNPCName(ghost.GhostType)} has arrived...?", 0, 255, 100);
-                        else if (Main.netMode == 2)
+                        string message = $"The {Lang.GetNPCName(ghost.GhostType)} has arrived...?";
+                        if (Main.netMode == NetmodeID.SinglePlayer)
+                            Main.NewText(message, 0, 255, 100);
+                        else if (Main.netMode == NetmodeID.Server)
                         {
-                            ChatHelper.BroadcastChatMessage(Terraria.Localization.NetworkText.FromLiteral("A strange NPC has arrived..."), new Color(0, 255, 100));
+                            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(message), new Color(0, 255, 100));
                         }
                     }
                     else
                     {
                         npc.netUpdate = true;
                         string fullName = npc.FullName;
-                        if (Main.netMode == 0)
+                        if (Main.netMode == NetmodeID.SinglePlayer)
                             Main.NewText(Language.GetTextValue("Announcement.HasArrived", fullName), 50, 125);
-                        else if (Main.netMode == 2)
+                        else if (Main.netMode == NetmodeID.Server)
                             ChatHelper.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasArrived", npc.GetFullNetName()), new Color(50, 125, 255));
                     }
                 });
@@ -144,7 +145,6 @@ namespace SeldomArchipelago
                 if (-1 < index && index <= Main.npc.Length && Main.npc[index].ModNPC is GhostNPC ghost)
                 {
                     archipelagoSystem.QueueLocationClient(ArchipelagoSystem.npcIDtoName[ghost.GhostType]);
-                    archipelagoSystem.world.checkedNPCs.Add(ghost.GhostType);
                     if (archipelagoSystem.world.npcLocTypeToNpcItemType is not null && archipelagoSystem.world.npcLocTypeToNpcItemType.TryGetValue(ghost.GhostType, out int newNpcType))
                     {
                         Main.npc[index].Transform(newNpcType);
@@ -244,7 +244,7 @@ namespace SeldomArchipelago
                 cursor.EmitDelegate(() =>
                 {
                     if (archipelagoSystem.session is null) return NPC.downedBoss3 || NPC.AnyNPCs(NPCID.OldMan);
-                    return archipelagoSystem.session.collectedLocations.Contains("Skeletron") || NPC.AnyNPCs(NPCID.OldMan);
+                    return archipelagoSystem.LocationCollected("Skeletron") || NPC.AnyNPCs(NPCID.OldMan);
                 });
 
                 // Town NPCs
@@ -301,7 +301,7 @@ namespace SeldomArchipelago
                             NPCID.Steampunker,
                             NPCID.Cyborg
                         ];
-                        if (princessNPCs.IsSubsetOf(existingTownTypes))
+                         if (princessNPCs.IsSubsetOf(existingTownTypes))
                         {
                             Main.townNPCCanSpawn[NPCID.Princess] = true;
                         }
@@ -320,7 +320,7 @@ namespace SeldomArchipelago
                         // Enqueue Ghosts
                         foreach (int type in validGhostTypes)
                         {
-                            if (!archipelagoSystem.ghostNPCqueue.Contains(type) && !archipelagoSystem.world.checkedNPCs.Contains(type))
+                            if (!archipelagoSystem.ghostNPCqueue.Contains(type) && !archipelagoSystem.LocationCollected(ArchipelagoSystem.npcIDtoName[type]))
                                 archipelagoSystem.ghostNPCqueue.Enqueue(type);
                         }
                     }
@@ -379,7 +379,7 @@ namespace SeldomArchipelago
                 cursor.GotoNext(i => i.MatchLdsfld(typeof(NPC).GetField(nameof(NPC.downedBoss3))));
                 cursor.Index++;
                 cursor.EmitPop();
-                cursor.EmitDelegate<Func<bool>>(() => archipelagoSystem.session is null ? NPC.downedBoss3 : archipelagoSystem.session.collectedLocations.Contains("Skeletron"));
+                cursor.EmitDelegate<Func<bool>>(() => archipelagoSystem.session is null ? NPC.downedBoss3 : archipelagoSystem.LocationCollected("Skeletron"));
             };
 
             // Add Checks To Bound NPCs
