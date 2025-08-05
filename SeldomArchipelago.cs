@@ -88,21 +88,27 @@ namespace SeldomArchipelago
                 cursor.Remove();
                 cursor.EmitDelegate((IEntitySource source, int x, int y, int type, int mysteryNumber, float _, float _, float _, float _, int target) => // whatever floats ur boat, dude
                 {
-                    if (archipelagoSystem.ghostNPCqueue.TryDequeue(out int ghostID))
+                    int itemsChecked = 0;
+                    while (itemsChecked < archipelagoSystem.ghostNPCqueue.Count)
                     {
-                        int ghostIndex = NPC.NewNPC(source, WorldGen.bestX * 16, WorldGen.bestY * 16, ModContent.NPCType<GhostNPC>(), mysteryNumber, 0f, 0f, 0f, 0f, target);
-                        //CheckNPC ghost = Main.npc[ghostIndex].ModNPC as CheckNPC;
-                        //ghost.home = new(WorldGen.bestX, WorldGen.bestY);
-                        NPC ghost = Main.npc[ghostIndex];
-                        ghost.homeTileX = WorldGen.bestX;
-                        ghost.homeTileY = WorldGen.bestY;
-                        GhostNPC modGhost = ghost.ModNPC as GhostNPC;
-                        modGhost.GhostType = ghostID;
-                        return ghostIndex;
-                    } else
-                    {
-                        return NPC.NewNPC(source, x, y, type, mysteryNumber, 0f, 0f, 0f, 0f, target);
+                        int ghostID = archipelagoSystem.ghostNPCqueue.Dequeue();
+                        if (type != ghostID && ArchipelagoSystem.specialSpawnGhosts.Contains(ghostID))
+                        {
+                            archipelagoSystem.ghostNPCqueue.Enqueue(ghostID);
+                        }
+                        else
+                        {
+                            int ghostIndex = NPC.NewNPC(source, WorldGen.bestX * 16, WorldGen.bestY * 16, ModContent.NPCType<GhostNPC>(), mysteryNumber, 0f, 0f, 0f, 0f, target);
+                            NPC ghost = Main.npc[ghostIndex];
+                            ghost.homeTileX = WorldGen.bestX;
+                            ghost.homeTileY = WorldGen.bestY;
+                            GhostNPC modGhost = ghost.ModNPC as GhostNPC;
+                            modGhost.GhostType = ghostID;
+                            return ghostIndex;
+                        }
+                        itemsChecked++;
                     }
+                    return NPC.NewNPC(source, x, y, type, mysteryNumber, 0f, 0f, 0f, 0f, target);
                 });
                 cursor.GotoNext(i => i.MatchCallvirt(out var mref) && mref.Name == "get_FullName");
                 cursor.EmitDelegate((NPC npc) =>
@@ -113,7 +119,7 @@ namespace SeldomArchipelago
                             Main.NewText($"The {Lang.GetNPCName(ghost.GhostType)} has arrived...?", 0, 255, 100);
                         else if (Main.netMode == 2)
                         {
-                            ChatHelper.BroadcastChatMessage(Terraria.Localization.NetworkText.FromLiteral("A strange NPC has arrived...?"), new Color(0, 255, 100));
+                            ChatHelper.BroadcastChatMessage(Terraria.Localization.NetworkText.FromLiteral("A strange NPC has arrived..."), new Color(0, 255, 100));
                         }
                     }
                     else
@@ -223,7 +229,7 @@ namespace SeldomArchipelago
                     int count = 0;
                     for (int i = 0; i < Main.npc.Length; i++)
                     {
-                        if (Main.npc[i].active && Main.npc[i].townNPC)
+                        if (Main.npc[i].active && Main.npc[i].townNPC && Main.npc[i].ModNPC is not GhostNPC)
                         {
                             count++;
                         }
@@ -248,71 +254,68 @@ namespace SeldomArchipelago
                 cursor.EmitPop();
                 cursor.EmitDelegate(() =>
                 {
-                    // Evaluate
-                    HashSet<int> validGhostTypes = new();
-                    for (int i = 0; i < Main.townNPCCanSpawn.Length; i++)
-                        if (Main.townNPCCanSpawn[i] && GhostNPC.GhostableType(i))
-                            validGhostTypes.Add(i);
-                    // Build
-                    if (archipelagoSystem.world.NPCRandoActive())
-                        for (int i = 0; i < Main.townNPCCanSpawn.Length; i++)
-                            Main.townNPCCanSpawn[i] = archipelagoSystem.world.receivedNPCs.Contains(i);
-                    // Remove Dupes
-                    for (int i = 0; i < Main.npc.Length; i++)
+                    // Collect NPCs & Ghosts
+                    HashSet<int> existingTownTypes = new();
+                    HashSet<int> existingGhostTypes = new();
+                    foreach (NPC npc in Main.npc)
                     {
-                        NPC npc = Main.npc[i];
                         if (!npc.active) continue;
                         if (npc.townNPC)
                         {
-                            Main.townNPCCanSpawn[npc.type] = false;
+                            existingTownTypes.Add(npc.type);
                         }
-                        else if (npc.ModNPC is GhostNPC ghost)
+                        if (npc.ModNPC is GhostNPC ghost)
                         {
-                            validGhostTypes.Remove(ghost.GhostType);
+                            existingGhostTypes.Add(ghost.GhostType);
                         }
                     }
-                    // Enqueue Ghosts
+                    // Nurse & Demolitionist Override (this is needed since we stuffed the local variable for the merchant's existence)
+                    if (existingTownTypes.Contains(NPCID.Merchant))
+                    {
+                        Main.townNPCCanSpawn[NPCID.Nurse] = NPC.SpawnAllowed_Nurse();
+                        Main.townNPCCanSpawn[NPCID.Demolitionist] = NPC.SpawnAllowed_Demolitionist();
+                    }
                     if (archipelagoSystem.world.NPCRandoActive())
                     {
+                        // Evaluate and Build
+                        HashSet<int> validGhostTypes = new();
+                        foreach (int type in archipelagoSystem.world.randomizedNPCs)
+                        {
+                            if (Main.townNPCCanSpawn[type] && GhostNPC.GhostableType(type) && !existingGhostTypes.Contains(type))
+                                validGhostTypes.Add(type);
+                            Main.townNPCCanSpawn[type] = archipelagoSystem.world.receivedNPCs.Contains(type) && !existingTownTypes.Contains(type);
+                        }
+                            
+                        // Enqueue Ghosts
                         foreach (int type in validGhostTypes)
                         {
                             if (!archipelagoSystem.ghostNPCqueue.Contains(type) && !archipelagoSystem.world.checkedNPCs.Contains(type))
                                 archipelagoSystem.ghostNPCqueue.Enqueue(type);
                         }
                     }
+                    // Set prioritizedNPC if Vanilla NPC can spawn
+                    for (int i = 0; i < Main.townNPCCanSpawn.Length; i++)
+                    {
+                        if (Main.townNPCCanSpawn[i])
+                        {
+                            WorldGen.prioritizedTownNPCType = i;
+                            break;
+                        }
+                    }
                     // Set prioritizedNPC if Ghost NPC is next
-                    if (archipelagoSystem.ghostNPCqueue.Count > 0)
+                    int firstGhost = archipelagoSystem.ghostNPCqueue.FirstOrDefault();
+                    if (archipelagoSystem.ghostNPCqueue.Count == 1 && ArchipelagoSystem.specialSpawnGhosts.Contains(firstGhost))
                     {
-                        int ghostType = archipelagoSystem.ghostNPCqueue.Peek();
-                        if (ArchipelagoSystem.specialSpawnGhosts.Contains(ghostType))
-                        {
-                            // If the NPC needs to spawn in a specific house, we need to trick SpawnNPC into triggering only when
-                            // the coords found satisfy that NPC's spawn condition...
-                            Main.townNPCCanSpawn[ghostType] = true;
-                            WorldGen.prioritizedTownNPCType = ghostType;
-                        }
-                        else
-                        {
-                            // ...otherwise the value we assign here is arbitrary, it just needs to be set to a town npc's type.
-                            Main.townNPCCanSpawn[NPCID.SantaClaus] = true;
-                            WorldGen.prioritizedTownNPCType = NPCID.SantaClaus;
-                        }
+                        Main.townNPCCanSpawn[firstGhost] = true;
+                        WorldGen.prioritizedTownNPCType = firstGhost;
+                    }
+                    else if (archipelagoSystem.ghostNPCqueue.Count > 0)
+                    {
+                        // For regular NPCs the value we assign here is arbitrary, it just needs to be set to a town npc's type so SpawnNPC can trigger at all
+                        Main.townNPCCanSpawn[NPCID.SantaClaus] = true;
+                        WorldGen.prioritizedTownNPCType = NPCID.SantaClaus;
                         return;
-                    }
-                    // Set prioritizedNPC if Vanilla NPC is next
-                    if (WorldGen.prioritizedTownNPCType == 0)
-                    {
-                        for (int i = 0; i < Main.townNPCCanSpawn.Length; i++)
-                        {
-                            if (Main.townNPCCanSpawn[i])
-                            {
-                                WorldGen.prioritizedTownNPCType = i;
-                                return;
-                            }
-                        }
-                    }
-
-
+                    };
                 });
                 cursor.EmitLdsfld(typeof(NPC).GetField(nameof(NPC.boughtCat)));
                 cursor.Index--;
@@ -378,6 +381,7 @@ namespace SeldomArchipelago
                         case NPCID.Wizard: boundNPCtype = NPCID.BoundWizard; locName = "Wizard"; NPC.savedWizard = true; break;
                         default: throw new Exception($"NPC type {npcType} unaccounted for in TransformBoundNPC");
                     }
+                    if (!archipelagoSystem.world.randomizedNPCs.Contains(npcType)) return npcType;
                     archipelagoSystem.QueueLocationClient(locName);
                     if (archipelagoSystem.world.npcLocTypeToNpcItemType is not null && archipelagoSystem.world.npcLocTypeToNpcItemType.TryGetValue(npcType, out int newNpcType))
                         return newNpcType;

@@ -89,7 +89,7 @@ namespace SeldomArchipelago.NPCs
         {
             var texture = GetTexture();
             drawColor = NPC.GetNPCColorTintedByBuffs(drawColor);
-            drawColor.A = 5;
+            drawColor.A = 50;
             float num35 = 0f;
             float num36 = Main.NPCAddHeight(NPC);
             Vector2 halfSize = new Vector2(texture.Width() / 2, texture.Height() / Main.npcFrameCount[ghostType] / 2);
@@ -97,7 +97,7 @@ namespace SeldomArchipelago.NPCs
             Rectangle frame6 = texture.Frame(1, 25, 0, 0);
             float x = NPC.position.X - screenPos.X + (float)(NPC.width / 2) - (float)texture.Width() * NPC.scale / 2f + halfSize.X * NPC.scale;
             float y = NPC.position.Y - screenPos.Y + (float)NPC.height - (float)texture.Height() * NPC.scale / (float)Main.npcFrameCount[ghostType] + 4f + halfSize.Y * NPC.scale + num36 + num35 + NPC.gfxOffY;
-            spriteBatch.Draw(texture.Value, new Vector2(x, y), frame6, NPC.GetAlpha(drawColor), 0f, halfSize, NPC.rotation, spriteEffects, 0f);
+            spriteBatch.Draw(texture.Value, new Vector2(x, y), frame6, NPC.GetAlpha(drawColor), NPC.rotation, halfSize, NPC.scale, spriteEffects, 0f);
 
             return false;
         }

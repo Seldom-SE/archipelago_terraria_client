@@ -25,6 +25,7 @@ using Terraria.Social;
 using Terraria.WorldBuilding;
 using SeldomArchipelago.HardmodeItem;
 using System.Linq;
+using SeldomArchipelago.NPCs;
 
 namespace SeldomArchipelago.Systems
 {
@@ -48,6 +49,8 @@ namespace SeldomArchipelago.Systems
             // playing Hardcore and wants to receive all the rewards again when making a new player/
             // world.
             public List<int> receivedRewards = new List<int>();
+            // All NPCs that have been randomized.
+            public ImmutableHashSet<int> randomizedNPCs = null;
             // Set of town NPC locations checked in this world.
             public HashSet<int> checkedNPCs = null;
             // Set of town NPC items received in this world.
@@ -56,7 +59,7 @@ namespace SeldomArchipelago.Systems
             // If this is the case, we can transform the ghost/bound npc into the item npc as soon as it is activated, for both expediency and cuteness.
             public Dictionary<int, int> npcLocTypeToNpcItemType = null;
 
-            public bool NPCRandoActive() => receivedNPCs is not null;
+            public bool NPCRandoActive() => randomizedNPCs is not null;
         }
 
         // Data that's reset between Archipelago sessions
@@ -95,6 +98,7 @@ namespace SeldomArchipelago.Systems
             world.receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
             if (!world.NPCRandoActive())
             {
+                world.randomizedNPCs = tag.ContainsKey("ApRandomizedNPCs") ? tag.Get<List<int>>("ApRandomizedNPCs").ToImmutableHashSet() : null;
                 world.checkedNPCs = tag.ContainsKey("ApCheckedNPCs") ? tag.Get<List<int>>("ApCheckedNPCs").ToHashSet() : null;
                 world.receivedNPCs = tag.ContainsKey("ApReceivedNPCs") ? tag.Get<List<int>>("ApReceivedNPCs").ToHashSet() : null;
             }
@@ -156,8 +160,10 @@ namespace SeldomArchipelago.Systems
                 session.deathlink.OnDeathLinkReceived += ReceiveDeathlink;
             }
 
-            if ((bool)success.SlotData["randomize_npcs"])
+            string[] randomizedNPCnames = ((JArray)success.SlotData["randomize_npcs"]).ToObject<string[]>();
+            if (randomizedNPCnames.Length > 0)
             {
+                world.randomizedNPCs = (from name in randomizedNPCnames select npcNameToID[name]).ToImmutableHashSet();
                 world.checkedNPCs = session.session.DataStorage[Scope.Slot, "CheckedNPCs"].To<HashSet<int>>();
                 if (world.checkedNPCs is null) world.checkedNPCs = new();
                 world.receivedNPCs = new();
@@ -496,6 +502,17 @@ namespace SeldomArchipelago.Systems
                 return;
             }
 
+            if (world.NPCRandoActive() && !world.receivedNPCs.Contains(NPCID.Guide))
+            {
+                int guideIndex = NPC.FindFirstNPC(NPCID.Guide);
+                if (guideIndex != -1)
+                {
+                    Main.npc[guideIndex].Transform(ModContent.GetInstance<GhostNPC>().Type);
+                    GhostNPC ghost = Main.npc[guideIndex].ModNPC as GhostNPC;
+                    ghost.GhostType = NPCID.Guide;
+                }
+            }
+
             var unqueue = new List<int>();
             for (var i = 0; i < session.locationQueue.Count; i++)
             {
@@ -554,6 +571,7 @@ namespace SeldomArchipelago.Systems
             tag["ApReceivedRewards"] = world.receivedRewards;
             if (world.NPCRandoActive())
             {
+                tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
                 tag["ApCheckedNPCs"] = world.checkedNPCs.ToList();
                 tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
             }
