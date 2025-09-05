@@ -352,11 +352,18 @@ namespace SeldomArchipelago
                 cursor.Index--;
             };
 
-            // Allow Bound NPCs/Old Man to spawn until checked
+            // Bypass Spawn Blocking for Santa & Bound NPCs
             Terraria.IL_NPC.AI_007_TownEntities += il =>
             {
                 var cursor = new ILCursor(il);
 
+                // Santa
+                cursor.GotoNext(i => i.MatchLdsfld(typeof(Main).GetField(nameof(Main.xMas))));
+                cursor.Index++;
+                cursor.EmitPop();
+                cursor.EmitLdcI4(1);
+
+                // Bound NPCs
                 void SkipInstruction(string varName)
                 {
                     var label = il.DefineLabel();
