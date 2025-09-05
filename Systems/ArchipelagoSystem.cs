@@ -53,6 +53,8 @@ namespace SeldomArchipelago.Systems
             public ImmutableHashSet<int> randomizedNPCs = null;
             // Set of town NPC items received in this world.
             public HashSet<int> receivedNPCs = null;
+            // Contains all ghosts that are available to spawn.
+            public Queue<int> ghostNPCqueue = new();
             // Dict of loc npc ids to item npc ids, if a player's npc item happens to be placed in one of their npc locations.
             // If this is the case, we can transform the ghost/bound npc into the item npc as soon as it is activated, for both expediency and cuteness.
             public Dictionary<int, int> npcLocTypeToNpcItemType = null;
@@ -82,8 +84,6 @@ namespace SeldomArchipelago.Systems
         public WorldState world = new();
         public SessionState session;
 
-        // Contains all ghosts that are available to spawn.
-        public Queue<int> ghostNPCqueue = new();
         // Contains ghosts that require special housing conditions to spawn.
         public readonly static ImmutableHashSet<int> specialSpawnGhosts =
         [
@@ -581,7 +581,6 @@ namespace SeldomArchipelago.Systems
         public override void OnWorldUnload()
         {
             world = new();
-            ghostNPCqueue = new();
             Reset();
         }
 

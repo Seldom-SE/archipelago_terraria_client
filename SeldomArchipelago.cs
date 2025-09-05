@@ -89,12 +89,12 @@ namespace SeldomArchipelago
                 cursor.EmitDelegate((IEntitySource source, int x, int y, int type, int mysteryNumber, float _, float _, float _, float _, int target) => // whatever floats ur boat, dude
                 {
                     int itemsChecked = 0;
-                    while (itemsChecked < archipelagoSystem.ghostNPCqueue.Count)
+                    while (itemsChecked < archipelagoSystem.world.ghostNPCqueue.Count)
                     {
-                        int ghostID = archipelagoSystem.ghostNPCqueue.Dequeue();
+                        int ghostID = archipelagoSystem.world.ghostNPCqueue.Dequeue();
                         if (type != ghostID && ArchipelagoSystem.specialSpawnGhosts.Contains(ghostID))
                         {
-                            archipelagoSystem.ghostNPCqueue.Enqueue(ghostID);
+                            archipelagoSystem.world.ghostNPCqueue.Enqueue(ghostID);
                         }
                         else
                         {
@@ -320,8 +320,8 @@ namespace SeldomArchipelago
                         // Enqueue Ghosts
                         foreach (int type in validGhostTypes)
                         {
-                            if (!archipelagoSystem.ghostNPCqueue.Contains(type) && !archipelagoSystem.LocationCollected(ArchipelagoSystem.npcIDtoName[type]))
-                                archipelagoSystem.ghostNPCqueue.Enqueue(type);
+                            if (!archipelagoSystem.world.ghostNPCqueue.Contains(type) && !archipelagoSystem.LocationCollected(ArchipelagoSystem.npcIDtoName[type]))
+                                archipelagoSystem.world.ghostNPCqueue.Enqueue(type);
                         }
                     }
                     // Set prioritizedNPC if Vanilla NPC can spawn
@@ -334,13 +334,13 @@ namespace SeldomArchipelago
                         }
                     }
                     // Set prioritizedNPC if Ghost NPC is next
-                    int firstGhost = archipelagoSystem.ghostNPCqueue.FirstOrDefault();
-                    if (archipelagoSystem.ghostNPCqueue.Count == 1 && ArchipelagoSystem.specialSpawnGhosts.Contains(firstGhost))
+                    int firstGhost = archipelagoSystem.world.ghostNPCqueue.FirstOrDefault();
+                    if (archipelagoSystem.world.ghostNPCqueue.Count == 1 && ArchipelagoSystem.specialSpawnGhosts.Contains(firstGhost))
                     {
                         Main.townNPCCanSpawn[firstGhost] = true;
                         WorldGen.prioritizedTownNPCType = firstGhost;
                     }
-                    else if (archipelagoSystem.ghostNPCqueue.Count > 0)
+                    else if (archipelagoSystem.world.ghostNPCqueue.Count > 0)
                     {
                         // For regular NPCs the value we assign here is arbitrary, it just needs to be set to a town npc's type so SpawnNPC can trigger at all
                         Main.townNPCCanSpawn[NPCID.SantaClaus] = true;
