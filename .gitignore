@@ -3,8 +3,7 @@
 /.vs
 /ref
 /Backup
-/UpgradeLog.htm
-lib/CalamityMod.dll
+/UpgradeLog.html
 *.csproj
 /lib/CalamityMod.dll
 /.idea
