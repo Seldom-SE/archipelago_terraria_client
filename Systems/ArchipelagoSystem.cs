@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using SeldomArchipelago.Players;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Threading.Tasks;
 using Terraria;
@@ -23,13 +24,15 @@ using Terraria.ModLoader.IO;
 using Terraria.Social;
 using Terraria.WorldBuilding;
 using SeldomArchipelago.HardmodeItem;
+using System.Linq;
+using SeldomArchipelago.NPCs;
 
 namespace SeldomArchipelago.Systems
 {
-    public class ArchipelagoSystem : ModSystem
+    class ArchipelagoSystem : ModSystem
     {
         // Data that's reset between worlds
-        class WorldState
+        public class WorldState
         {
             // Achievements can be completed while loading into the world, but those complete before
             // `ArchipelagoPlayer::OnEnterWorld`, where achievements are reset, is run. So, this
@@ -46,10 +49,21 @@ namespace SeldomArchipelago.Systems
             // playing Hardcore and wants to receive all the rewards again when making a new player/
             // world.
             public List<int> receivedRewards = new List<int>();
+            // All NPCs that have been randomized.
+            public ImmutableHashSet<int> randomizedNPCs = null;
+            // Set of town NPC items received in this world.
+            public HashSet<int> receivedNPCs = null;
+            // Contains all ghosts that are available to spawn.
+            public Queue<int> ghostNPCqueue = new();
+            // Dict of loc npc ids to item npc ids, if a player's npc item happens to be placed in one of their npc locations.
+            // If this is the case, we can transform the ghost/bound npc into the item npc as soon as it is activated, for both expediency and cuteness.
+            public Dictionary<int, int> npcLocTypeToNpcItemType = null;
+
+            public bool NPCRandoActive() => randomizedNPCs is not null;
         }
 
         // Data that's reset between Archipelago sessions
-        class SessionState
+        public class SessionState
         {
             // List of locations that are currently being sent
             public List<Task<Dictionary<long, ScoutedItemInfo>>> locationQueue = new List<Task<Dictionary<long, ScoutedItemInfo>>>();
@@ -67,13 +81,24 @@ namespace SeldomArchipelago.Systems
             public int slot;
         }
 
-        WorldState world = new();
-        SessionState session;
+        public WorldState world = new();
+        public SessionState session;
+
+        // Contains ghosts that require special housing conditions to spawn.
+        public readonly static ImmutableHashSet<int> specialSpawnGhosts =
+        [
+            NPCID.Truffle
+        ];
 
         public override void LoadWorldData(TagCompound tag)
         {
             world.collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
             world.receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
+            if (!world.NPCRandoActive())
+            {
+                world.randomizedNPCs = tag.ContainsKey("ApRandomizedNPCs") ? tag.Get<List<int>>("ApRandomizedNPCs").ToImmutableHashSet() : null;
+                world.receivedNPCs = tag.ContainsKey("ApReceivedNPCs") ? tag.Get<List<int>>("ApReceivedNPCs").ToHashSet() : null;
+            }
         }
 
         public override void OnWorldLoad()
@@ -132,11 +157,46 @@ namespace SeldomArchipelago.Systems
                 session.deathlink.OnDeathLinkReceived += ReceiveDeathlink;
             }
 
-            session.slot = success.Slot;
+            string[] randomizedNPCnames = ((JArray)success.SlotData["randomize_npcs"]).ToObject<string[]>();
+            if (randomizedNPCnames.Length > 0)
+            {
+                world.randomizedNPCs = (from name in randomizedNPCnames select npcNameToID[name]).ToImmutableHashSet();
+                world.receivedNPCs = new();
+                string[] allNPCnames = npcNameToID.Keys.ToArray();
+                var locIDtoNPCname = new Dictionary<long, string>();
+                foreach (string loc in allNPCnames)
+                {
+                    locIDtoNPCname[session.session.Locations.GetLocationIdFromName("Terraria", loc)] = loc;
+                }
+                if (locIDtoNPCname.ContainsKey(-1))
+                {
+                    throw new Exception($"Some retrieved NPC locations turned up -1 ids.");
+                }
+                var task = session.session.Locations.ScoutLocationsAsync(locIDtoNPCname.Keys.ToArray());
+                if (task.Wait(1000))
+                {
+                    world.npcLocTypeToNpcItemType = new();
+                    int playerID = success.Slot;
+                    var npcLocDict = task.Result;
+                    foreach(long key in npcLocDict.Keys)
+                        {
+                            ItemInfo itemInfo = npcLocDict[key];
+                            if (itemInfo.Player.Slot == playerID && allNPCnames.Contains(itemInfo.ItemName))
+                            {
+                                int npcType = npcNameToID[locIDtoNPCname[key]];
+                                world.npcLocTypeToNpcItemType[npcType] = npcNameToID[itemInfo.ItemName];
+                            }
+                        }
+                }
+                
+            }
+
+                session.slot = success.Slot;
 
             foreach (var location in world.locationBacklog) QueueLocation(location);
             world.locationBacklog.Clear();
         }
+        public bool LocationCollected(string loc) => session.collectedLocations.Contains(loc) || world.locationBacklog.Contains(loc);
 
         public string[] flags = { "Post-King Slime", "Post-Desert Scourge", "Post-Giant Clam", "Post-Eye of Cthulhu", "Post-Acid Rain Tier 1", "Post-Crabulon", "Post-Evil Boss", "Post-Old One's Army Tier 1", "Post-Goblin Army", "Post-Queen Bee", "Post-The Hive Mind", "Post-The Perforators", "Post-Skeletron", "Post-Deerclops", "Post-The Slime God", "Hardmode", "Post-Dreadnautilus", "Post-Hardmode Giant Clam", "Post-Pirate Invasion", "Post-Queen Slime", "Post-Aquatic Scourge", "Post-Cragmaw Mire", "Post-Acid Rain Tier 2", "Post-The Twins", "Post-Old One's Army Tier 2", "Post-Brimstone Elemental", "Post-The Destroyer", "Post-Cryogen", "Post-Skeletron Prime", "Post-Calamitas Clone", "Post-Plantera", "Post-Great Sand Shark", "Post-Leviathan and Anahita", "Post-Astrum Aureus", "Post-Golem", "Post-Old One's Army Tier 3", "Post-Martian Madness", "Post-The Plaguebringer Goliath", "Post-Duke Fishron", "Post-Mourning Wood", "Post-Pumpking", "Post-Everscream", "Post-Santa-NK1", "Post-Ice Queen", "Post-Frost Legion", "Post-Ravager", "Post-Empress of Light", "Post-Lunatic Cultist", "Post-Astrum Deus", "Post-Lunar Events", "Post-Moon Lord", "Post-Profaned Guardians", "Post-The Dragonfolly", "Post-Providence, the Profaned Goddess", "Post-Storm Weaver", "Post-Ceaseless Void", "Post-Signus, Envoy of the Devourer", "Post-Polterghast", "Post-Mauler", "Post-Nuclear Terror", "Post-The Old Duke", "Post-The Devourer of Gods", "Post-Yharon, Dragon of Rebirth", "Post-Exo Mechs", "Post-Supreme Witch, Calamitas", "Post-Primordial Wyrm", "Post-Boss Rush" };
 
@@ -174,9 +234,43 @@ namespace SeldomArchipelago.Systems
             "Post-Moon Lord" => NPC.downedMoonlord,
             _ => ModContent.GetInstance<CalamitySystem>()?.CheckCalamityFlag(flag) ?? false,
         };
-
+        public static Dictionary<string, int> npcNameToID = new()
+            {
+                {"Guide", NPCID.Guide },
+                {"Merchant", NPCID.Merchant },
+                {"Nurse", NPCID.Nurse },
+                {"Demolitionist", NPCID.Demolitionist },
+                {"Dye Trader", NPCID.DyeTrader },
+                {"Angler", NPCID.Angler },
+                {"Zoologist", NPCID.BestiaryGirl },
+                {"Dryad", NPCID.Dryad },
+                {"Painter", NPCID.Painter },
+                {"Golfer", NPCID.Golfer },
+                {"Arms Dealer", NPCID.ArmsDealer },
+                {"Tavernkeep", NPCID.DD2Bartender },
+                {"Stylist", NPCID.Stylist },
+                {"Goblin Tinkerer", NPCID.GoblinTinkerer },
+                {"Witch Doctor", NPCID.WitchDoctor },
+                {"Clothier", NPCID.Clothier },
+                {"Mechanic", NPCID.Mechanic },
+                {"Party Girl", NPCID.PartyGirl },
+                {"Wizard", NPCID.Wizard },
+                {"Tax Collector", NPCID.TaxCollector },
+                {"Truffle", NPCID.Truffle },
+                {"Pirate", NPCID.Pirate },
+                {"Steampunker", NPCID.Steampunker },
+                {"Cyborg", NPCID.Cyborg },
+                {"Santa Claus", NPCID.SantaClaus },
+                {"Princess", NPCID.Princess },
+            };
+        public static Dictionary<int, string> npcIDtoName = npcNameToID.ToDictionary(x => x.Value, x => x.Key);
         public void Collect(string item)
         {
+            if (npcNameToID.ContainsKey(item))
+            {
+                world.receivedNPCs.Add(npcNameToID[item]);
+                return;
+            }
             switch (item)
             {
                 case "Reward: Torch God's Favor": GiveItem(ItemID.TorchGodsFavor); break;
@@ -392,7 +486,6 @@ namespace SeldomArchipelago.Systems
                 default: Chat($"Received unknown item: {item}"); break;
             }
         }
-
         public override void PostUpdateWorld()
         {
             if (session == null) return;
@@ -402,6 +495,17 @@ namespace SeldomArchipelago.Systems
                 Chat("Disconnected from Archipelago. Reload the world to reconnect.");
                 session = null;
                 return;
+            }
+
+            if (world.NPCRandoActive() && !world.receivedNPCs.Contains(NPCID.Guide))
+            {
+                int guideIndex = NPC.FindFirstNPC(NPCID.Guide);
+                if (guideIndex != -1)
+                {
+                    Main.npc[guideIndex].Transform(ModContent.GetInstance<GhostNPC>().Type);
+                    GhostNPC ghost = Main.npc[guideIndex].ModNPC as GhostNPC;
+                    ghost.GhostType = NPCID.Guide;
+                }
             }
 
             var unqueue = new List<int>();
@@ -454,8 +558,16 @@ namespace SeldomArchipelago.Systems
         public override void SaveWorldData(TagCompound tag)
         {
             tag["ApCollectedItems"] = world.collectedItems;
-            if (session != null) session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
+            if (session != null)
+            {
+                session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
+            }
             tag["ApReceivedRewards"] = world.receivedRewards;
+            if (world.NPCRandoActive())
+            {
+                tag["ApRandomizedNPCs"] = world.randomizedNPCs.ToList();
+                tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
+            }
         }
 
         public void Reset()

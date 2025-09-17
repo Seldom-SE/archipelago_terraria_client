@@ -3,8 +3,11 @@
   <Import Project="..\tModLoader.targets" />
   <PropertyGroup>
     <AssemblyName>SeldomArchipelago</AssemblyName>
+	<TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="tModLoader.CodeAssist" Version="0.1.*" />
   </ItemGroup>
