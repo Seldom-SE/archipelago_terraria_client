@@ -282,16 +282,7 @@ namespace SeldomArchipelago.Systems
                 case "Post-Queen Bee": BossFlag(ref NPC.downedQueenBee, NPCID.QueenBee); break;
                 case "Post-Skeletron": BossFlag(ref NPC.downedBoss3, NPCID.SkeletronHead); break;
                 case "Post-Deerclops": BossFlag(ref NPC.downedDeerclops, NPCID.Deerclops); break;
-                case "Hardmode":
-                    if (ModContent.GetInstance<Config.Config>().hardmodeAsItem)
-                    {
-                        GiveItem(ModContent.ItemType<HardmodeStarter>());
-                    }
-                    else
-                    {
-                        ActivateHardmode();
-                    }
-                    break;
+                case "Hardmode": ActivateHardmode(); break;
                 case "Post-Pirate Invasion": NPC.downedPirates = true; break;
                 case "Post-Queen Slime": BossFlag(ref NPC.downedQueenSlime, NPCID.QueenSlimeBoss); break;
                 case "Post-The Twins":
@@ -484,6 +475,7 @@ namespace SeldomArchipelago.Systems
                 case "Reward: Defender Medal": GiveItem(ItemID.DefenderMedal); break;
                 case null: break;
                 default: Chat($"Received unknown item: {item}"); break;
+                    
             }
         }
         public override void PostUpdateWorld()
