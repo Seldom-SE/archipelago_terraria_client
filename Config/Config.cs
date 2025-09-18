@@ -38,7 +38,6 @@ namespace SeldomArchipelago.Config
 
         [Label("String Array Test")]
         [DefaultValue(null)]
-        [ReloadRequired]
         public List<string> arrayTest;
 
         [OnDeserialized]
