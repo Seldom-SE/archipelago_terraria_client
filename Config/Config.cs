@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 using Terraria.ModLoader.Config;
 
 namespace SeldomArchipelago.Config
@@ -33,5 +35,19 @@ namespace SeldomArchipelago.Config
         [Label("Receive Hardmode As Item")]
         [DefaultValue(false)]
         public bool hardmodeAsItem;
+
+        [Label("String Array Test")]
+        [DefaultValue(null)]
+        [ReloadRequired]
+        public List<string> arrayTest;
+
+        [OnDeserialized]
+        internal void CheckItems(StreamingContext _)
+        {
+            if (arrayTest.Contains("error"))
+            {
+                arrayTest.Remove("error");
+            }
+        }
     }
 }

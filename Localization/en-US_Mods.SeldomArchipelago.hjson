@@ -32,6 +32,11 @@ Configs: {
 			Label: Receive Hardmode As Item
 			Tooltip: ""
 		}
+
+		arrayTest: {
+			Label: String Array Test
+			Tooltip: ""
+		}
 	}
 }
 
