@@ -279,7 +279,9 @@ namespace SeldomArchipelago.Systems
                     FlagStarter flagStarterMod = flagStarter.ModItem as FlagStarter;
                     flagStarterMod.FlagName = item;
                     player.QuickSpawnItem(player.GetSource_GiftOrReward(), flagStarter, 1);
+                    ChatHelper.SendChatMessageFromClient(new ChatMessage($"Flag Starter for {item} received!"));
                 });
+                return;
             }
             switch (item)
             {
