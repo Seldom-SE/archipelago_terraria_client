@@ -49,7 +49,7 @@ namespace SeldomArchipelago.FlagItem
         {
             Item.CloneDefaults(ItemID.DemonHeart);
         }
-
+        public override bool CanStack(Item source) => false;
         public override bool? UseItem(Player player)
         {
             ModContent.GetInstance<ArchipelagoSystem>().Collect(flagName, true);

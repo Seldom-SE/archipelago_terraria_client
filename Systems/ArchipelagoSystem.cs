@@ -276,6 +276,7 @@ namespace SeldomArchipelago.Systems
                 GiveItem(null, (Player player) =>
                 {
                     Item flagStarter = new Item(ModContent.ItemType<FlagStarter>());
+                    flagStarter.SetNameOverride($"{item} Starter");
                     FlagStarter flagStarterMod = flagStarter.ModItem as FlagStarter;
                     flagStarterMod.FlagName = item;
                     player.QuickSpawnItem(player.GetSource_GiftOrReward(), flagStarter, 1);
