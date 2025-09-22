@@ -37,6 +37,11 @@ Configs: {
 			Label: String Array Test
 			Tooltip: ""
 		}
+
+		manualFlags: {
+			Label: Receive Flag As Item
+			Tooltip: ""
+		}
 	}
 }
 
@@ -79,6 +84,11 @@ NPCs: {
 Items: {
 	HardmodeStarter: {
 		DisplayName: Hardmode Starter
+		Tooltip: ""
+	}
+
+	FlagStarter: {
+		DisplayName: Flag Starter
 		Tooltip: ""
 	}
 }

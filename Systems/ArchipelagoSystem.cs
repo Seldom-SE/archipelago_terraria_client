@@ -23,7 +23,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.Social;
 using Terraria.WorldBuilding;
-using SeldomArchipelago.HardmodeItem;
+using SeldomArchipelago.FlagItem;
 using System.Linq;
 using SeldomArchipelago.NPCs;
 
@@ -264,12 +264,22 @@ namespace SeldomArchipelago.Systems
                 {"Princess", NPCID.Princess },
             };
         public static Dictionary<int, string> npcIDtoName = npcNameToID.ToDictionary(x => x.Value, x => x.Key);
-        public void Collect(string item)
+        public void Collect(string item, bool bypassStarterConfigCheck = false)
         {
             if (npcNameToID.ContainsKey(item))
             {
                 world.receivedNPCs.Add(npcNameToID[item]);
                 return;
+            }
+            if (!bypassStarterConfigCheck && ModContent.GetInstance<Config.Config>().manualFlags.Contains(item))
+            {
+                GiveItem(null, (Player player) =>
+                {
+                    Item flagStarter = new Item(ModContent.ItemType<FlagStarter>());
+                    FlagStarter flagStarterMod = flagStarter.ModItem as FlagStarter;
+                    flagStarterMod.FlagName = item;
+                    player.QuickSpawnItem(player.GetSource_GiftOrReward(), flagStarter, 1);
+                });
             }
             switch (item)
             {
@@ -769,6 +779,7 @@ namespace SeldomArchipelago.Systems
         }
         public static void ActivateHardmode()
         {
+            if (Main.hardMode) return;
             ArchipelagoSystem.BossFlag(NPCID.WallofFlesh);
             WorldGen.StartHardmode();
         }

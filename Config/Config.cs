@@ -37,12 +37,12 @@ namespace SeldomArchipelago.Config
 
         [Label("Receive Flag As Item")]
         [DefaultValue(null)]
-        public List<string> arrayTest;
+        public List<string> manualFlags;
 
         [OnDeserialized]
         internal void CheckItems(StreamingContext _)
         {
-            if (arrayTest is null) return;
+            if (manualFlags is null) return;
             ImmutableHashSet<string> postItems = [
                 "Post-King Slime",
                 "Post-Eye of Cthulhu",
@@ -112,9 +112,9 @@ namespace SeldomArchipelago.Config
                 "Post-Boss Rush",
             ];
             int counter = 0;
-            while (counter < arrayTest.Count)
+            while (counter < manualFlags.Count)
             {
-                string item = arrayTest[counter];
+                string item = manualFlags[counter];
                 if (postItems.Contains(item))
                 {
                     counter++;
@@ -123,11 +123,11 @@ namespace SeldomArchipelago.Config
                 string? assumedItem = postItems.Where(x => x.Contains(item)).FirstOrDefault();
                 if (assumedItem is not null)
                 {
-                    arrayTest[counter] = assumedItem;
+                    manualFlags[counter] = assumedItem;
                     counter++;
                     continue;
                 }
-                arrayTest.RemoveAt(counter);
+                manualFlags.RemoveAt(counter);
             }
         }
     }
