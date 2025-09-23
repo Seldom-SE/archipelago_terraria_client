@@ -63,8 +63,9 @@ namespace SeldomArchipelago.FlagItem
         public override bool CanStack(Item source) => false;
         public override bool? UseItem(Player player)
         {
-            if (flagName is null) return true;
-            ModContent.GetInstance<ArchipelagoSystem>().Collect(flagName, true);
+            var system = ModContent.GetInstance<ArchipelagoSystem>();
+            if (flagName is null || system.CheckFlag(flagName)) return true;
+            system.Collect(flagName, true);
             return true;
         }
         public override void UpdateInventory(Player player)
