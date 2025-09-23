@@ -28,18 +28,17 @@ namespace SeldomArchipelago.FlagItem
             get { return flagName; }
             set
             {
-                if (flagName is null)
+                flagName = value;
+                if (value is null)
                 {
-                    flagName = value;
-                    Item.SetNameOverride($"{value} Starter");
-                    using (SHA256 hash = SHA256.Create())
-                    {
-                        colorHash = hash.ComputeHash(Encoding.UTF8.GetBytes(value));
-                    }
+                    Item.SetNameOverride($"Inert Starter");
+                    colorHash = [0, 20, 20, 20];
+                    return;
                 }
-                else
+                Item.SetNameOverride($"{value} Starter");
+                using (SHA256 hash = SHA256.Create())
                 {
-                    throw new Exception($"Tried to set pre-existing FlagStarter item of type {flagName} to {value}");
+                    colorHash = hash.ComputeHash(Encoding.UTF8.GetBytes(value));
                 }
             }
         }
@@ -50,6 +49,13 @@ namespace SeldomArchipelago.FlagItem
             lightColor.B = colorHash[3];
             return lightColor;
         }
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            if (flagName == null)
+            {
+                tooltips.Add(new TooltipLine(Mod, "Tooltip0", "\"Missed its window\""));
+            }
+        }
         public override void SetDefaults()
         {
             Item.CloneDefaults(ItemID.DemonHeart);
@@ -57,8 +63,16 @@ namespace SeldomArchipelago.FlagItem
         public override bool CanStack(Item source) => false;
         public override bool? UseItem(Player player)
         {
+            if (flagName is null) return true;
             ModContent.GetInstance<ArchipelagoSystem>().Collect(flagName, true);
             return true;
+        }
+        public override void UpdateInventory(Player player)
+        {
+            if (flagName is not null && ModContent.GetInstance<ArchipelagoSystem>().CheckFlag(flagName))
+            {
+                FlagName = null;
+            }
         }
         public override void LoadData(TagCompound tag) => FlagName = tag.GetString(nameof(flagName));
         public override void SaveData(TagCompound tag) => tag[nameof(flagName)] = flagName;

@@ -26,6 +26,8 @@ using Terraria.WorldBuilding;
 using SeldomArchipelago.FlagItem;
 using System.Linq;
 using SeldomArchipelago.NPCs;
+using System.Diagnostics.Metrics;
+using Terraria.GameContent.UI.States;
 
 namespace SeldomArchipelago.Systems
 {
@@ -49,6 +51,8 @@ namespace SeldomArchipelago.Systems
             // playing Hardcore and wants to receive all the rewards again when making a new player/
             // world.
             public List<int> receivedRewards = new List<int>();
+            // List of flags that have been received but not triggered
+            public List<string> suspendedFlags = new List<string>();
             // All NPCs that have been randomized.
             public ImmutableHashSet<int> randomizedNPCs = null;
             // Set of town NPC items received in this world.
@@ -94,6 +98,7 @@ namespace SeldomArchipelago.Systems
         {
             world.collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
             world.receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
+            world.suspendedFlags = tag.ContainsKey("ApSuspendedFlags") ? tag.Get<List<string>>("ApSuspendedFlags") : new();
             if (!world.NPCRandoActive())
             {
                 world.randomizedNPCs = tag.ContainsKey("ApRandomizedNPCs") ? tag.Get<List<int>>("ApRandomizedNPCs").ToImmutableHashSet() : null;
@@ -198,7 +203,28 @@ namespace SeldomArchipelago.Systems
         }
         public bool LocationCollected(string loc) => session.collectedLocations.Contains(loc) || world.locationBacklog.Contains(loc);
 
-        public string[] flags = { "Post-King Slime", "Post-Desert Scourge", "Post-Giant Clam", "Post-Eye of Cthulhu", "Post-Acid Rain Tier 1", "Post-Crabulon", "Post-Evil Boss", "Post-Old One's Army Tier 1", "Post-Goblin Army", "Post-Queen Bee", "Post-The Hive Mind", "Post-The Perforators", "Post-Skeletron", "Post-Deerclops", "Post-The Slime God", "Hardmode", "Post-Dreadnautilus", "Post-Hardmode Giant Clam", "Post-Pirate Invasion", "Post-Queen Slime", "Post-Aquatic Scourge", "Post-Cragmaw Mire", "Post-Acid Rain Tier 2", "Post-The Twins", "Post-Old One's Army Tier 2", "Post-Brimstone Elemental", "Post-The Destroyer", "Post-Cryogen", "Post-Skeletron Prime", "Post-Calamitas Clone", "Post-Plantera", "Post-Great Sand Shark", "Post-Leviathan and Anahita", "Post-Astrum Aureus", "Post-Golem", "Post-Old One's Army Tier 3", "Post-Martian Madness", "Post-The Plaguebringer Goliath", "Post-Duke Fishron", "Post-Mourning Wood", "Post-Pumpking", "Post-Everscream", "Post-Santa-NK1", "Post-Ice Queen", "Post-Frost Legion", "Post-Ravager", "Post-Empress of Light", "Post-Lunatic Cultist", "Post-Astrum Deus", "Post-Lunar Events", "Post-Moon Lord", "Post-Profaned Guardians", "Post-The Dragonfolly", "Post-Providence, the Profaned Goddess", "Post-Storm Weaver", "Post-Ceaseless Void", "Post-Signus, Envoy of the Devourer", "Post-Polterghast", "Post-Mauler", "Post-Nuclear Terror", "Post-The Old Duke", "Post-The Devourer of Gods", "Post-Yharon, Dragon of Rebirth", "Post-Exo Mechs", "Post-Supreme Witch, Calamitas", "Post-Primordial Wyrm", "Post-Boss Rush" };
+        public static string[] flags = { "Post-King Slime", "Post-Desert Scourge", "Post-Giant Clam", "Post-Eye of Cthulhu", "Post-Acid Rain Tier 1", "Post-Crabulon", "Post-Evil Boss", "Post-Old One's Army Tier 1", "Post-Goblin Army", "Post-Queen Bee", "Post-The Hive Mind", "Post-The Perforators", "Post-Skeletron", "Post-Deerclops", "Post-The Slime God", "Hardmode", "Post-Dreadnautilus", "Post-Hardmode Giant Clam", "Post-Pirate Invasion", "Post-Queen Slime", "Post-Aquatic Scourge", "Post-Cragmaw Mire", "Post-Acid Rain Tier 2", "Post-The Twins", "Post-Old One's Army Tier 2", "Post-Brimstone Elemental", "Post-The Destroyer", "Post-Cryogen", "Post-Skeletron Prime", "Post-Calamitas Clone", "Post-Plantera", "Post-Great Sand Shark", "Post-Leviathan and Anahita", "Post-Astrum Aureus", "Post-Golem", "Post-Old One's Army Tier 3", "Post-Martian Madness", "Post-The Plaguebringer Goliath", "Post-Duke Fishron", "Post-Mourning Wood", "Post-Pumpking", "Post-Everscream", "Post-Santa-NK1", "Post-Ice Queen", "Post-Frost Legion", "Post-Ravager", "Post-Empress of Light", "Post-Lunatic Cultist", "Post-Astrum Deus", "Post-Lunar Events", "Post-Moon Lord", "Post-Profaned Guardians", "Post-The Dragonfolly", "Post-Providence, the Profaned Goddess", "Post-Storm Weaver", "Post-Ceaseless Void", "Post-Signus, Envoy of the Devourer", "Post-Polterghast", "Post-Mauler", "Post-Nuclear Terror", "Post-The Old Duke", "Post-The Devourer of Gods", "Post-Yharon, Dragon of Rebirth", "Post-Exo Mechs", "Post-Supreme Witch, Calamitas", "Post-Primordial Wyrm", "Post-Boss Rush" };
+
+        public static bool FindFlag(string flag, out string fuzzy)
+        {
+            fuzzy = null;
+            if (flags.Contains(flag))
+            {
+                return true;
+            }
+            else
+            {
+                string lowerItem = flag.ToLower();
+                int assumedItemIndex = Array.FindIndex(flags, x => x.ToLower().Contains(lowerItem));
+                if (assumedItemIndex > -1)
+                {
+                    fuzzy = flags[assumedItemIndex];
+                    return true;
+                }
+                return false;
+
+            }
+        }
 
         public bool CheckFlag(string flag) => flag switch
         {
@@ -279,9 +305,13 @@ namespace SeldomArchipelago.Systems
                     FlagStarter flagStarterMod = flagStarter.ModItem as FlagStarter;
                     flagStarterMod.FlagName = item;
                     player.QuickSpawnItem(player.GetSource_GiftOrReward(), flagStarter, 1);
-                    ChatHelper.SendChatMessageFromClient(new ChatMessage($"Flag Starter for {item} received!"));
+                    Main.NewText($"Flag Starter for {item} received! If you ever lose a flagstarter item, use '/apflagstart' and '/apflagstart list'.");
                 });
+                world.suspendedFlags.Add(item);
                 return;
+            } else
+            {
+                world.suspendedFlags.Remove(item);
             }
             switch (item)
             {
@@ -567,6 +597,7 @@ namespace SeldomArchipelago.Systems
                 session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
             }
             tag["ApReceivedRewards"] = world.receivedRewards;
+            tag["ApSuspendedFlags"] = world.suspendedFlags;
             if (world.NPCRandoActive())
             {
                 tag["ApRandomizedNPCs"] = world.randomizedNPCs.ToList();
