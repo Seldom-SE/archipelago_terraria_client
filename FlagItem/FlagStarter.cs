@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 using Microsoft.Xna.Framework;
 
@@ -30,7 +31,11 @@ namespace SeldomArchipelago.FlagItem
                 if (flagName is null)
                 {
                     flagName = value;
-                    colorHash = BitConverter.GetBytes(flagName.GetHashCode());
+                    Item.SetNameOverride($"{value} Starter");
+                    using (SHA256 hash = SHA256.Create())
+                    {
+                        colorHash = hash.ComputeHash(Encoding.UTF8.GetBytes(value));
+                    }
                 }
                 else
                 {

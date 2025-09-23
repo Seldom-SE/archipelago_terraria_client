@@ -43,7 +43,7 @@ namespace SeldomArchipelago.Config
         internal void CheckItems(StreamingContext _)
         {
             if (manualFlags is null) return;
-            ImmutableHashSet<string> postItems = [
+            ImmutableArray<string> postItems = [
                 "Post-King Slime",
                 "Post-Eye of Cthulhu",
                 "Post-Evil Boss",
@@ -112,22 +112,38 @@ namespace SeldomArchipelago.Config
                 "Post-Boss Rush",
             ];
             int counter = 0;
+            HashSet<string> registeredFlags = new();
+            string[] lowercasePostItems = (from x in postItems select x.ToLower()).ToArray();
+
             while (counter < manualFlags.Count)
             {
                 string item = manualFlags[counter];
-                if (postItems.Contains(item))
+
+                if (!postItems.Contains(item))
                 {
-                    counter++;
+                    string lowerItem = item.ToLower();
+                    int assumedItemIndex = System.Array.FindIndex(lowercasePostItems, x => x.Contains(lowerItem));
+                    if (assumedItemIndex > -1)
+                    {
+                        item = postItems[assumedItemIndex];
+                    }
+                    else
+                    {
+                        manualFlags.RemoveAt(counter);
+                        continue;
+                    }
+                       
+                }
+
+                if (registeredFlags.Contains(item))
+                {
+                    manualFlags.RemoveAt(counter);
                     continue;
                 }
-                string? assumedItem = postItems.Where(x => x.Contains(item)).FirstOrDefault();
-                if (assumedItem is not null)
-                {
-                    manualFlags[counter] = assumedItem;
-                    counter++;
-                    continue;
-                }
-                manualFlags.RemoveAt(counter);
+
+                manualFlags[counter] = item;
+                registeredFlags.Add(item);
+                counter++;
             }
         }
     }
