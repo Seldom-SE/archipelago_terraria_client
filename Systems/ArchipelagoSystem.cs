@@ -161,7 +161,11 @@ namespace SeldomArchipelago.Systems
             if (randomizedNPCnames.Length > 0)
             {
                 world.randomizedNPCs = (from name in randomizedNPCnames select npcNameToID[name]).ToImmutableHashSet();
-                world.receivedNPCs = new();
+                world.receivedNPCs = session.session.DataStorage[Scope.Slot, "ReceivedNPCs"].To<HashSet<int>>();
+                if (world.receivedNPCs is null)
+                {
+                    world.receivedNPCs = new();
+                }
                 string[] allNPCnames = npcNameToID.Keys.ToArray();
                 var locIDtoNPCname = new Dictionary<long, string>();
                 foreach (string loc in allNPCnames)
@@ -567,6 +571,10 @@ namespace SeldomArchipelago.Systems
             {
                 tag["ApRandomizedNPCs"] = world.randomizedNPCs.ToList();
                 tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
+                if (session != null)
+                {
+                    session.session.DataStorage[Scope.Slot, "ReceivedNPCs"] = world.receivedNPCs.ToArray();
+                }
             }
         }
 
