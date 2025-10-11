@@ -97,6 +97,7 @@ namespace SeldomArchipelago.Systems
             world.collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
             world.receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
             world.receivedNPCs = tag.ContainsKey("ApReceivedNPCs") ? tag.Get<List<int>>("ApReceivedNPCs").ToHashSet() : new();
+            world.randomizedNPCs = tag.ContainsKey("ApRandomizedNPCs") ? tag.Get<List<int>>("ApRandomizedNPCs").ToImmutableHashSet() : null;
         }
 
         public override void OnWorldLoad()
@@ -561,6 +562,10 @@ namespace SeldomArchipelago.Systems
             }
             tag["ApReceivedRewards"] = world.receivedRewards;
             tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
+            if (world.NPCRandoActive())
+            {
+                tag["ApRandomizedNPCs"] = world.randomizedNPCs.ToList();
+            }
         }
 
         public void Reset()
