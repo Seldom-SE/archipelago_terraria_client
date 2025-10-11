@@ -33,11 +33,6 @@ Configs: {
 			Tooltip: ""
 		}
 
-		arrayTest: {
-			Label: String Array Test
-			Tooltip: ""
-		}
-
 		manualFlags: {
 			Label: Receive Flag As Item
 			Tooltip: ""
