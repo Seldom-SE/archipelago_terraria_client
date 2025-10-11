@@ -55,8 +55,10 @@ namespace SeldomArchipelago.Systems
             public List<string> suspendedFlags = new List<string>();
             // All NPCs that have been randomized.
             public ImmutableHashSet<int> randomizedNPCs = null;
-            // Set of town NPC items received in this world.
-            public HashSet<int> receivedNPCs = null;
+            // Set of town NPC items received in this world. Since this is saved to the world and
+            // modded NPC IDs are not stable, the type will need to change if Calamity NPC support
+            // is added.
+            public HashSet<int> receivedNPCs = new();
             // Contains all ghosts that are available to spawn.
             public Queue<int> ghostNPCqueue = new();
             // Dict of loc npc ids to item npc ids, if a player's npc item happens to be placed in one of their npc locations.
@@ -99,11 +101,8 @@ namespace SeldomArchipelago.Systems
             world.collectedItems = tag.ContainsKey("ApCollectedItems") ? tag.Get<int>("ApCollectedItems") : 0;
             world.receivedRewards = tag.ContainsKey("ApReceivedRewards") ? tag.Get<List<int>>("ApReceivedRewards") : new();
             world.suspendedFlags = tag.ContainsKey("ApSuspendedFlags") ? tag.Get<List<string>>("ApSuspendedFlags") : new();
-            if (!world.NPCRandoActive())
-            {
-                world.randomizedNPCs = tag.ContainsKey("ApRandomizedNPCs") ? tag.Get<List<int>>("ApRandomizedNPCs").ToImmutableHashSet() : null;
-                world.receivedNPCs = tag.ContainsKey("ApReceivedNPCs") ? tag.Get<List<int>>("ApReceivedNPCs").ToHashSet() : null;
-            }
+            world.receivedNPCs = tag.ContainsKey("ApReceivedNPCs") ? tag.Get<List<int>>("ApReceivedNPCs").ToHashSet() : new();
+            world.randomizedNPCs = tag.ContainsKey("ApRandomizedNPCs") ? tag.Get<List<int>>("ApRandomizedNPCs").ToImmutableHashSet() : null;
         }
 
         public override void OnWorldLoad()
@@ -166,7 +165,6 @@ namespace SeldomArchipelago.Systems
             if (randomizedNPCnames.Length > 0)
             {
                 world.randomizedNPCs = (from name in randomizedNPCnames select npcNameToID[name]).ToImmutableHashSet();
-                world.receivedNPCs = new();
                 string[] allNPCnames = npcNameToID.Keys.ToArray();
                 var locIDtoNPCname = new Dictionary<long, string>();
                 foreach (string loc in allNPCnames)
@@ -183,20 +181,20 @@ namespace SeldomArchipelago.Systems
                     world.npcLocTypeToNpcItemType = new();
                     int playerID = success.Slot;
                     var npcLocDict = task.Result;
-                    foreach(long key in npcLocDict.Keys)
+                    foreach (long key in npcLocDict.Keys)
+                    {
+                        ItemInfo itemInfo = npcLocDict[key];
+                        if (itemInfo.Player.Slot == playerID && allNPCnames.Contains(itemInfo.ItemName))
                         {
-                            ItemInfo itemInfo = npcLocDict[key];
-                            if (itemInfo.Player.Slot == playerID && allNPCnames.Contains(itemInfo.ItemName))
-                            {
-                                int npcType = npcNameToID[locIDtoNPCname[key]];
-                                world.npcLocTypeToNpcItemType[npcType] = npcNameToID[itemInfo.ItemName];
-                            }
+                            int npcType = npcNameToID[locIDtoNPCname[key]];
+                            world.npcLocTypeToNpcItemType[npcType] = npcNameToID[itemInfo.ItemName];
                         }
+                    }
                 }
-                
+
             }
 
-                session.slot = success.Slot;
+            session.slot = success.Slot;
 
             foreach (var location in world.locationBacklog) QueueLocation(location);
             world.locationBacklog.Clear();
@@ -598,10 +596,10 @@ namespace SeldomArchipelago.Systems
             }
             tag["ApReceivedRewards"] = world.receivedRewards;
             tag["ApSuspendedFlags"] = world.suspendedFlags;
+            tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
             if (world.NPCRandoActive())
             {
                 tag["ApRandomizedNPCs"] = world.randomizedNPCs.ToList();
-                tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
             }
         }
 
@@ -670,6 +668,8 @@ namespace SeldomArchipelago.Systems
                 }
 
                 info.Add($"You've collected {world.collectedItems} items");
+                info.Add($"NPC randomization is {(world.NPCRandoActive() ? "en" : "dis")}abled");
+                info.Add($"Received NPC IDs: [{string.Join(", ", world.receivedNPCs)}]");
             }
 
             if (session == null)
