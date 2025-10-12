@@ -38,7 +38,8 @@ namespace SeldomArchipelago.Config
         [Header("Miscellaneous")]
 
         [Label("Receive Flag As Item")]
-        public List<string> manualFlags = ["Hardmode", "Post-Moon Lord"];
+        [DefaultListValue("Hardmode")]
+        public List<string> manualFlags = [];
 
         [OnDeserialized]
         internal void CheckItems(StreamingContext _)
