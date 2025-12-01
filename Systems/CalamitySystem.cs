@@ -107,7 +107,7 @@ namespace SeldomArchipelago.Systems
 
         public void CalamityStartHardmode()
         {
-            if (CalamityConfig.Instance.EarlyHardmodeProgressionRework && NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3) SpawnMechOres();
+            if (CalamityServerConfig.Instance.EarlyHardmodeProgressionRework && NPC.downedMechBoss1 && NPC.downedMechBoss2 && NPC.downedMechBoss3) SpawnMechOres();
         }
 
         public void VanillaBossKilled(int boss)
@@ -218,14 +218,14 @@ namespace SeldomArchipelago.Systems
 
         public void SpawnHardOres()
         {
-            if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
+            if (!CalamityMod.CalamityServerConfig.Instance.EarlyHardmodeProgressionRework) return;
             CalamityMod.CalamityUtils.SpawnOre(107, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
             CalamityMod.CalamityUtils.SpawnOre(221, 0.00012, 0.45f, 0.7f, 3, 8, Array.Empty<int>());
         }
 
         public void SpawnMechOres()
         {
-            if (!CalamityMod.CalamityConfig.Instance.EarlyHardmodeProgressionRework) return;
+            if (!CalamityMod.CalamityServerConfig.Instance.EarlyHardmodeProgressionRework) return;
             typeof(CalamityMod.NPCs.CalamityGlobalNPC).GetMethod("SpawnMechBossHardmodeOres", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(new CalamityMod.NPCs.CalamityGlobalNPC(), null);
         }
 
