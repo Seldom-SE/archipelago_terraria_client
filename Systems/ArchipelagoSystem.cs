@@ -449,6 +449,12 @@ namespace SeldomArchipelago.Systems
             session.session.Socket.SendPacket(victoryPacket);
 
             session.victory = true;
+
+            Chat([
+                "Goal! I hope you enjoyed! Archipelago Randomizer credits:",
+                "Seldom: created and maintains the mod",
+                "desperandos: added the Hardmode starter item",
+            ], color: Color.Orange);
         }
 
         public override void SaveWorldData(TagCompound tag)
@@ -576,23 +582,25 @@ namespace SeldomArchipelago.Systems
             return info.ToArray();
         }
 
-        public void Chat(string message, int player = -1)
+        public void Chat(string message, int player = -1, Color? color = null)
         {
+            var resolvedColor = color ?? Color.White;
+
             if (player == -1)
             {
                 if (Main.netMode == NetmodeID.Server)
                 {
-                    ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(message), Color.White);
+                    ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(message), resolvedColor);
                     Console.WriteLine(message);
                 }
-                else Main.NewText(message);
+                else Main.NewText(message, resolvedColor);
             }
-            else ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(message), Color.White, player);
+            else ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(message), resolvedColor, player);
         }
 
-        public void Chat(string[] messages, int player = -1)
+        public void Chat(string[] messages, int player = -1, Color? color = null)
         {
-            foreach (var message in messages) Chat(message, player);
+            foreach (var message in messages) Chat(message, player, color);
         }
 
         public void QueueLocation(string locationName)
