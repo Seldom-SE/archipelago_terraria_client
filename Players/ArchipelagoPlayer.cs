@@ -9,6 +9,7 @@ using Terraria.GameContent.Achievements;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.Audio;
 
 namespace SeldomArchipelago.Players
 {
@@ -48,6 +49,8 @@ namespace SeldomArchipelago.Players
                     if (serCondition.Get<bool>("completed")) condition.Value.Complete();
                 }
             }
+            
+            SoundEngine.StopTrackedSounds();
 
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
