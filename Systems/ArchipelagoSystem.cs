@@ -582,7 +582,7 @@ namespace SeldomArchipelago.Systems
             Chat([
                 "Goal! I hope you enjoyed! Archipelago Randomizer credits:",
                 "Seldom: created and maintains the mod",
-                "desperandos: added the Hardmode starter item",
+                "desperandos: NPC randomization, \"Receive Flag as Item\"",
             ], color: Color.Orange);
         }
 
