@@ -60,7 +60,6 @@ namespace SeldomArchipelago.Systems
             // instead of collecting them. This is needed bc AP just gives us a list of items that
             // we have, and it's up to us to keep track of which ones we've already applied.
             public int currentItem;
-            public List<string> collectedLocations = new List<string>();
             public List<string> goals = new List<string>();
 
             public bool victory;
@@ -104,12 +103,6 @@ namespace SeldomArchipelago.Systems
 
             session = new();
             session.session = newSession;
-
-            var locations = session.session.DataStorage[Scope.Slot, "CollectedLocations"].To<String[]>();
-            if (locations != null)
-            {
-                session.collectedLocations = new List<string>(locations);
-            }
 
             var success = (LoginSuccessful)result;
             session.goals = new List<string>(((JArray)success.SlotData["goal"]).ToObject<string[]>());
@@ -440,7 +433,7 @@ namespace SeldomArchipelago.Systems
 
             if (session.victory) return;
 
-            foreach (var goal in session.goals) if (!session.collectedLocations.Contains(goal)) return;
+            foreach (var goal in session.goals) if (!session.session.Locations.AllLocationsChecked.Contains(session.session.Locations.GetLocationIdFromName("Terraria", goal))) return;
 
             var victoryPacket = new StatusUpdatePacket()
             {
@@ -460,7 +453,6 @@ namespace SeldomArchipelago.Systems
         public override void SaveWorldData(TagCompound tag)
         {
             tag["ApCollectedItems"] = world.collectedItems;
-            if (session != null) session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
             tag["ApReceivedRewards"] = world.receivedRewards;
         }
 
@@ -573,7 +565,6 @@ namespace SeldomArchipelago.Systems
 
                 info.Add($"DeathLink is {(session.deathlink == null ? "dis" : "en")}abled");
                 info.Add($"{session.currentItem} items have been applied");
-                info.Add($"Collected locations: [{string.Join("; ", session.collectedLocations)}]");
                 info.Add($"Goals: [{string.Join("; ", session.goals)}]");
                 info.Add($"Victory has {(session.victory ? "been achieved! Hooray!" : "not been achieved. Alas.")}");
                 info.Add($"You are slot {session.slot}");
@@ -614,12 +605,7 @@ namespace SeldomArchipelago.Systems
             var location = session.session.Locations.GetLocationIdFromName("Terraria", locationName);
             if (location == -1 || !session.session.Locations.AllMissingLocations.Contains(location)) return;
 
-            if (!session.collectedLocations.Contains(locationName))
-            {
-                session.locationQueue.Add(session.session.Locations.ScoutLocationsAsync(new[] { location }));
-                session.collectedLocations.Add(locationName);
-            }
-
+            session.locationQueue.Add(session.session.Locations.ScoutLocationsAsync(new[] { location }));
             session.session.Locations.CompleteLocationChecks(new[] { location });
         }
 
