@@ -910,6 +910,7 @@ namespace SeldomArchipelago
                 _ => null,
             };
 
+            if (name == "Begone, Evil!" && Main.gameMenu) return;  // Hardcoding
             if (name != null) ModContent.GetInstance<ArchipelagoSystem>().QueueLocationClient(name);
             ModContent.GetInstance<ArchipelagoSystem>().Achieved(achievement.Name);
         }
