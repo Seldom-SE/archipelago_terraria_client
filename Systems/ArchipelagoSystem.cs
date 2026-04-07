@@ -80,7 +80,6 @@ namespace SeldomArchipelago.Systems
             // instead of collecting them. This is needed bc AP just gives us a list of items that
             // we have, and it's up to us to keep track of which ones we've already applied.
             public int currentItem;
-            public List<string> collectedLocations = new List<string>();
             public List<string> goals = new List<string>();
 
             public bool victory;
@@ -133,12 +132,6 @@ namespace SeldomArchipelago.Systems
 
             session = new();
             session.session = newSession;
-
-            var locations = session.session.DataStorage[Scope.Slot, "CollectedLocations"].To<String[]>();
-            if (locations != null)
-            {
-                session.collectedLocations = new List<string>(locations);
-            }
 
             var success = (LoginSuccessful)result;
             session.goals = new List<string>(((JArray)success.SlotData["goal"]).ToObject<string[]>());
@@ -199,7 +192,7 @@ namespace SeldomArchipelago.Systems
             foreach (var location in world.locationBacklog) QueueLocation(location);
             world.locationBacklog.Clear();
         }
-        public bool LocationCollected(string loc) => session.collectedLocations.Contains(loc) || world.locationBacklog.Contains(loc);
+        public bool LocationCollected(string loc) => session.session.Locations.AllLocationsChecked.Contains(session.session.Locations.GetLocationIdFromName("Terraria", loc)) || world.locationBacklog.Contains(loc);
 
         public static string[] flags = { "Post-King Slime", "Post-Desert Scourge", "Post-Giant Clam", "Post-Eye of Cthulhu", "Post-Acid Rain Tier 1", "Post-Crabulon", "Post-Evil Boss", "Post-Old One's Army Tier 1", "Post-Goblin Army", "Post-Queen Bee", "Post-The Hive Mind", "Post-The Perforators", "Post-Skeletron", "Post-Deerclops", "Post-The Slime God", "Hardmode", "Post-Dreadnautilus", "Post-Hardmode Giant Clam", "Post-Pirate Invasion", "Post-Queen Slime", "Post-Aquatic Scourge", "Post-Cragmaw Mire", "Post-Acid Rain Tier 2", "Post-The Twins", "Post-Old One's Army Tier 2", "Post-Brimstone Elemental", "Post-The Destroyer", "Post-Cryogen", "Post-Skeletron Prime", "Post-Calamitas Clone", "Post-Plantera", "Post-Great Sand Shark", "Post-Leviathan and Anahita", "Post-Astrum Aureus", "Post-Golem", "Post-Old One's Army Tier 3", "Post-Martian Madness", "Post-The Plaguebringer Goliath", "Post-Duke Fishron", "Post-Mourning Wood", "Post-Pumpking", "Post-Everscream", "Post-Santa-NK1", "Post-Ice Queen", "Post-Frost Legion", "Post-Ravager", "Post-Empress of Light", "Post-Lunatic Cultist", "Post-Astrum Deus", "Post-Lunar Events", "Post-Moon Lord", "Post-Profaned Guardians", "Post-The Dragonfolly", "Post-Providence, the Profaned Goddess", "Post-Storm Weaver", "Post-Ceaseless Void", "Post-Signus, Envoy of the Devourer", "Post-Polterghast", "Post-Mauler", "Post-Nuclear Terror", "Post-The Old Duke", "Post-The Devourer of Gods", "Post-Yharon, Dragon of Rebirth", "Post-Exo Mechs", "Post-Supreme Witch, Calamitas", "Post-Primordial Wyrm", "Post-Boss Rush" };
 
@@ -515,7 +508,7 @@ namespace SeldomArchipelago.Systems
                 case "Reward: Defender Medal": GiveItem(ItemID.DefenderMedal); break;
                 case null: break;
                 default: Chat($"Received unknown item: {item}"); break;
-                    
+
             }
         }
         public override void PostUpdateWorld()
@@ -576,7 +569,7 @@ namespace SeldomArchipelago.Systems
 
             if (session.victory) return;
 
-            foreach (var goal in session.goals) if (!session.collectedLocations.Contains(goal)) return;
+            foreach (var goal in session.goals) if (!session.session.Locations.AllLocationsChecked.Contains(session.session.Locations.GetLocationIdFromName("Terraria", goal))) return;
 
             var victoryPacket = new StatusUpdatePacket()
             {
@@ -585,15 +578,17 @@ namespace SeldomArchipelago.Systems
             session.session.Socket.SendPacket(victoryPacket);
 
             session.victory = true;
+
+            Chat([
+                "Goal! I hope you enjoyed! Archipelago Randomizer credits:",
+                "Seldom: created and maintains the mod",
+                "desperandos: added the Hardmode starter item",
+            ], color: Color.Orange);
         }
 
         public override void SaveWorldData(TagCompound tag)
         {
             tag["ApCollectedItems"] = world.collectedItems;
-            if (session != null)
-            {
-                session.session.DataStorage[Scope.Slot, "CollectedLocations"] = session.collectedLocations.ToArray();
-            }
             tag["ApReceivedRewards"] = world.receivedRewards;
             tag["ApSuspendedFlags"] = world.suspendedFlags;
             tag["ApReceivedNPCs"] = world.receivedNPCs.ToList();
@@ -714,7 +709,6 @@ namespace SeldomArchipelago.Systems
 
                 info.Add($"DeathLink is {(session.deathlink == null ? "dis" : "en")}abled");
                 info.Add($"{session.currentItem} items have been applied");
-                info.Add($"Collected locations: [{string.Join("; ", session.collectedLocations)}]");
                 info.Add($"Goals: [{string.Join("; ", session.goals)}]");
                 info.Add($"Victory has {(session.victory ? "been achieved! Hooray!" : "not been achieved. Alas.")}");
                 info.Add($"You are slot {session.slot}");
@@ -723,23 +717,25 @@ namespace SeldomArchipelago.Systems
             return info.ToArray();
         }
 
-        public void Chat(string message, int player = -1)
+        public void Chat(string message, int player = -1, Color? color = null)
         {
+            var resolvedColor = color ?? Color.White;
+
             if (player == -1)
             {
                 if (Main.netMode == NetmodeID.Server)
                 {
-                    ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(message), Color.White);
+                    ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(message), resolvedColor);
                     Console.WriteLine(message);
                 }
-                else Main.NewText(message);
+                else Main.NewText(message, resolvedColor);
             }
-            else ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(message), Color.White, player);
+            else ChatHelper.SendChatMessageToClient(NetworkText.FromLiteral(message), resolvedColor, player);
         }
 
-        public void Chat(string[] messages, int player = -1)
+        public void Chat(string[] messages, int player = -1, Color? color = null)
         {
-            foreach (var message in messages) Chat(message, player);
+            foreach (var message in messages) Chat(message, player, color);
         }
 
         public void QueueLocation(string locationName)
@@ -753,12 +749,7 @@ namespace SeldomArchipelago.Systems
             var location = session.session.Locations.GetLocationIdFromName("Terraria", locationName);
             if (location == -1 || !session.session.Locations.AllMissingLocations.Contains(location)) return;
 
-            if (!session.collectedLocations.Contains(locationName))
-            {
-                session.locationQueue.Add(session.session.Locations.ScoutLocationsAsync(new[] { location }));
-                session.collectedLocations.Add(locationName);
-            }
-
+            session.locationQueue.Add(session.session.Locations.ScoutLocationsAsync(new[] { location }));
             session.session.Locations.CompleteLocationChecks(new[] { location });
         }
 

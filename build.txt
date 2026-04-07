@@ -1,6 +1,6 @@
 displayName = Archipelago Randomizer (Seldom's implementation)
 author = Seldom
-version = 2.0
+version = 2.1
 homepage = https://github.com/Seldom-SE/archipelago_terraria_client
 includeSource = true
 dllReferences = Archipelago.MultiClient.Net, Newtonsoft.Json
